@@ -3,1124 +3,600 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JeevanKey — Find Your Care Team</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<title>JeevanKey Navigator — Find Your Care Team</title>
 <style>
-:root {
-  --navy:      #0C447C;
-  --navy-d:    #082f58;
-  --navy-l:    #1a5a9e;
-  --navy-xlt:  #e8f0f9;
-  --navy-2:    #d0e2f4;
-  --white:     #ffffff;
-  --off:       #f7fafd;
-  --text:      #0d1b2a;
-  --text-2:    #3a5068;
-  --text-3:    #6b8ba4;
-  --text-4:    #a8c0d4;
-  --wa:        #25D366;
-  --wa-d:      #1aab53;
-  --accent:    #e8a020;
-  --accent-l:  #f5c060;
-  --danger:    #c0392b;
-  --success:   #1e8449;
-  --teal:      #0e7b7b;
-  --sans:      'Sora', system-ui, sans-serif;
-  --serif:     'Lora', Georgia, serif;
-  --ease:      cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-in:   cubic-bezier(0.4, 0, 1, 1);
-}
+  :root {
+    --navy:     #0C447C;
+    --navy-d:   #06233f;
+    --navy-l:   #12579b;
+    --green:    #3B6D11;
+    --green-d:  #24440a;
+    --green-l:  #539719;
+    --white:    #ffffff;
+    --off:      #f4f7f5;
+    --ink:      #111b24;
+    --ink-2:    #2c3a46;
+    --ink-3:    #526371;
+    --ink-4:    #8ea1b0;
+    --wa:       #25D366;
+    --wa-d:     #1aab53;
+    --teal:     #1b4d4d;
+    --teal-lt:  #2d6b6b;
+    --sans:     -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-in-out:   cubic-bezier(0.4, 0, 0.2, 1);
+  }
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html { height: 100%; }
-body {
-  font-family: var(--sans);
-  background: var(--white);
-  color: var(--text);
-  height: 100%; overflow: hidden;
-  -webkit-font-smoothing: antialiased;
-}
+  html, body {
+    height: 100%;
+    font-family: var(--sans);
+    background: var(--off);
+    color: var(--ink);
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
 
-/* ── SCREENS ── */
-#app { position: fixed; inset: 0; overflow: hidden; }
+  #app {
+    position: fixed; inset: 0; z-index: 1;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 20px;
+  }
 
-.screen {
-  position: absolute; inset: 0;
-  display: flex; flex-direction: column;
-  opacity: 0; pointer-events: none;
-  transform: translateY(22px);
-  transition: opacity .5s var(--ease), transform .5s var(--ease);
-  overflow-y: auto; overflow-x: hidden;
-}
-.screen.active  { opacity: 1; transform: none; pointer-events: all; }
-.screen.leaving { opacity: 0; transform: translateY(-16px); pointer-events: none;
-  transition: opacity .28s var(--ease-in), transform .28s var(--ease-in); }
+  /* Single Container Metrics matching Carrd structural layouts */
+  .wrap {
+    width: 100%;
+    max-width: 480px;
+    background: var(--white);
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(12, 68, 124, 0.06);
+    padding: 40px 32px;
+    position: relative;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
 
-/* ── TOP BAR ── */
-.topbar {
-  position: sticky; top: 0; z-index: 10;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 clamp(20px,5vw,56px);
-  height: 60px;
-  background: var(--white);
-  border-bottom: 1px solid var(--navy-2);
-  flex-shrink: 0;
-}
-.logo {
-  font-family: var(--sans); font-size: 17px; font-weight: 600;
-  color: var(--navy); text-decoration: none; letter-spacing: -.01em;
-}
-.logo span { color: var(--accent); }
+  .screen {
+    display: none;
+    flex-direction: column;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity .4s var(--ease-out-expo), transform .4s var(--ease-out-expo);
+    overflow-y: auto;
+    width: 100%;
+  }
+  .screen.active {
+    display: flex; opacity: 1; transform: translateY(0);
+  }
 
-/* Progress bar */
-.progress-track {
-  height: 3px;
-  background: var(--navy-2);
-  border-radius: 2px;
-  width: 120px; overflow: hidden;
-}
-.progress-fill {
-  height: 100%; background: var(--navy);
-  border-radius: 2px;
-  transition: width .5s var(--ease);
-}
-.progress-label {
-  font-size: 11px; font-weight: 500; color: var(--text-3);
-  letter-spacing: .06em; text-transform: uppercase;
-  white-space: nowrap;
-}
+  /* ── Brand Bar ── */
+  .nav {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 24px;
+    flex-shrink: 0;
+    width: 100%;
+  }
+  .logo {
+    font-size: 20px; font-weight: 700; letter-spacing: -.02em;
+    color: var(--navy); text-decoration: none;
+  }
+  .logo span { color: var(--green); }
 
-/* ── MAIN CONTENT AREA ── */
-.content {
-  flex: 1;
-  padding: clamp(28px,5vh,56px) clamp(20px,5vw,56px);
-  max-width: 700px;
-  width: 100%;
-}
+  /* Progress Indicators */
+  .progress { display: flex; gap: 6px; align-items: center; }
+  .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #e1e8ed;
+    transition: all .4s var(--ease-out-expo);
+  }
+  .dot.done { background: var(--green); width: 14px; border-radius: 3px; }
+  .dot.active { background: var(--navy); transform: scale(1.2); }
 
-/* ── WELCOME ── */
-#screen-welcome {
-  background: var(--navy);
-}
-#screen-welcome .topbar {
-  background: transparent; border-bottom-color: rgba(255,255,255,.1);
-}
-#screen-welcome .logo { color: var(--white); }
-#screen-welcome .logo span { color: var(--accent-l); }
-#screen-welcome .content {
-  display: flex; flex-direction: column; justify-content: center;
-  flex: 1; max-width: 640px;
-}
+  /* ── Header Labels ── */
+  .q-label {
+    font-size: 11px; font-weight: 600; letter-spacing: .05em;
+    text-transform: uppercase; color: var(--green);
+    margin-bottom: 8px;
+  }
+  .q-text {
+    font-size: 22px; font-weight: 800; line-height: 1.25;
+    color: var(--ink); margin-bottom: 20px;
+    letter-spacing: -.01em;
+  }
+  .q-text em {
+    font-style: normal;
+    background: linear-gradient(270deg, var(--green) 45%, var(--navy) 63%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
+  }
 
-.welcome-tag {
-  display: inline-flex; align-items: center; gap: 8px;
-  font-size: 11px; font-weight: 500; letter-spacing: .1em;
-  text-transform: uppercase;
-  color: var(--accent-l);
-  margin-bottom: 28px;
-}
-.welcome-tag::before {
-  content: '';
-  display: block; width: 24px; height: 1.5px;
-  background: var(--accent-l);
-}
+  /* ── Conversational Option Buttons ── */
+  .answers { display: flex; flex-direction: column; gap: 8px; }
+  .answers.multi-col {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 8px;
+  }
 
-.welcome-h {
-  font-family: var(--serif);
-  font-size: clamp(32px,5vw,58px);
-  font-weight: 400; line-height: 1.12;
-  color: var(--white); margin-bottom: 20px;
-}
-.welcome-h em { font-style: italic; color: var(--accent-l); }
+  .answer-btn {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 16px;
+    background: var(--white);
+    border: 1.5px solid #d2dbe1;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: left;
+    font-family: var(--sans);
+    font-size: 14px; font-weight: 500;
+    color: var(--ink-2); line-height: 1.4;
+    transition: all .2s var(--ease-out-expo);
+    animation: fadeUp .4s var(--ease-out-expo) both;
+  }
+  .answer-btn:hover {
+    border-color: var(--green-l);
+    background: #fbfdfa;
+    color: var(--green-d);
+    transform: translateX(2px);
+  }
+  .answer-btn.selected {
+    border-color: var(--green);
+    background: #f4faf0;
+    color: var(--green-d);
+    font-weight: 600;
+  }
 
-.welcome-p {
-  font-size: 15px; line-height: 1.7;
-  color: rgba(255,255,255,.72);
-  margin-bottom: 40px; max-width: 480px;
-  font-weight: 300;
-}
+  .btn-icon { font-size: 16px; flex-shrink: 0; }
+  .multi-hint { font-size: 12px; color: var(--ink-4); margin-bottom: 12px; font-style: italic; }
 
-.btn-start {
-  display: inline-flex; align-items: center; gap: 12px;
-  padding: 16px 32px;
-  background: var(--wa); color: var(--white);
-  border: none; border-radius: 6px;
-  font-family: var(--sans); font-size: 15px; font-weight: 600;
-  cursor: pointer; letter-spacing: .01em;
-  transition: all .22s var(--ease);
-  box-shadow: 0 4px 20px rgba(37,211,102,.35);
-}
-.btn-start:hover { background: var(--wa-d); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(37,211,102,.4); }
-.btn-arrow { transition: transform .22s; }
-.btn-start:hover .btn-arrow { transform: translateX(4px); }
+  /* Navigation Buttons */
+  .continue-btn {
+    margin-top: 16px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 14px 24px;
+    background: var(--navy); color: var(--white);
+    border: none; border-radius: 8px;
+    font-family: var(--sans); font-size: 14.5px; font-weight: 600;
+    cursor: pointer; transition: all .2s var(--ease-out-expo);
+    opacity: 0; pointer-events: none; width: 100%;
+  }
+  .continue-btn.visible { opacity: 1; pointer-events: all; }
+  .continue-btn:hover { background: var(--navy-l); }
 
-.welcome-meta {
-  margin-top: 20px;
-  font-size: 12px; color: rgba(255,255,255,.4);
-  line-height: 1.6;
-}
+  /* ── Pulse Loading Screen ── */
+  #screen-matching { text-align: center; padding: 24px 0; }
+  .matching-pulse {
+    font-size: 40px; margin-bottom: 16px;
+    animation: bounce 1.5s infinite ease-in-out;
+  }
+  @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+  .matching-title { font-size: 20px; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+  .matching-sub { font-size: 14px; color: var(--ink-3); }
 
-/* Stats row */
-.stat-row {
-  display: flex; gap: 28px; margin-top: 48px; flex-wrap: wrap;
-}
-.stat { }
-.stat-n { font-size: 22px; font-weight: 600; color: var(--white); }
-.stat-l { font-size: 11px; color: rgba(255,255,255,.45); margin-top: 1px; }
+  /* ── Outcome Review Screens ── */
+  .result-header { text-align: center; margin-bottom: 20px; }
+  .result-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--green); margin-bottom: 6px; }
+  .result-headline { font-size: 24px; font-weight: 800; color: var(--navy); margin-bottom: 6px; }
+  .result-sub { font-size: 13.5px; color: var(--ink-3); line-height: 1.5; }
 
-/* ── QUESTION SCREENS ── */
-.q-tag {
-  font-size: 11px; font-weight: 500; letter-spacing: .1em;
-  text-transform: uppercase; color: var(--navy);
-  display: flex; align-items: center; gap: 8px;
-  margin-bottom: 18px;
-}
-.q-tag::before {
-  content: '';
-  display: block; width: 20px; height: 1.5px;
-  background: var(--navy);
-}
+  /* Accordion Cards */
+  .team-grid { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+  .team-card { border: 1.5px solid #edf2f5; border-radius: 8px; overflow: hidden; }
+  .team-card-header {
+    display: flex; align-items: center; gap: 10px; padding: 12px 14px;
+    background: #f8fafc; cursor: pointer; transition: background .2s;
+  }
+  .team-card-header:hover { background: #edf2f5; }
+  .team-role-badge {
+    font-size: 9px; font-weight: 600; letter-spacing: .05em;
+    text-transform: uppercase; padding: 3px 6px; border-radius: 4px; white-space: nowrap;
+  }
+  .badge-anchor { background: var(--navy); color: var(--white); }
+  .badge-driver { background: var(--green); color: var(--white); }
+  .badge-accel { background: #e1e8ed; color: var(--ink-2); }
+  .badge-compliance { background: #e1e8ed; color: var(--ink-2); }
 
-.q-h {
-  font-family: var(--serif);
-  font-size: clamp(24px,3.5vw,38px);
-  font-weight: 400; line-height: 1.2;
-  color: var(--text); margin-bottom: clamp(24px,4vh,44px);
-}
-.q-h em { font-style: italic; color: var(--navy); }
+  .team-expert-name { font-size: 14.5px; font-weight: 700; color: var(--ink); flex: 1; }
+  .team-card-chevron { color: var(--ink-4); font-size: 14px; transition: transform .3s; }
+  .team-card.open .team-card-chevron { transform: rotate(180deg); }
+  .team-card-body { max-height: 0; overflow: hidden; transition: max-height .3s var(--ease-out-expo); background: var(--white); }
+  .team-card.open .team-card-body { max-height: 150px; }
+  .team-card-body-inner { padding: 12px 14px; font-size: 13px; line-height: 1.5; color: var(--ink-3); border-top: 1px solid #edf2f5; }
 
-/* ── ANSWERS ── */
-.answers { display: flex; flex-direction: column; gap: 9px; }
-.answers.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 9px;
-}
+  .phase-notice { background: #f4faf0; border: 1px solid #d4ebd4; border-left: 3px solid var(--green); border-radius: 4px; padding: 12px; margin-bottom: 16px; font-size: 12.5px; color: var(--green-d); line-height: 1.5; }
 
-.ans {
-  display: flex; align-items: center; gap: 14px;
-  padding: 14px 18px;
-  border: 1.5px solid var(--navy-2);
-  border-radius: 8px;
-  background: var(--white);
-  cursor: pointer; text-align: left;
-  font-family: var(--sans); font-size: 13.5px; font-weight: 400;
-  color: var(--text-2); line-height: 1.45;
-  transition: all .2s var(--ease);
-  animation: fadeUp .4s var(--ease) both;
-  -webkit-tap-highlight-color: transparent;
-}
-.ans:nth-child(1){animation-delay:.04s} .ans:nth-child(2){animation-delay:.09s}
-.ans:nth-child(3){animation-delay:.14s} .ans:nth-child(4){animation-delay:.19s}
-.ans:nth-child(5){animation-delay:.24s} .ans:nth-child(6){animation-delay:.29s}
-.ans:nth-child(7){animation-delay:.34s} .ans:nth-child(8){animation-delay:.39s}
-.ans:nth-child(9){animation-delay:.44s}
+  /* Plan Matrices Grid */
+  .plan-section { margin-bottom: 20px; }
+  .plan-label { font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--ink-4); margin-bottom: 8px; }
+  .plan-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+  .plan-card { border: 1.5px solid #d2dbe1; border-radius: 8px; padding: 10px 12px; cursor: pointer; transition: all .2s; position: relative; }
+  .plan-card:hover { border-color: var(--green-l); background: #fbfdfa; }
+  .plan-card.selected { border-color: var(--green); background: #f4faf0; }
+  .plan-popular { position: absolute; top: -7px; right: 8px; background: var(--green); color: var(--white); font-size: 8px; font-weight: 700; padding: 1px 4px; border-radius: 3px; text-transform: uppercase; }
+  .plan-name { font-size: 14px; font-weight: 700; color: var(--ink); }
+  .plan-price { font-size: 13px; font-weight: 700; color: var(--green); margin: 2px 0; }
+  .plan-experts { font-size: 11px; color: var(--ink-4); }
 
-.ans:hover { border-color: var(--navy-l); background: var(--navy-xlt); color: var(--navy); transform: translateX(3px); }
-.ans.sel   { border-color: var(--navy); background: var(--navy-xlt); color: var(--navy); font-weight: 500; }
+  /* Submit Layout Actions */
+  .whatsapp-btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 14px 24px; background: var(--wa); color: var(--white);
+    border: none; border-radius: 8px; font-size: 15px; font-weight: 600;
+    cursor: pointer; text-decoration: none; transition: background .2s; width: 100%;
+  }
+  .whatsapp-btn:hover { background: var(--wa-d); }
+  .cta-note { font-size: 11.5px; color: var(--ink-4); text-align: center; margin-top: 8px; }
 
-.ans-icon {
-  width: 36px; height: 36px; border-radius: 8px;
-  background: var(--off); flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 17px; transition: background .2s;
-}
-.ans:hover .ans-icon, .ans.sel .ans-icon { background: var(--navy-2); }
+  .disclaimer { font-size: 10.5px; color: var(--ink-4); line-height: 1.4; margin-top: 16px; border-top: 1px solid #edf2f5; padding-top: 12px; }
+  .restart-btn { background: none; border: none; cursor: pointer; font-size: 12px; color: var(--ink-4); text-decoration: underline; margin-top: 12px; text-align: center; display: block; width: 100%; }
 
-.hint { font-size: 12px; color: var(--text-3); font-style: italic; margin-bottom: 14px; }
+  /* Welcome Screen UI Metric Settings */
+  #screen-welcome { text-align: center; }
+  .welcome-tag { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--green); background: #f4faf0; padding: 4px 10px; border-radius: 4px; margin-bottom: 16px; }
+  .welcome-headline { font-size: 32px; font-weight: 800; line-height: 1.15; color: var(--navy); margin-bottom: 12px; letter-spacing: -.02em; }
+  .welcome-headline em { font-style: normal; color: var(--green); }
+  .welcome-body { font-size: 14.5px; color: var(--ink-3); line-height: 1.6; margin-bottom: 24px; }
+  .start-btn { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; padding: 14px 24px; background: var(--navy); color: var(--white); border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background .2s; }
+  .start-btn:hover { background: var(--navy-l); }
+  .welcome-reassure { font-size: 11px; color: var(--ink-4); margin-top: 16px; }
 
-.btn-continue {
-  margin-top: 18px;
-  display: inline-flex; align-items: center; gap: 10px;
-  padding: 14px 28px;
-  background: var(--navy); color: var(--white);
-  border: none; border-radius: 6px;
-  font-family: var(--sans); font-size: 14px; font-weight: 600;
-  cursor: pointer; letter-spacing: .01em;
-  transition: all .22s var(--ease);
-  opacity: 0; pointer-events: none;
-}
-.btn-continue.on { opacity: 1; pointer-events: all; }
-.btn-continue:hover { background: var(--navy-l); transform: translateY(-1px); }
-.btn-continue svg { transition: transform .2s; }
-.btn-continue:hover svg { transform: translateX(3px); }
-
-/* ── MATCHING SCREEN ── */
-#screen-match {
-  background: linear-gradient(155deg, var(--navy-d) 0%, var(--navy) 60%, var(--teal) 100%);
-  align-items: center; justify-content: center;
-}
-#screen-match .content {
-  display: flex; flex-direction: column; align-items: center;
-  justify-content: center; text-align: center;
-  flex: 1;
-}
-
-.match-ring {
-  width: 80px; height: 80px; border-radius: 50%;
-  background: rgba(255,255,255,.1);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 32px; margin: 0 auto 36px;
-  position: relative;
-}
-.match-ring::before, .match-ring::after {
-  content: '';
-  position: absolute; inset: 0;
-  border-radius: 50%;
-  border: 1.5px solid rgba(255,255,255,.25);
-  animation: ripple 2.2s var(--ease) infinite;
-}
-.match-ring::after { animation-delay: .8s; }
-@keyframes ripple {
-  0%   { transform: scale(1);    opacity: .6; }
-  100% { transform: scale(2.2);  opacity: 0; }
-}
-
-.match-h {
-  font-family: var(--serif);
-  font-size: clamp(26px,3.5vw,40px);
-  font-weight: 400; color: var(--white); line-height: 1.2;
-  margin-bottom: 14px;
-}
-.match-p { font-size: 14px; color: rgba(255,255,255,.55); font-weight: 300; line-height: 1.6; }
-
-.dots { display: flex; gap: 7px; justify-content: center; margin-top: 28px; }
-.dots span {
-  width: 7px; height: 7px; border-radius: 50%;
-  background: rgba(255,255,255,.4);
-  animation: blink 1.3s ease-in-out infinite;
-}
-.dots span:nth-child(2){animation-delay:.2s} .dots span:nth-child(3){animation-delay:.4s}
-@keyframes blink { 0%,80%,100%{opacity:.2} 40%{opacity:1} }
-
-/* ── RESULT SCREEN ── */
-#screen-result { background: var(--off); }
-#screen-result .content { max-width: 720px; }
-
-.result-top {
-  background: var(--navy);
-  padding: clamp(24px,4vh,44px) clamp(20px,5vw,56px);
-  border-radius: 0 0 16px 16px;
-  margin-bottom: 28px;
-}
-.result-tag {
-  font-size: 11px; font-weight: 500; letter-spacing: .1em;
-  text-transform: uppercase; color: var(--accent-l);
-  display: flex; align-items: center; gap: 8px;
-  margin-bottom: 14px;
-}
-.result-tag::before { content:''; display:block; width:20px; height:1.5px; background:var(--accent-l); }
-
-.result-h {
-  font-family: var(--serif);
-  font-size: clamp(26px,3.5vw,40px);
-  font-weight: 400; line-height: 1.15;
-  color: var(--white); margin-bottom: 10px;
-}
-.result-sub { font-size: 14px; color: rgba(255,255,255,.65); line-height: 1.65; font-weight: 300; max-width: 560px; }
-
-.section-pad { padding: 0 clamp(20px,5vw,56px); }
-
-/* Team cards */
-.team-stack { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
-
-.tc {
-  background: var(--white);
-  border: 1px solid var(--navy-2);
-  border-radius: 10px; overflow: hidden;
-  animation: fadeUp .45s var(--ease) both;
-  box-shadow: 0 1px 4px rgba(12,68,124,.06);
-}
-.tc:nth-child(1){animation-delay:.08s} .tc:nth-child(2){animation-delay:.16s}
-.tc:nth-child(3){animation-delay:.24s} .tc:nth-child(4){animation-delay:.32s}
-
-.tc-head {
-  display: flex; align-items: center; gap: 12px;
-  padding: 14px 18px; cursor: pointer;
-  transition: background .18s;
-}
-.tc-head:hover { background: var(--navy-xlt); }
-
-.tc-badge {
-  font-size: 9.5px; font-weight: 600; letter-spacing: .08em;
-  text-transform: uppercase; padding: 3px 9px; border-radius: 4px;
-  white-space: nowrap; flex-shrink: 0;
-}
-.b-anchor     { background: var(--navy);    color: var(--white); }
-.b-driver     { background: var(--teal);    color: var(--white); }
-.b-accel      { background: var(--navy-2);  color: var(--navy); }
-.b-compliance { background: var(--off);     color: var(--text-3); border: 1px solid var(--navy-2); }
-
-.tc-name { font-family: var(--serif); font-size: 18px; font-weight: 400; color: var(--text); flex: 1; }
-.tc-chev { color: var(--text-4); font-size: 16px; transition: transform .3s var(--ease); }
-.tc.open .tc-chev { transform: rotate(180deg); }
-
-.tc-body {
-  max-height: 0; overflow: hidden;
-  transition: max-height .42s var(--ease);
-  border-top: 1px solid transparent;
-}
-.tc.open .tc-body { max-height: 240px; border-top-color: var(--navy-2); }
-.tc-body-inner { padding: 14px 18px; font-size: 13.5px; line-height: 1.7; color: var(--text-2); font-weight: 300; }
-
-/* Phase notice */
-.phase-box {
-  background: var(--white);
-  border: 1px solid var(--navy-2);
-  border-left: 3px solid var(--accent);
-  border-radius: 8px; padding: 14px 18px;
-  margin-bottom: 20px;
-  font-size: 13px; line-height: 1.65; color: var(--text-2);
-  font-weight: 300;
-  animation: fadeUp .4s var(--ease) .4s both;
-}
-.phase-box strong { color: var(--text); font-weight: 600; }
-
-/* Plan picker */
-.plan-lbl {
-  font-size: 11px; font-weight: 600; letter-spacing: .08em;
-  text-transform: uppercase; color: var(--text-3); margin-bottom: 12px;
-}
-.plan-row {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
-  margin-bottom: 24px;
-}
-.pc {
-  border: 1.5px solid var(--navy-2); border-radius: 8px;
-  padding: 14px 12px; cursor: pointer; position: relative;
-  transition: all .2s var(--ease); background: var(--white);
-  text-align: center;
-}
-.pc:hover { border-color: var(--navy-l); background: var(--navy-xlt); }
-.pc.sel   { border-color: var(--navy); background: var(--navy-xlt); }
-.pc.pop   { border-color: var(--navy-l); }
-
-.pc-pop {
-  position: absolute; top: -9px; left: 50%; transform: translateX(-50%);
-  background: var(--navy); color: var(--white);
-  font-size: 9px; font-weight: 600; letter-spacing: .07em;
-  text-transform: uppercase; padding: 2px 8px; border-radius: 3px;
-  white-space: nowrap;
-}
-.pc-name { font-family: var(--serif); font-size: 16px; color: var(--text); margin-bottom: 3px; }
-.pc-price { font-size: 14px; font-weight: 600; color: var(--navy); }
-.pc-period { font-size: 10px; color: var(--text-3); font-weight: 400; }
-.pc-xp { font-size: 10.5px; color: var(--text-3); margin-top: 4px; }
-
-/* WA button */
-.wa-btn {
-  display: flex; align-items: center; justify-content: center; gap: 12px;
-  padding: 18px 28px;
-  background: var(--wa); color: var(--white);
-  border: none; border-radius: 8px;
-  font-family: var(--sans); font-size: 15px; font-weight: 600;
-  cursor: pointer; text-decoration: none;
-  transition: all .22s var(--ease);
-  box-shadow: 0 4px 20px rgba(37,211,102,.3);
-  width: 100%; max-width: 440px;
-  animation: fadeUp .4s var(--ease) .5s both;
-}
-.wa-btn:hover { background: var(--wa-d); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(37,211,102,.4); }
-
-.cta-note { font-size: 12px; color: var(--text-3); margin-top: 10px; line-height: 1.55; }
-
-.disclaimer {
-  margin-top: 28px; padding: 16px 18px;
-  background: var(--white); border: 1px solid var(--navy-2);
-  border-radius: 8px;
-  font-size: 11.5px; color: var(--text-3); line-height: 1.7;
-  animation: fadeUp .4s var(--ease) .6s both;
-}
-
-.restart {
-  display: inline-block; margin-top: 14px; margin-bottom: 32px;
-  font-size: 12px; color: var(--text-4);
-  background: none; border: none; cursor: pointer;
-  font-family: var(--sans); text-decoration: underline;
-  text-underline-offset: 3px; transition: color .18s;
-}
-.restart:hover { color: var(--text-3); }
-
-@keyframes fadeUp {
-  from { opacity:0; transform:translateY(14px); }
-  to   { opacity:1; transform:none; }
-}
-
-@media(max-width:560px){
-  .plan-row { grid-template-columns: repeat(2,1fr); }
-  .answers.grid { grid-template-columns: 1fr; }
-  .stat-row { gap: 20px; }
-}
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
 </style>
 </head>
 <body>
+
 <div id="app">
+  <div class="wrap">
 
-<!-- ══════════ WELCOME ══════════ -->
-<div class="screen active" id="screen-welcome">
-  <div class="topbar">
-    <a class="logo" href="#">Jeevan<span>Key</span></a>
-  </div>
-  <div class="content">
-    <div class="welcome-tag">Clinical Navigator</div>
-    <h1 class="welcome-h">Know exactly<br><em>who</em> can help you.</h1>
-    <p class="welcome-p">Four questions. Ninety seconds. Your precise expert team — matched to your concern, not a generic package.</p>
-    <button class="btn-start" onclick="go('q1')">
-      Find My Team
-      <span class="btn-arrow">→</span>
-    </button>
-    <p class="welcome-meta">Not a diagnosis · Not medical advice · Your personalised care pathway</p>
-    <div class="stat-row">
-      <div class="stat"><div class="stat-n">8</div><div class="stat-l">Expert types</div></div>
-      <div class="stat"><div class="stat-n">~90s</div><div class="stat-l">To your match</div></div>
-      <div class="stat"><div class="stat-n">35+</div><div class="stat-l">Team combinations</div></div>
+    <!-- ══ WELCOME ══ -->
+    <div class="screen active" id="screen-welcome">
+      <div class="welcome-tag">Clinical Navigator</div>
+      <h1 class="welcome-headline">Know exactly<br><em>who</em> can help.</h1>
+      <p class="welcome-body">Four questions. Ninety seconds. We match you with the precise combination of experts your health concern actually needs — no guesswork.</p>
+      <button class="start-btn" onclick="startNavigator()">Begin →</button>
+      <p class="welcome-reassure">Not a diagnosis · Expert-matched pathway</p>
     </div>
+
+    <!-- ══ Q1 ══ -->
+    <div class="screen" id="screen-q1">
+      <nav class="nav">
+        <a class="logo" href="#">Jeevan<span>Key</span></a>
+        <div class="progress"><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+      </nav>
+      <p class="q-label">Question 1 of 4</p>
+      <h2 class="q-text">What's been bothering you <em>the most</em>?</h2>
+      <div class="answers" id="q1-answers">
+        <button class="answer-btn" onclick="selectQ1('mind')" data-val="mind"><span class="btn-icon">🧠</span><span>My mind won't stop — stress, burnout</span></button>
+        <button class="answer-btn" onclick="selectQ1('gut')" data-val="gut"><span class="btn-icon">🌿</span><span>My digestion is a mess — gut, bloating</span></button>
+        <button class="answer-btn" onclick="selectQ1('pain')" data-val="pain"><span class="btn-icon">🦴</span><span>My body aches — back pain, joints</span></button>
+        <button class="answer-btn" onclick="selectQ1('hormonal')" data-val="hormonal"><span class="btn-icon">🌙</span><span>My hormones feel off — periods, PCOD</span></button>
+        <button class="answer-btn" onclick="selectQ1('energy')" data-val="energy"><span class="btn-icon">⚡</span><span>Low energy all the time — fatigue</span></button>
+        <button class="answer-btn" onclick="selectQ1('chronic')" data-val="chronic"><span class="btn-icon">📋</span><span>Managing a long-term condition</span></button>
+      </div>
+    </div>
+
+    <!-- ══ Q2 ══ -->
+    <div class="screen" id="screen-q2">
+      <nav class="nav">
+        <a class="logo" href="#">Jeevan<span>Key</span></a>
+        <div class="progress"><div class="dot done"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div></div>
+      </nav>
+      <p class="q-label">Question 2 of 4</p>
+      <h2 class="q-text">How long has this been <em>part of your life</em>?</h2>
+      <div class="answers" id="q2-answers">
+        <button class="answer-btn" onclick="selectQ2('acute')" data-val="acute"><span class="btn-icon">🌱</span><span>Under a month</span></button>
+        <button class="answer-btn" onclick="selectQ2('months')" data-val="months"><span class="btn-icon">📅</span><span>A few months now</span></button>
+        <button class="answer-btn" onclick="selectQ2('long')" data-val="long"><span class="btn-icon">⏳</span><span>More than six months</span></button>
+        <button class="answer-btn" onclick="selectQ2('recurring')" data-val="recurring"><span class="btn-icon">🔄</span><span>It comes and goes — years</span></button>
+      </div>
+    </div>
+
+    <!-- ══ Q3 ══ -->
+    <div class="screen" id="screen-q3">
+      <nav class="nav">
+        <a class="logo" href="#">Jeevan<span>Key</span></a>
+        <div class="progress"><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div><div class="dot"></div></div>
+      </nav>
+      <p class="q-label">Question 3 of 4</p>
+      <h2 class="q-text">Anything else showing up <em>alongside</em> it?</h2>
+      <p class="multi-hint">Tap all that apply — then continue</p>
+      <div class="answers multi-col" id="q3-answers">
+        <button class="answer-btn" onclick="toggleQ3('sleep')" data-val="sleep"><span class="btn-icon">😴</span>Sleep loops</button>
+        <button class="answer-btn" onclick="toggleQ3('weight')" data-val="weight"><span class="btn-icon">⚖️</span>Weight shifts</button>
+        <button class="answer-btn" onclick="toggleQ3('skin_hair')" data-val="skin_hair"><span class="btn-icon">✨</span>Skin/hair changes</button>
+        <button class="answer-btn" onclick="toggleQ3('mood')" data-val="mood"><span class="btn-icon">🌊</span>Mood swings</button>
+        <button class="answer-btn" onclick="toggleQ3('motivation')" data-val="motivation"><span class="btn-icon">🌫️</span>Low motivation</button>
+        <button class="answer-btn" onclick="toggleQ3('meal_fatigue')" data-val="meal_fatigue"><span class="btn-icon">🍽️</span>Meal fatigue</button>
+        <button class="answer-btn" onclick="toggleQ3('periods')" data-val="periods"><span class="btn-icon">🌺</span>Irregular cycles</button>
+        <button class="answer-btn" onclick="toggleQ3('acne')" data-val="acne"><span class="btn-icon">🔴</span>Breakouts</button>
+        <button class="answer-btn" onclick="toggleQ3('none')" data-val="none" id="q3-none"><span class="btn-icon">✓</span>None of these</button>
+      </div>
+      <button class="continue-btn" id="q3-continue" onclick="goToQ4()">Continue</button>
+    </div>
+
+    <!-- ══ Q4 ══ -->
+    <div class="screen" id="screen-q4">
+      <nav class="nav">
+        <a class="logo" href="#">Jeevan<span>Key</span></a>
+        <div class="progress"><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div></div>
+      </nav>
+      <p class="q-label">Question 4 of 4</p>
+      <h2 class="q-text">How would you describe your <em>daily life</em> right now?</h2>
+      <div class="answers" id="q4-answers">
+        <button class="answer-btn" onclick="selectQ4('sedentary')" data-val="sedentary"><span class="btn-icon">💻</span><span>Mostly desk-bound — low movement</span></button>
+        <button class="answer-btn" onclick="selectQ4('stressed')" data-val="stressed"><span class="btn-icon">🔥</span><span>Active but running on stress</span></button>
+        <button class="answer-btn" onclick="selectQ4('sleep_issue')" data-val="sleep_issue"><span class="btn-icon">🌙</span><span>Sleep is my biggest problem</span></button>
+        <button class="answer-btn" onclick="selectQ4('managing')" data-val="managing"><span class="btn-icon">🏥</span><span>Managing an ongoing condition</span></button>
+      </div>
+    </div>
+
+    <!-- ══ MATCHING ══ -->
+    <div class="screen" id="screen-matching">
+      <div class="matching-pulse">🔬</div>
+      <h2 class="matching-title">Reading your concern profile…</h2>
+      <p class="matching-sub">We're matching you with the expert team best suited to your situation.</p>
+    </div>
+
+    <!-- ══ RESULT ══ -->
+    <div class="screen" id="screen-result">
+      <div class="result-header">
+        <p class="result-eyebrow" id="result-eyebrow">Optimised Care Pathway</p>
+        <h2 class="result-headline">Your team is ready.</h2>
+        <p class="result-sub" id="result-sub"></p>
+      </div>
+
+      <div class="team-grid" id="team-grid"></div>
+      <div class="phase-notice" id="phase-notice" style="display:none"></div>
+
+      <div class="plan-section">
+        <p class="plan-label">Choose your plan</p>
+        <div class="plan-grid" id="plan-grid"></div>
+      </div>
+
+      <div class="cta-section">
+        <button class="whatsapp-btn" id="whatsapp-btn" onclick="openWhatsAppRedirect()">
+          <span class="btn-icon">💬</span><span id="whatsapp-text">Connect on WhatsApp</span>
+        </button>
+        <p class="cta-note">Your Coordinator will confirm your team allocation within 2 hours.</p>
+      </div>
+
+      <div class="disclaimer">This is a care pathway recommendation. It is not a medical diagnosis. JeevanKey operates as a guided navigation platform to align specialized clinical experts.</div>
+      <button class="restart-btn" onclick="restart()">← Start over</button>
+    </div>
+
   </div>
 </div>
-
-<!-- ══════════ Q1 ══════════ -->
-<div class="screen" id="screen-q1">
-  <div class="topbar">
-    <a class="logo" href="#">Jeevan<span>Key</span></a>
-    <div style="display:flex;align-items:center;gap:12px">
-      <span class="progress-label">1 of 4</span>
-      <div class="progress-track"><div class="progress-fill" style="width:25%"></div></div>
-    </div>
-  </div>
-  <div class="content">
-    <p class="q-tag">Your concern</p>
-    <h2 class="q-h">What's been bothering you <em>the most?</em></h2>
-    <div class="answers" id="q1-ans">
-      <button class="ans" onclick="pickQ1('mind')" data-v="mind"><span class="ans-icon">🧠</span>My mind won't stop — anxiety, stress, low mood, burnout</button>
-      <button class="ans" onclick="pickQ1('gut')"  data-v="gut"><span class="ans-icon">🌿</span>My digestion is a mess — bloating, reflux, weight, gut issues</button>
-      <button class="ans" onclick="pickQ1('pain')" data-v="pain"><span class="ans-icon">🦴</span>My body aches — back pain, joints, posture, sciatica</button>
-      <button class="ans" onclick="pickQ1('hormonal')" data-v="hormonal"><span class="ans-icon">🌙</span>My hormones feel off — periods, skin, hair, PCOD</button>
-      <button class="ans" onclick="pickQ1('energy')" data-v="energy"><span class="ans-icon">⚡</span>Low energy all the time — fatigue, sluggish, can't recover</button>
-      <button class="ans" onclick="pickQ1('chronic')" data-v="chronic"><span class="ans-icon">📋</span>Managing a long-term condition — diabetes, BP, thyroid</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════ Q2 ══════════ -->
-<div class="screen" id="screen-q2">
-  <div class="topbar">
-    <a class="logo" href="#">Jeevan<span>Key</span></a>
-    <div style="display:flex;align-items:center;gap:12px">
-      <span class="progress-label">2 of 4</span>
-      <div class="progress-track"><div class="progress-fill" style="width:50%"></div></div>
-    </div>
-  </div>
-  <div class="content">
-    <p class="q-tag">Duration</p>
-    <h2 class="q-h">How long has this been <em>part of your life?</em></h2>
-    <div class="answers" id="q2-ans">
-      <button class="ans" onclick="pickQ2('acute')"     data-v="acute"><span class="ans-icon">🌱</span>Just started — under a month</button>
-      <button class="ans" onclick="pickQ2('months')"    data-v="months"><span class="ans-icon">📅</span>A few months now</button>
-      <button class="ans" onclick="pickQ2('long')"      data-v="long"><span class="ans-icon">⏳</span>More than six months</button>
-      <button class="ans" onclick="pickQ2('recurring')" data-v="recurring"><span class="ans-icon">🔄</span>It comes and goes — years sometimes</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════ Q3 ══════════ -->
-<div class="screen" id="screen-q3">
-  <div class="topbar">
-    <a class="logo" href="#">Jeevan<span>Key</span></a>
-    <div style="display:flex;align-items:center;gap:12px">
-      <span class="progress-label">3 of 4</span>
-      <div class="progress-track"><div class="progress-fill" style="width:75%"></div></div>
-    </div>
-  </div>
-  <div class="content">
-    <p class="q-tag">Secondary signals</p>
-    <h2 class="q-h">Anything else showing up <em>alongside it?</em></h2>
-    <p class="hint">Select everything that applies — then tap Continue</p>
-    <div class="answers grid" id="q3-ans">
-      <button class="ans" onclick="toggleQ3('sleep')"       data-v="sleep"><span class="ans-icon">😴</span>Sleep problems</button>
-      <button class="ans" onclick="toggleQ3('weight')"      data-v="weight"><span class="ans-icon">⚖️</span>Weight changes</button>
-      <button class="ans" onclick="toggleQ3('skin_hair')"   data-v="skin_hair"><span class="ans-icon">✨</span>Skin or hair changes</button>
-      <button class="ans" onclick="toggleQ3('mood')"        data-v="mood"><span class="ans-icon">🌊</span>Mood swings</button>
-      <button class="ans" onclick="toggleQ3('motivation')"  data-v="motivation"><span class="ans-icon">🌫️</span>Low motivation</button>
-      <button class="ans" onclick="toggleQ3('meal_fat')"    data-v="meal_fat"><span class="ans-icon">🍽️</span>Fatigue after eating</button>
-      <button class="ans" onclick="toggleQ3('periods')"     data-v="periods"><span class="ans-icon">🌺</span>Irregular periods</button>
-      <button class="ans" onclick="toggleQ3('acne')"        data-v="acne"><span class="ans-icon">🔴</span>Acne or breakouts</button>
-      <button class="ans" onclick="toggleQ3('none')"        data-v="none" id="q3none"><span class="ans-icon">✓</span>None of the above</button>
-    </div>
-    <button class="btn-continue" id="q3cont" onclick="go('q4')">
-      Continue
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </button>
-  </div>
-</div>
-
-<!-- ══════════ Q4 ══════════ -->
-<div class="screen" id="screen-q4">
-  <div class="topbar">
-    <a class="logo" href="#">Jeevan<span>Key</span></a>
-    <div style="display:flex;align-items:center;gap:12px">
-      <span class="progress-label">4 of 4</span>
-      <div class="progress-track"><div class="progress-fill" style="width:100%"></div></div>
-    </div>
-  </div>
-  <div class="content">
-    <p class="q-tag">Lifestyle</p>
-    <h2 class="q-h">How would you describe your <em>daily life right now?</em></h2>
-    <div class="answers" id="q4-ans">
-      <button class="ans" onclick="pickQ4('sedentary')"   data-v="sedentary"><span class="ans-icon">💻</span>Mostly desk-bound — low movement, long hours</button>
-      <button class="ans" onclick="pickQ4('stressed')"    data-v="stressed"><span class="ans-icon">🔥</span>Active but running on stress — always on</button>
-      <button class="ans" onclick="pickQ4('sleep_issue')" data-v="sleep_issue"><span class="ans-icon">🌙</span>Sleep is my biggest problem right now</button>
-      <button class="ans" onclick="pickQ4('managing')"    data-v="managing"><span class="ans-icon">🏥</span>Managing an ongoing health condition day to day</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════ MATCHING ══════════ -->
-<div class="screen" id="screen-match">
-  <div class="content">
-    <div class="match-ring">🔬</div>
-    <h2 class="match-h">Reading your<br>concern profile…</h2>
-    <p class="match-p">Matching you with the right combination of experts for your specific situation.</p>
-    <div class="dots"><span></span><span></span><span></span></div>
-  </div>
-</div>
-
-<!-- ══════════ RESULT ══════════ -->
-<div class="screen" id="screen-result">
-  <div class="topbar">
-    <a class="logo" href="#">Jeevan<span>Key</span></a>
-  </div>
-  <div class="result-top" id="result-top">
-    <div class="result-tag" id="result-tag">Your Care Pathway</div>
-    <h2 class="result-h" id="result-h">Your team is ready.</h2>
-    <p class="result-sub" id="result-sub"></p>
-  </div>
-
-  <div class="section-pad">
-    <div class="team-stack" id="team-stack"></div>
-    <div class="phase-box" id="phase-box" style="display:none"></div>
-
-    <p class="plan-lbl">Choose your plan</p>
-    <div class="plan-row" id="plan-row"></div>
-
-    <a href="#" class="wa-btn" id="wa-btn" target="_blank">
-      <span style="font-size:20px">💬</span>
-      <span id="wa-text">Connect on WhatsApp</span>
-    </a>
-    <p class="cta-note">Your JeevanKey Coordinator will confirm your team within 2 hours — on WhatsApp.</p>
-
-    <div class="disclaimer">
-      This is a care pathway recommendation based on the health concerns you described. It is not a medical diagnosis or prescription. Your Diagnostic Anchor will establish your clinical picture before any intervention begins. JeevanKey is a health navigation service — we help you find the right expert, not replace one.
-    </div>
-    <button class="restart" onclick="restart()">← Start over</button>
-  </div>
-</div>
-
-</div><!-- /app -->
 
 <script>
 /* ── STATE ── */
-const S = { q1:null, q2:null, q3:[], q4:null, plan:null };
+const state = { q1: null, q2: null, q3: [], q4: null, selectedPlan: null, activeWaUrl: '#' };
 
-/* ── NAV ── */
-function go(id) {
-  document.querySelectorAll('.screen').forEach(s => {
-    if (s.classList.contains('active')) {
-      s.classList.add('leaving');
-      setTimeout(()=>s.classList.remove('active','leaving'), 300);
-    }
-  });
-  setTimeout(()=>{
-    const t = document.getElementById('screen-'+id);
-    t.classList.add('active');
-    t.scrollTop = 0;
-  }, 110);
-}
-
-/* ── Q1 ── */
-function pickQ1(v){ S.q1=v; hilite('q1-ans',v); setTimeout(()=>go('q2'),260); }
-
-/* ── Q2 ── */
-function pickQ2(v){ S.q2=v; hilite('q2-ans',v); setTimeout(()=>go('q3'),260); }
-
-/* ── Q3 multi-select ── */
-function toggleQ3(v){
-  const btn=document.querySelector('#q3-ans [data-v="'+v+'"]');
-  const nb=document.getElementById('q3none');
-  if(v==='none'){
-    S.q3=[];
-    document.querySelectorAll('#q3-ans .ans').forEach(b=>b.classList.remove('sel'));
-    btn.classList.add('sel'); S.q3=['none'];
-  } else {
-    nb.classList.remove('sel'); S.q3=S.q3.filter(x=>x!=='none');
-    if(S.q3.includes(v)){ S.q3=S.q3.filter(x=>x!==v); btn.classList.remove('sel'); }
-    else { S.q3.push(v); btn.classList.add('sel'); }
+/* ── NAVIGATION ── */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const target = document.getElementById('screen-' + id);
+  if (target) {
+    target.classList.add('active');
+    target.scrollTop = 0;
   }
-  const c=document.getElementById('q3cont');
-  c.classList.toggle('on', S.q3.length>0);
 }
 
-/* ── Q4 ── */
-function pickQ4(v){
-  S.q4=v; hilite('q4-ans',v);
-  setTimeout(()=>{ go('match'); setTimeout(buildResult, 2500); }, 260);
+function startNavigator() { showScreen('q1'); }
+
+/* ── CONVERSATIONAL LOOPS ── */
+function selectQ1(val) {
+  state.q1 = val;
+  highlightSelected('q1-answers', val);
+  setTimeout(() => showScreen('q2'), 250);
 }
 
-function hilite(cid,v){
-  document.querySelectorAll('#'+cid+' .ans').forEach(b=>b.classList.toggle('sel',b.dataset.v===v));
+function selectQ2(val) {
+  state.q2 = val;
+  highlightSelected('q2-answers', val);
+  setTimeout(() => showScreen('q3'), 250);
 }
-function has(...vs){ return vs.some(v=>S.q3.includes(v)); }
 
-/* ══════════════════════════
-   ROUTING ENGINE — 35 MAPPINGS
-   Each mapping: Q1 + Q2 + Q3 signals + Q4 → profileKey
-══════════════════════════ */
+function toggleQ3(val) {
+  const btn = document.querySelector(`#q3-answers [data-val="${val}"]`);
+  const noneBtn = document.getElementById('q3-none');
+
+  if (val === 'none') {
+    state.q3 = ['none'];
+    document.querySelectorAll('#q3-answers .answer-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+  } else {
+    noneBtn.classList.remove('selected');
+    state.q3 = state.q3.filter(v => v !== 'none');
+    if (state.q3.includes(val)) {
+      state.q3 = state.q3.filter(v => v !== val);
+      btn.classList.remove('selected');
+    } else {
+      state.q3.push(val);
+      btn.classList.add('selected');
+    }
+  }
+  document.getElementById('q3-continue').classList.toggle('visible', state.q3.length > 0);
+}
+
+function goToQ4() { if (state.q3.length > 0) showScreen('q4'); }
+
+function selectQ4(val) {
+  state.q4 = val;
+  highlightSelected('q4-answers', val);
+  setTimeout(() => {
+    showScreen('matching');
+    setTimeout(() => computeResult(), 2000);
+  }, 250);
+}
+
+function highlightSelected(containerId, val) {
+  document.querySelectorAll(`#${containerId} .answer-btn`).forEach(b => {
+    b.classList.toggle('selected', b.dataset.val === val);
+  });
+}
+
+/* ── PROFILE ROUTING OBJECT MATRIX ── */
 const PROFILES = {
-
-  /* ─── MIND cluster ─── */
-  mind_essential: {
-    tag:'Mental wellness · Essential',
-    h:'Your team is built for stress and mood.',
-    sub:'Your concern profile points toward a stress-mood cluster. A clean, focused two-expert team covers the clinical and therapeutic bases.',
-    team:[
-      {role:'Diagnostic Anchor',badge:'b-anchor',name:'MBBS Doctor',info:'Rules out physiological drivers — thyroid, hormonal, nutritional deficiency — that can present as mood or anxiety symptoms. Medication review if applicable.'},
-      {role:'Active Treatment Lead',badge:'b-driver',name:'Psychotherapist / Counsellor',info:'Structured therapeutic work on the stress and mood pattern. Evidence-based approaches for anxiety, low mood, burnout, and nervous system dysregulation.'}
-    ], multi:false, phase:null, floor:'essential',
-    wa:'Hi, I just completed the JeevanKey Navigator. My profile: Stress & mental wellness. Interested in the Essential Plan.'
+  hormonal: {
+    eyebrow: 'Hormonal — Dynamic Care Track',
+    sub: 'Your profile reflects a hormonal-stress cluster. We have aligned clinical confirmation leads with underlying cortisol recovery paths.',
+    team: [
+      { role: 'Diagnostic Anchor', badge: 'badge-anchor', name: 'Gynaecologist / Endocrinologist', detail: 'Establishes clinical baseline tracking panels (LH/FSH, fasting insulin, androgen profiles).' },
+      { role: 'Active Treatment Lead', badge: 'badge-driver', name: 'Psychotherapist', detail: 'Targets cortisol stabilization loops directly linked to PCOD loop flare-ups.' },
+      { role: 'Accelerator', badge: 'badge-accel', name: 'Dietician', detail: 'Deploys target low-GI meal tracking configurations for insulin optimizations.' }
+    ],
+    multiphase: true,
+    phaseNotice: '<strong>Dynamic Review Protocol:</strong> At day 60, if nervous load stabilizes but physical indicators persist, your Gynaecologist assumes structural treatment leadership.',
+    planFloor: 'premium',
+    waCopy: 'Hello JeevanKey, I completed the Clinical Navigator. Result: Hormonal Cluster.'
   },
-
-  mind_premium: {
-    tag:'Mental wellness · Premium',
-    h:'Your team covers mind, body, and metabolic health.',
-    sub:'Your stress-mood cluster has secondary lifestyle signals. Three experts address the full picture — not just the surface symptom.',
-    team:[
-      {role:'Diagnostic Anchor',badge:'b-anchor',name:'MBBS Doctor',info:'Rules out physiological causes of mood symptoms. Blood work review. Medication assessment if applicable.'},
-      {role:'Active Treatment Lead',badge:'b-driver',name:'Psychotherapist / Counsellor',info:'Leads the therapeutic work. Anxiety, depression, burnout, sleep-stress loop — monthly structured check-in plus async support.'},
-      {role:'Accelerator',badge:'b-accel',name:'Dietician',info:'Mood-food connection is biochemically real. Gut-brain axis nutrition, energy stabilisation, anti-inflammatory eating to support the therapeutic work.'}
-    ], multi:false, phase:null, floor:'premium',
-    wa:'Hi, I just completed the JeevanKey Navigator. My profile: Stress & mental wellness with lifestyle signals. Interested in the Premium Plan.'
+  mind: {
+    eyebrow: 'Nervous System Stabilization',
+    sub: 'Profile points heavily toward stress exhaustion and neural tracking loops. Focus is placed on systemic behavioral recovery mechanics.',
+    team: [
+      { role: 'Diagnostic Anchor', badge: 'badge-anchor', name: 'MBBS General Practitioner', detail: 'Rules out nutritional deficiencies, thyroid fluctuations, or biochemical mimics.' },
+      { role: 'Active Treatment Lead', badge: 'badge-driver', name: 'Psychotherapist', detail: 'Manages evidence-backed cognitive interventions for nervous system de-escalation.' }
+    ],
+    multiphase: false,
+    planFloor: 'essential',
+    waCopy: 'Hello JeevanKey, I completed the Clinical Navigator. Result: Stress and Mental Wellness.'
   },
-
-  mind_sleep_premium: {
-    tag:'Mental wellness + sleep · Premium',
-    h:'Your team addresses the stress-sleep loop.',
-    sub:'Stress and sleep are bidirectionally linked. This team works on both simultaneously — not one after the other.',
-    team:[
-      {role:'Diagnostic Anchor',badge:'b-anchor',name:'MBBS Doctor',info:'Rules out sleep apnoea, thyroid, or hormonal root causes of sleep disruption. Medication review.'},
-      {role:'Active Treatment Lead',badge:'b-driver',name:'Psychotherapist / Counsellor',info:'Sleep and stress share the same nervous system mechanism. CBT-I (cognitive behavioural therapy for insomnia) plus anxiety management.'},
-      {role:'Compliance Anchor',badge:'b-compliance',name:'Yoga & Breathwork Specialist',info:'Parasympathetic activation protocols. Evening breathwork specifically designed to improve sleep onset and depth.'}
-    ], multi:false, phase:null, floor:'premium',
-    wa:'Hi, I just completed the JeevanKey Navigator. My profile: Stress + sleep disruption cluster. Interested in the Premium Plan.'
+  gut: {
+    eyebrow: 'Metabolic & Gut Restoration',
+    sub: 'Focused on functional gastrointestinal optimization pathways supervised under baseline medical rule-outs.',
+    team: [
+      { role: 'Diagnostic Anchor', badge: 'badge-anchor', name: 'MBBS Clinician', detail: 'Reviews blood biomarker baselines and systemic inflammatory markers.' },
+      { role: 'Active Treatment Lead', badge: 'badge-driver', name: 'Dietician', detail: 'Runs tailored element elimination matrices to isolate persistent food triggers.' }
+    ],
+    multiphase: false,
+    planFloor: 'essential',
+    waCopy: 'Hello JeevanKey, I completed the Clinical Navigator. Result: Gut & Metabolic Cluster.'
   },
-
-  /* ─── GUT cluster ─── */
-  gut_essential: {
-    tag:'Gut & metabolic · Essential',
-    h:'Your team is built around your gut health.',
-    sub:'A focused two-expert team — clinical confirmation and nutritional intervention working together.',
-    team:[
-      {role:'Diagnostic Anchor',badge:'b-anchor',name:'MBBS Doctor',info:'Rules out structural causes. Blood work — CBC, thyroid, liver panel, gut markers. Identifies whether this is functional or needs specialist referral.'},
-      {role:'Active Treatment Lead',badge:'b-driver',name:'Dietician',info:'Gut-specific elimination and repair protocol. Identifies food triggers, builds a personalised plan targeting bloating, weight, and energy through nutrition science.'}
-    ], multi:false, phase:null, floor:'essential',
-    wa:'Hi, I just completed the JeevanKey Navigator. My profile: Gut & digestive health. Interested in the Essential Plan.'
+  movement: {
+    eyebrow: 'Musculoskeletal Rehabilitation',
+    sub: 'Aligns mechanical posture correction pipelines while addressing the pain-stress amplification loop.',
+    team: [
+      { role: 'Diagnostic Anchor', badge: 'badge-anchor', name: 'MBBS Doctor', detail: 'Assesses structural nerve radiculopathy or decompression indicators.' },
+      { role: 'Active Treatment Lead', badge: 'badge-driver', name: 'Physiotherapist', detail: 'Deploys customized physical spinal alignment and tracking exercises.' }
+    ],
+    multiphase: false,
+    planFloor: 'premium',
+    waCopy: 'Hello JeevanKey, I completed the Clinical Navigator. Result: Musculoskeletal Rehab.'
   },
-
-  gut_premium: {
-    tag:'Gut & metabolic · Premium',
-    h:'Your team covers gut, metabolism, and movement.',
-    sub:'The gut-metabolic cluster responds fastest when nutrition, movement, and clinical oversight work as one team.',
-    team:[
-      {role:'Diagnostic Anchor',badge:'b-anchor',name:'MBBS Doctor',info:'Rules out structural causes. Blood work, liver panel, thyroid markers. Coordinates specialist referral if structural gut pathology is found.'},
-      {role:'Active Treatment Lead',badge:'b-driver',name:'Dietician',info:'Gut-specific elimination and repair. Personalised meal plan targeting bloating, weight, energy, and liver health through evidence-based nutrition.'},
-      {role:'Compliance Anchor',badge:'b-compliance',name:'Yoga & Breathwork Specialist',info:'Low-impact protocols that support gut motility, digestion rhythm, and energy. Particularly effective for sedentary profiles with chronic bloating.'}
-    ], multi:false, phase:null, floor:'premium',
-    wa:'Hi, I just completed the JeevanKey Navigator. My profile: Gut, metabolic & weight cluster. Interested in the Premium Plan.'
-  },
-
-  gut_weight_premium: {
-    tag:'Gut & weight management · Premium',
-    h:'Your team targets weight through the gut root.',
-    sub:'Weight that resists change is often a gut-metabolic problem, not a willpower problem. This team works at the root.',
-    team:[
-      {role:'Diagnostic Anchor',badge:'b-anchor',name:'MBBS Doctor',info:'Rules out thyroid, insulin resistance, PCOD-driven weight. Blood markers. Ensures no clinical contraindication to dietary intervention.'},
-      {role:'Active Treatment Lead',badge:'b-driver',name:'Dietician',info:'Metabolic meal planning for sustainable weight change. Not a calorie-deficit plan — a root-cause nutritional protocol.'},
-      {role:'Accelerator',badge:'b-accel',name:'Yoga & Fitness Specialist',info:'Movement protocol calibrated to your energy and gut state. Supports metabolic rate and improves gut motility simultaneously.'}
-    ], multi:false, phase:null, floor:'premium',
-    wa:'Hi, I just completed the JeevanKey Navigator. My profile: Gut & weight management. Interested in the Premium Plan.'
-  },
-
-  gut_stress_premium: {
-    tag:'Gut-stress axis · Premium',
-    h:'Your team addresses the gut-brain connection.',
-    sub:'Chronic stress directly degrades gut function. Your team treats both ends of this loop — not just one side.',
-    team:[
-      {role:'Diagnostic Anchor',badge:'b-anchor',name:'MBBS Doctor',info:'Clinical baseline. Rules out IBS, SIBO, or inflammatory gut conditions. Ensures no structural cause is being missed.'},
-      {role:'Active Treatment Lead',badge:'b-driver',name:'Dietician',info:'Gut-repair nutrition plan targeting the microbiome, inflammation, and stress-eating patterns simultaneously.'},
-      {role:'Accelerator',badge:'b-accel',name:'Psychotherapist / Counsellor',info:'The gut-brain axis is bidirectional — stress worsens gut symptoms, and gut distress worsens anxiety. Therapeutic work on the psychological driver.'}
-    ], multi:false, phase:null, floor:'premium',
-    wa:'Hi, I just completed the JeevanKey Navigator. My profile: Gut + stress axis cluster. Interested in the Premium Plan.'
-  },
-
-  /* ─── PAIN cluster ─── */
-  pain_essential: {
-    tag:'Musculoskeletal · Essential',
-    h:'Your team is built around movement and recovery.',
-    sub:'A focused two-expert team — structural rehabilitation and clinical oversight working together from day one.',
-    team:[
-      {role:'Diagnostic Anchor',badge:'b-anchor',name:'MBBS Doctor',info:'Assesses nerve involvement, inflammation markers, red flags. Determines whether imaging is needed before rehabilitation begins.'},
-      {role:'Active Treatment Lead',badge:'b-driver',name:'Physiotherapist',info:'Targeted structural rehabilitation — postural correction, core strengthening, nerve decompression protocols. The primary engine of your recovery.'}
-    ], multi:false, phase:null, floor:'essential',
-    wa:'Hi, I just completed the JeevanKey Navigator. My profile: Musculoskeletal & pain. Interested in the Essential Plan.'
-  },
-
-  pain_premium: {
-    tag:'Musculoskeletal · Premium',
-    h:'Your team treats your pain and what drives it.',
-    sub:'Chronic pain involves a structural component and a neurological-psychological one. Treating only one gives partial results.',
-    team:[
-      {role:'Diagnostic Anchor',badge:'b-anchor',name:'MBBS Doctor',info:'Assesses nerve involvement, inflammation, red flags. Orders imaging if indicated. Ensures no surgical flag is missed.'},
-      {role:'Active Treatment Lead',badge:'b-driver',name:'Physiotherapist',info:'Comprehensive rehabilitation protocol — structural realignment, core work, nerve decompression, ergonomic correction for desk workers.'},
-      {role:'Accelerator',badge:'b-accel',name:'Psychotherapist / Counsellor',info:'Chronic pain amplifies stress, and stress amplifies pain perception. This bidirectional loop is why pain management without psychological support has a lower long-term success rate.'}
-    ], multi:false, phase:null, floor:'premium',
-    wa:'Hi, I just completed the JeevanKey Navigator. My profile: Musculoskeletal with stress overlay. Interested in the Premium Plan.'
-  },
-
-  pain_full_premium: {
-    tag:'Musculoskeletal · Full team · Premium',
-    h:'Your team covers every dimension of your pain.',
-    sub:'Back pain plus stress plus poor sleep is a three-way loop. This team addresses all three simultaneously.',
-    team:[
-      {role:'Diagnostic Anchor',badge:'b-anchor',name:'MBBS Doctor',info:'Clinical baseline, imaging decisions, inflammation markers, red flag assessment.'},
-      {role:'Active Treatment Lead',badge:'b-driver',name:'Physiotherapist',info:'Structural rehabilitation — posture, core, nerve decompression, movement reprogramming.'},
-      {role:'Accelerator',badge:'b-accel',name:'Psychotherapist / Counsellor',info:'Pain-stress-sleep loop. The psychological component of chronic pain is neurologically real, not supplementary.'},
-      {role:'Compliance Anchor',badge:'b-compliance',name:'Yoga & Breathwork Specialist',info:'Spine-safe daily protocols, ergonomic movement, gentle mobility work between physiotherapy sessions.'}
-    ], multi:false, phase:null, floor:'premium',
-    wa:'Hi, I just completed the JeevanKey Navigator. My profile: Musculoskeletal, stress & sleep cluster. Interested in the Premium Plan.'
-  },
-
-  /* ─── HORMONAL cluster ─── */
-  hormonal_essential: {
-    tag:'Hormonal · Essential',
-    h:'Your team establishes your hormonal baseline.',
-    sub:'Clinical confirmation comes first. Then targeted nutritional support to work on the metabolic component.',
-    team:[
-      {role:'Diagnostic Anchor',badge:'b-anchor',name:'Gynaecologist / MBBS Doctor',info:'Baseline hormonal panel — LH/FSH, fasting insulin, androgen profile. Pelvic ultrasound if indicated. Confirms clinical picture before any intervention.'},
-      {role:'Accelerator',badge:'b-accel',name:'Dietician',info:'Low-GI, anti-inflammatory, insulin-resistance nutrition. The dietary component of hormonal management is evidence-based and highly effective alongside medical care.'}
-    ], multi:false, phase:null, floor:'essential',
-    wa:'Hi, I just completed the JeevanKey Navigator. My profile: Hormonal & reproductive. Interested in the Essential Plan.'
-  },
-
-  hormonal_premium: {
-    tag:'Hormonal · Premium · Dynamic pathway',
-    h:'Your team is built around your hormonal pattern.',
-    sub:'Your concern profile points toward a hormonal-stress cluster. Diagnostic confirmation comes first — then targeted work on the root mechanism.',
-    team:[
-      {role:'Diagnostic Anchor',badge:'b-anchor',name:'Gynaecologist / Endocrinologist',info:'Establishes clinical baseline — hormonal panel, pelvic ultrasound, androgen markers. Your medical foundation before any intervention begins.'},
-      {role:'Active Treatment Lead',badge:'b-driver',name:'Psychotherapist / Counsellor',info:'Your cortisol levels are directly amplifying your hormonal imbalance — a well-documented loop in PCOD. Reducing nervous system load produces measurable hormonal shifts within 60–90 days.'},
-      {role:'Accelerator',badge:'b-accel',name:'Dietician',info:'Low-GI, anti-inflammatory meal plan targeting insulin resistance — the metabolic component of hormonal imbalance.'}
-    ], multi:true,
-    phase:'<strong>Dynamic Care Pathway.</strong> At your 60-day review: if stress markers improve but physical symptoms persist, your Gynaecologist moves into the Active Treatment Lead role. Your Coordinator tracks this transition — you don\'t manage it.',
-    floor:'premium',
-    wa:'Hi, I just completed the JeevanKey Navigator. My profile: Hormonal + stress cluster (PCOD pattern). Interested in the Premium Plan.'
-  },
-
-  hormonal_full_elite: {
-    tag:'Hormonal · Full team · Elite',
-    h:'Your team covers every layer of your hormonal health.',
-    sub:'Complex hormonal presentation with multiple interconnected signals. A full specialist-led team is the right architecture.',
-    team:[
-      {role:'Diagnostic Anchor',badge:'b-anchor',name:'Gynaecologist / MD Specialist',info:'Full diagnostic workup — hormonal panel, pelvic ultrasound, androgen profile, thyroid markers. Clinical lead throughout the pathway.'},
-      {role:'Active Treatment Lead',badge:'b-driver',name:'Dietician',info:'Comprehensive hormonal nutrition plan — insulin resistance, anti-inflammatory, cycle-supportive eating protocol built from your blood reports.'},
-      {role:'Accelerator',badge:'b-accel',name:'Psychotherapist / Counsellor',info:'Cortisol-PCOS amplification loop. Stress management as medical intervention, not supplementary care.'},
-      {role:'Compliance Anchor',badge:'b-compliance',name:'Yoga & Breathwork Specialist',info:'Pelvic-opening protocols, parasympathetic activation, cycle regulation breathwork. Daily consistency layer.'}
-    ], multi:true,
-    phase:'<strong>Dynamic Care Pathway.</strong> The Gynaecologist holds the Diagnostic Anchor role throughout. At 90 days, if medical intervention is needed, they step into the Active Treatment Lead role. Your Coordinator manages this transition.',
-    floor:'elite',
-    wa:'Hi, I just completed the JeevanKey Navigator. My profile: Complex hormonal cluster. Interested in the Elite Plan.'
-  },
-
-  hormonal_hair_premium: {
-    tag:'Hormonal + hair & skin · Premium',
-    h:'Your team treats the root, not the surface.',
-    sub:'Hair loss and skin changes in your profile are hormonal signals — not cosmetic problems. This team addresses the source.',
-    team:[
-      {role:'Diagnostic Anchor',badge:'b-anchor',name:'MBBS Doctor / Gynaecologist',info:'Androgen panel, thyroid markers, iron and ferritin — the clinical drivers of hormonal hair loss. Confirms root before treatment begins.'},
-      {role:'Active Treatment Lead',badge:'b-driver',name:'Dietician',info:'Anti-inflammatory, hormone-balancing nutrition. Iron, zinc, biotin, and omega-3 protocols calibrated to your blood reports — not generic supplements.'},
-      {role:'Accelerator',badge:'b-accel',name:'Psychotherapist / Counsellor',info:'Stress is a confirmed amplifier of hormonal hair loss. Cortisol management as a clinical component of the treatment plan.'}
-    ], multi:false, phase:null, floor:'premium',
-    wa:'Hi, I just completed the JeevanKey Navigator. My profile: Hormonal with hair & skin signals. Interested in the Premium Plan.'
-  },
-
-  /* ─── ENERGY cluster ─── */
-  energy_essential: {
-    tag:'Energy & vitality · Essential',
-    h:'Your team investigates your energy at the root.',
-    sub:'Persistent fatigue has identifiable causes. This team finds them and addresses them — not just manages symptoms.',
-    team:[
-      {role:'Diagnostic Anchor',badge:'b-anchor',name:'MBBS Doctor',info:'Blood work — iron, ferritin, B12, D3, thyroid, fasting glucose. The most common causes of fatigue are measurable and correctable.'},
-      {role:'Active Treatment Lead',badge:'b-driver',name:'Dietician',info:'Nutritional deficiency correction plan. Energy-supportive eating — not generic advice, built from your blood report results.'}
-    ], multi:false, phase:null, floor:'essential',
-    wa:'Hi, I just completed the JeevanKey Navigator. My profile: Low energy & fatigue. Interested in the Essential Plan.'
-  },
-
-  energy_stress_premium: {
-    tag:'Energy + stress · Premium',
-    h:'Your team addresses energy at both its sources.',
-    sub:'When fatigue and stress co-exist, they amplify each other. One team, working on both simultaneously, is more effective than sequential care.',
-    team:[
-      {role:'Diagnostic Anchor',badge:'b-anchor',name:'MBBS Doctor',info:'Blood markers for deficiency and adrenal fatigue pattern. Rules out thyroid, anaemia, diabetes.'},
-      {role:'Active Treatment Lead',badge:'b-driver',name:'Dietician',info:'Energy-focused nutrition protocol — deficiency correction, adrenal-supportive eating, stable blood sugar maintenance.'},
-      {role:'Accelerator',badge:'b-accel',name:'Psychotherapist / Counsellor',info:'Burnout and chronic stress produce measurable physical fatigue. The psychological intervention is not supplementary — it is part of the energy recovery.'}
-    ], multi:false, phase:null, floor:'premium',
-    wa:'Hi, I just completed the JeevanKey Navigator. My profile: Low energy + stress cluster. Interested in the Premium Plan.'
-  },
-
-  energy_gut_premium: {
-    tag:'Energy + gut · Premium',
-    h:'Your energy is being drained by your gut.',
-    sub:'Post-meal fatigue and low energy together are a strong signal of malabsorption or gut-microbiome imbalance. This team addresses the gut as the energy source.',
-    team:[
-      {role:'Diagnostic Anchor',badge:'b-anchor',name:'MBBS Doctor',info:'Gut panel, microbiome markers, iron and B12 absorption markers. Identifies malabsorption as a root cause of fatigue.'},
-      {role:'Active Treatment Lead',badge:'b-driver',name:'Dietician',info:'Gut-repair nutrition — elimination protocol, microbiome-supportive eating, iron and B12 absorption optimisation.'},
-      {role:'Compliance Anchor',badge:'b-compliance',name:'Yoga & Breathwork Specialist',info:'Low-impact movement to support gut motility and energy levels. Breathwork for vagal tone improvement.'}
-    ], multi:false, phase:null, floor:'premium',
-    wa:'Hi, I just completed the JeevanKey Navigator. My profile: Low energy with gut signals. Interested in the Premium Plan.'
-  },
-
-  energy_hormonal_premium: {
-    tag:'Energy + hormonal · Premium',
-    h:'Your energy depletion has a hormonal root.',
-    sub:'Fatigue combined with hormonal signals points toward a thyroid or reproductive hormone pattern. The Diagnostic Anchor establishes which — then the team works accordingly.',
-    team:[
-      {role:'Diagnostic Anchor',badge:'b-anchor',name:'MBBS Doctor / Gynaecologist',info:'Thyroid panel, reproductive hormones, iron and ferritin. Determines whether the energy issue is thyroid-driven or reproductive-hormone-driven.'},
-      {role:'Active Treatment Lead',badge:'b-driver',name:'Dietician',info:'Metabolic and hormonal nutrition plan — calibrated after blood report review. Thyroid-supportive or PCOD-specific based on your clinical picture.'},
-      {role:'Accelerator',badge:'b-accel',name:'Yoga & Breathwork Specialist',info:'Gentle movement and breathwork calibrated to your energy state. Supports hormonal regulation without overtaxing a depleted system.'}
-    ], multi:true,
-    phase:'<strong>Adaptive pathway.</strong> The team composition adjusts once the Diagnostic Anchor receives your blood results — which determines whether thyroid or reproductive hormone management takes the lead.',
-    floor:'premium',
-    wa:'Hi, I just completed the JeevanKey Navigator. My profile: Low energy with hormonal signals. Interested in the Premium Plan.'
-  },
-
-  /* ─── CHRONIC cluster ─── */
-  chronic_essential: {
-    tag:'Chronic condition · Essential',
-    h:'Your team is built for consistent long-term management.',
-    sub:'A focused two-expert team — clinical oversight and nutritional management — the two most impactful levers in chronic condition control.',
-    team:[
-      {role:'Diagnostic Anchor & Treatment Lead',badge:'b-anchor',name:'MBBS Doctor',info:'Central clinical authority. Medication management, biomarker tracking, specialist coordination. Reviews all team inputs in context of your clinical parameters.'},
-      {role:'Accelerator',badge:'b-accel',name:'Dietician',info:'Condition-specific meal planning — evidence-based nutrition for diabetes, hypertension, thyroid, or post-cardiac care. The most controllable variable in your daily management.'}
-    ], multi:false, phase:null, floor:'essential',
-    wa:'Hi, I just completed the JeevanKey Navigator. My profile: Chronic condition management. Interested in the Essential Plan.'
-  },
-
-  chronic_premium: {
-    tag:'Chronic condition · Premium',
-    h:'Your team manages your condition and rebuilds your foundation.',
-    sub:'Chronic condition management is most effective when medical oversight, nutrition, and daily movement work as a coordinated system.',
-    team:[
-      {role:'Diagnostic Anchor & Treatment Lead',badge:'b-anchor',name:'MBBS Doctor',info:'Central clinical authority. Medication review, biomarker tracking, test coordination, specialist referrals when needed.'},
-      {role:'Accelerator',badge:'b-accel',name:'Dietician',info:'Condition-specific nutrition — diabetes, hypertension, thyroid, or post-cardiac. Built from your blood reports, not generic protocols.'},
-      {role:'Compliance Anchor',badge:'b-compliance',name:'Yoga & Breathwork Specialist',info:'Safe, condition-appropriate movement. Breath-based stress modulation. Reduces the cumulative physiological load of managing a chronic condition daily.'}
-    ], multi:false, phase:null, floor:'premium',
-    wa:'Hi, I just completed the JeevanKey Navigator. My profile: Chronic condition, Premium level. Interested in the Premium Plan.'
-  },
-
-  chronic_elite: {
-    tag:'Chronic condition · Elite',
-    h:'Your team provides comprehensive chronic care.',
-    sub:'Complex or long-term chronic conditions benefit from a full specialist-led team with coordinated oversight across all systems.',
-    team:[
-      {role:'Diagnostic Anchor & Treatment Lead',badge:'b-anchor',name:'MD Specialist',info:'Post-graduate specialist depth — endocrinologist, cardiologist, or internist as appropriate. Comprehensive clinical management, specialist coordination.'},
-      {role:'Accelerator',badge:'b-accel',name:'Dietician',info:'Condition-specific, blood-report-driven nutrition plan. Updated monthly as your biomarkers evolve.'},
-      {role:'Accelerator',badge:'b-accel',name:'MBBS Doctor',info:'Day-to-day clinical support between specialist reviews. Medication management, test ordering, first-line queries.'},
-      {role:'Compliance Anchor',badge:'b-compliance',name:'Yoga & Breathwork Specialist',info:'Medically cleared movement protocol. Breathwork for stress modulation. The daily consistency layer that keeps everything else working.'}
-    ], multi:false, phase:null, floor:'elite',
-    wa:'Hi, I just completed the JeevanKey Navigator. My profile: Complex chronic condition. Interested in the Elite Plan.'
-  },
-
-  chronic_mental_elite: {
-    tag:'Chronic condition + mental health · Elite',
-    h:'Your team manages your condition and your mind.',
-    sub:'Living with a chronic condition long-term carries a significant psychological load. This team addresses both the clinical and psychological dimensions.',
-    team:[
-      {role:'Diagnostic Anchor & Treatment Lead',badge:'b-anchor',name:'MBBS Doctor / MD Specialist',info:'Clinical lead. Chronic condition management, medication, biomarker tracking.'},
-      {role:'Active Treatment Lead',badge:'b-driver',name:'Psychotherapist / Counsellor',info:'Chronic condition + psychological load. Adjustment disorder, health anxiety, and the mental exhaustion of long-term illness management.'},
-      {role:'Accelerator',badge:'b-accel',name:'Dietician',info:'Condition-specific nutrition that also addresses mood and energy — the overlap between metabolic and psychological health.'},
-      {role:'Compliance Anchor',badge:'b-compliance',name:'Yoga & Breathwork Specialist',info:'Mind-body daily practice. Particularly effective for chronic pain conditions where psychological and physical symptoms are deeply intertwined.'}
-    ], multi:false, phase:null, floor:'elite',
-    wa:'Hi, I just completed the JeevanKey Navigator. My profile: Chronic condition + mental health. Interested in the Elite Plan.'
-  },
-
-  /* ─── AYURVEDA/INTEGRATIVE variants ─── */
-  gut_ayur_premium: {
-    tag:'Gut · Integrative · Premium',
-    h:'Your team combines modern nutrition with Ayurvedic gut care.',
-    sub:'Chronic gut conditions that have not fully resolved with conventional diet changes often respond well to an integrative approach.',
-    team:[
-      {role:'Diagnostic Anchor',badge:'b-anchor',name:'MBBS Doctor',info:'Clinical baseline — ensures no structural cause is overlooked. Blood work, gut markers.'},
-      {role:'Active Treatment Lead',badge:'b-driver',name:'Dietician',info:'Evidence-based gut-repair nutrition protocol as the primary intervention.'},
-      {role:'Accelerator',badge:'b-accel',name:'BAMS Ayurvedic Doctor',info:'Complementary herbal and lifestyle protocols for gut health — Triphala, digestive fire (Agni) correction, seasonal detox frameworks.'}
-    ], multi:false, phase:null, floor:'premium',
-    wa:'Hi, I just completed the JeevanKey Navigator. My profile: Gut health with integrative approach. Interested in the Premium Plan.'
-  },
-
-  chronic_ayur_elite: {
-    tag:'Chronic condition · Integrative · Elite',
-    h:'Your team spans conventional and integrative medicine.',
-    sub:'Long-term chronic conditions with incomplete resolution often benefit most from a coordinated conventional-integrative approach.',
-    team:[
-      {role:'Diagnostic Anchor & Treatment Lead',badge:'b-anchor',name:'MBBS Doctor / MD Specialist',info:'Conventional clinical lead. Medication, biomarkers, specialist coordination.'},
-      {role:'Accelerator',badge:'b-accel',name:'Dietician',info:'Evidence-based condition-specific nutrition built from blood reports.'},
-      {role:'Accelerator',badge:'b-accel',name:'BAMS Ayurvedic Doctor',info:'Herbal and lifestyle interventions — Rasayana therapy, seasonal protocols, adaptogen support — calibrated to your condition and conventional treatment plan.'},
-      {role:'Compliance Anchor',badge:'b-compliance',name:'Yoga & Breathwork Specialist',info:'Classical Yoga protocols appropriate for your condition. Pranayama for systemic regulation.'}
-    ], multi:false, phase:null, floor:'elite',
-    wa:'Hi, I just completed the JeevanKey Navigator. My profile: Chronic condition, integrative approach. Interested in the Elite Plan.'
-  },
-
-  /* ─── FALLBACK ─── */
-  gut_fallback: {
-    tag:'General health pathway',
-    h:'Your team provides a strong starting foundation.',
-    sub:'Your concern profile spans multiple areas. We\'ve matched you with a core team that can identify which dimension needs the most focus.',
-    team:[
-      {role:'Diagnostic Anchor',badge:'b-anchor',name:'MBBS Doctor',info:'Comprehensive baseline assessment. Blood work across key markers — metabolic, hormonal, nutritional. Identifies the primary clinical driver.'},
-      {role:'Active Treatment Lead',badge:'b-driver',name:'Dietician',info:'Nutrition is the highest-leverage intervention across almost every health concern. Starts here while the clinical picture is being established.'}
-    ], multi:false, phase:null, floor:'essential',
-    wa:'Hi, I just completed the JeevanKey Navigator. My profile: General health. Interested in getting started.'
+  chronic: {
+    eyebrow: 'Chronic Systematic Care Plan',
+    sub: 'Engineered for consistent biological management of systemic long-term tracking metrics.',
+    team: [
+      { role: 'Diagnostic Anchor & Lead', badge: 'badge-anchor', name: 'MD Specialist Consultation', detail: 'Central medical authority monitoring blood markers and adjusting prescriptions.' },
+      { role: 'Accelerator', badge: 'badge-accel', name: 'Dietician', detail: 'Configures glycemic or cardiovascular disease-focused restriction parameters.' }
+    ],
+    multiphase: false,
+    planFloor: 'elite',
+    waCopy: 'Hello JeevanKey, I completed the Clinical Navigator. Result: Chronic Condition Management.'
   }
 };
 
 const PLANS = [
-  {id:'trial',    name:'Trial',     price:'₹499',   period:'one-time', xp:'1 expert · 48hr'},
-  {id:'essential',name:'Essential', price:'₹2,499', period:'/month',   xp:'2 experts'},
-  {id:'premium',  name:'Premium',   price:'₹4,499', period:'/month',   xp:'3 experts', pop:true},
-  {id:'elite',    name:'Elite',     price:'₹7,499', period:'/month',   xp:'4–5 experts'}
+  { id: 'trial', name: 'Trial', price: '₹499', period: 'one-time', experts: '1 Expert Consultation', featured: false },
+  { id: 'essential', name: 'Essential', price: '₹2,499', period: '/month', experts: '2 Coordinated Experts', featured: false },
+  { id: 'premium', name: 'Premium', price: '₹4,499', period: '/month', experts: '3 Specialized Experts', featured: true },
+  { id: 'elite', name: 'Elite', price: '₹7,499', period: '/month', experts: '4+ Clinical Experts', featured: false }
 ];
 
-/* ══════════════════════════
-   ROUTING DECISION TREE
-   Maps all 35 combinations
-══════════════════════════ */
-function route() {
-  const {q1,q2,q3,q4} = S;
-  const h = (...vs) => vs.some(v=>q3.includes(v));
-  const chronic = q1==='chronic' || q4==='managing';
-  const long = q2==='long'||q2==='recurring';
-
-  if(chronic){
-    if(h('mood','motivation','sleep')&&long) return 'chronic_mental_elite';
-    if(long) return 'chronic_elite';
-    return q4==='managing'&&!long ? 'chronic_essential' : 'chronic_premium';
-  }
-
-  if(q1==='hormonal'){
-    if(h('skin_hair','acne')&&!h('mood','sleep')) return 'hormonal_hair_premium';
-    if(h('periods','acne')&&h('mood','motivation')) return 'hormonal_full_elite';
-    if(h('mood','motivation','sleep')) return 'hormonal_premium';
-    return long ? 'hormonal_premium' : 'hormonal_essential';
-  }
-
-  if(q1==='mind'){
-    if(h('periods','acne','skin_hair')&&(q4==='stressed'||q4==='sleep_issue')) return 'hormonal_premium';
-    if(h('sleep')&&(q4==='sleep_issue'||q4==='stressed')) return 'mind_sleep_premium';
-    if(h('weight','meal_fat','motivation')) return 'mind_premium';
-    return long ? 'mind_premium' : 'mind_essential';
-  }
-
-  if(q1==='gut'){
-    if(h('mood','motivation','sleep')&&q4==='stressed') return 'gut_stress_premium';
-    if(h('weight')&&!h('periods','acne')) return 'gut_weight_premium';
-    return long ? 'gut_premium' : 'gut_essential';
-  }
-
-  if(q1==='pain'){
-    if(h('sleep','mood','motivation')&&long) return 'pain_full_premium';
-    if(h('mood','sleep')||q4==='stressed') return 'pain_premium';
-    return 'pain_essential';
-  }
-
-  if(q1==='energy'){
-    if(h('periods','acne','skin_hair')) return 'energy_hormonal_premium';
-    if(h('meal_fat','weight')&&!h('mood','sleep')) return 'energy_gut_premium';
-    if(h('mood','motivation','sleep')||q4==='stressed') return 'energy_stress_premium';
-    return 'energy_essential';
-  }
-
-  return 'gut_fallback';
+function computeProfile() {
+  if (state.q1 === 'chronic' || state.q4 === 'managing') return 'chronic';
+  if (state.q1 === 'hormonal') return 'hormonal';
+  if (state.q1 === 'mind' && state.q3.some(v => ['periods','acne','skin_hair'].includes(v))) return 'hormonal';
+  if (state.q1 === 'pain') return 'movement';
+  if (state.q1 === 'gut') return 'gut';
+  return 'mind';
 }
 
-/* ══════════════════════════
-   BUILD RESULT
-══════════════════════════ */
-function buildResult(){
-  const key = route();
-  const P = PROFILES[key];
+function computeResult() {
+  const pKey = computeProfile();
+  const profile = PROFILES[pKey];
 
-  document.getElementById('result-tag').textContent = P.tag;
-  document.getElementById('result-h').textContent   = P.h;
-  document.getElementById('result-sub').textContent = P.sub;
+  document.getElementById('result-eyebrow').textContent = profile.eyebrow;
+  document.getElementById('result-sub').textContent = profile.sub;
 
-  // Team
-  const stack = document.getElementById('team-stack');
-  stack.innerHTML='';
-  P.team.forEach((m,i)=>{
-    const c=document.createElement('div');
-    c.className='tc'; c.style.animationDelay=(i*.08+.05)+'s';
-    c.innerHTML=`<div class="tc-head" onclick="flip(this)">
-      <span class="tc-badge ${m.badge}">${m.role}</span>
-      <span class="tc-name">${m.name}</span>
-      <span class="tc-chev">⌄</span>
-    </div>
-    <div class="tc-body"><div class="tc-body-inner">${m.info}</div></div>`;
-    stack.appendChild(c);
-    if(i===0) setTimeout(()=>c.classList.add('open'),700);
+  const grid = document.getElementById('team-grid');
+  grid.innerHTML = '';
+  profile.team.forEach((m, idx) => {
+    const card = document.createElement('div');
+    card.className = 'team-card';
+    card.innerHTML = `
+      <div class="team-card-header" onclick="this.parentElement.classList.toggle('open')">
+        <span class="team-role-badge ${m.badge}">${m.role}</span>
+        <span class="team-expert-name">${m.name}</span>
+        <span class="team-card-chevron">▼</span>
+      </div>
+      <div class="team-card-body"><div class="team-card-body-inner">${m.detail}</div></div>
+    `;
+    grid.appendChild(card);
+    if (idx === 0) card.classList.add('open');
   });
 
-  // Phase
-  const pb=document.getElementById('phase-box');
-  if(P.multi&&P.phase){ pb.style.display='block'; pb.innerHTML=P.phase; }
-  else pb.style.display='none';
-
-  // Plans
-  const pr=document.getElementById('plan-row'); pr.innerHTML='';
-  PLANS.forEach(pl=>{
-    const c=document.createElement('div');
-    c.className='pc'+(pl.pop?' pop':''); c.dataset.pid=pl.id;
-    c.innerHTML=(pl.pop?'<div class="pc-pop">Popular</div>':'')+
-      `<div class="pc-name">${pl.name}</div>
-       <div class="pc-price">${pl.price}<span class="pc-period"> ${pl.period}</span></div>
-       <div class="pc-xp">${pl.xp}</div>`;
-    c.onclick=()=>pickPlan(pl.id,pl.name,P.wa);
-    pr.appendChild(c);
-  });
-  setTimeout(()=>pickPlan(P.floor, PLANS.find(p=>p.id===P.floor).name, P.wa, false), 900);
-
-  go('result');
-}
-
-function pickPlan(id, name, wa, updateBtn=true){
-  S.plan=id;
-  document.querySelectorAll('.pc').forEach(c=>c.classList.toggle('sel',c.dataset.pid===id));
-  if(updateBtn){
-    const msg=encodeURIComponent(wa+' Plan: '+name+'.');
-    document.getElementById('wa-btn').href='https://wa.me/919259684363?text='+msg;
-    document.getElementById('wa-text').textContent='Start with '+name+' Plan →';
+  const pNotice = document.getElementById('phase-notice');
+  if (profile.multiphase && profile.phaseNotice) {
+    pNotice.style.display = 'block';
+    pNotice.innerHTML = profile.phaseNotice;
   } else {
-    const msg=encodeURIComponent(wa);
-    document.getElementById('wa-btn').href='https://wa.me/919259684363?text='+msg;
+    pNotice.style.display = 'none';
+  }
+
+  const planGrid = document.getElementById('plan-grid');
+  planGrid.innerHTML = '';
+  PLANS.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'plan-card' + (p.featured ? ' featured' : '');
+    card.dataset.planId = p.id;
+    card.innerHTML = `
+      ${p.featured ? '<div class="plan-popular">Popular</div>' : ''}
+      <div class="plan-name">${p.name}</div>
+      <div class="plan-price">${p.price}<span style="font-size:10px;color:var(--ink-4)"> ${p.period}</span></div>
+      <div class="plan-experts">${p.experts}</div>
+    `;
+    card.onclick = () => selectPlan(p.id, profile.waCopy);
+    planGrid.appendChild(card);
+  });
+
+  selectPlan(profile.planFloor, profile.waCopy);
+  showScreen('result');
+}
+
+function selectPlan(pId, waCopy) {
+  state.selectedPlan = pId;
+  document.querySelectorAll('.plan-card').forEach(c => {
+    c.classList.toggle('selected', c.dataset.planId === pId);
+  });
+  const plan = PLANS.find(p => p.id === pId);
+  const fullText = waCopy + (plan ? ` Plan Interest: ${plan.name} Tier.` : '');
+  state.activeWaUrl = 'https://wa.me/919259684363?text=' + encodeURIComponent(fullText);
+  document.getElementById('whatsapp-text').textContent = plan ? `Start with ${plan.name} Pathway →` : 'Connect on WhatsApp →';
+}
+
+function openWhatsAppRedirect() {
+  if (state.activeWaUrl && state.activeWaUrl !== '#') {
+    window.open(state.activeWaUrl, '_blank');
   }
 }
 
-function flip(h){ h.parentElement.classList.toggle('open'); }
-
-function restart(){
-  S.q1=null;S.q2=null;S.q3=[];S.q4=null;S.plan=null;
-  document.querySelectorAll('#q3-ans .ans').forEach(b=>b.classList.remove('sel'));
-  document.getElementById('q3cont').classList.remove('on');
-  go('welcome');
+function restart() {
+  state.q1 = null; state.q2 = null; state.q3 = []; state.q4 = null; state.selectedPlan = null;
+  document.querySelectorAll('#q3-answers .answer-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('q3-continue').classList.remove('visible');
+  showScreen('welcome');
 }
+
+showScreen('welcome');
 </script>
 </body>
 </html>
