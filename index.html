@@ -579,7 +579,8 @@ function selectPlan(pId, waCopy) {
     c.classList.toggle('selected', c.dataset.planId === pId);
   });
   const plan = PLANS.find(p => p.id === pId);
-  const fullText = waCopy + (plan ? ` Plan Interest: ${plan.name} Tier.` : '');
+  const consentText = '\n\nI accept the Terms of Service and consent to care coordination via WhatsApp.';
+  const fullText = waCopy + (plan ? ` Plan Interest: ${plan.name} Tier.` : '') + consentText;
   state.activeWaUrl = 'https://wa.me/919259684363?text=' + encodeURIComponent(fullText);
   document.getElementById('whatsapp-text').textContent = plan ? `Start with ${plan.name} Pathway →` : 'Connect on WhatsApp →';
 }
