@@ -1,917 +1,1208 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JeevanKey — Routing Mappings v2</title>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<title>JeevanKey Navigator — Find Your Care Team</title>
+
 <style>
-:root{
-  --navy:#0C447C;--navy-d:#082f58;--navy-l:#1a5a9e;
-  --navy-xlt:#e8f0f9;--navy-2:#d0e2f4;
-  --white:#fff;--off:#f7fafd;--text:#0d1b2a;--text-2:#3a5068;--text-3:#6b8ba4;--text-4:#a8c0d4;
-  --green:#3B6D11;--green-l:#539719;
-  --wa:#25D366;--accent:#e8a020;--teal:#0e7b7b;
-  --sans:'Sora',system-ui,sans-serif;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--sans);background:var(--off);color:var(--text);padding:32px 24px;-webkit-font-smoothing:antialiased}
-.page{max-width:980px;margin:0 auto}
-h1{font-size:22px;font-weight:600;color:var(--navy);margin-bottom:4px}
-.sub{font-size:13px;color:var(--text-3);margin-bottom:28px}
 
-/* Legend */
-.legend{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px;padding:14px 16px;background:var(--white);border-radius:8px;border:1px solid var(--navy-2)}
-.lg{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-3)}
-.lg strong{font-size:10.5px;color:var(--text-2)}
+  :root {
 
-/* Role badges — aligned to Expert Carrd terminology */
-.rbadge{font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:3px;white-space:nowrap;flex-shrink:0;margin-top:1px}
-.b-ma  {background:#0C447C;color:#fff}          /* Medical Anchor */
-.b-ta  {background:#1b4d4d;color:#fff}          /* Therapeutic Anchor */
-.b-atl {background:#3B6D11;color:#fff}          /* Active Treatment Lead */
-.b-ca  {background:#d0e2f4;color:#0C447C}       /* Core Accelerator */
-.b-co  {background:#f0f4f7;color:#6b8ba4;border:1px solid #d0e2f4} /* Compliance Anchor */
+    --navy:     #0C447C;
 
-/* Plan tiers */
-.tier{font-size:10.5px;font-weight:600;padding:3px 9px;border-radius:4px;white-space:nowrap}
-.t-trial    {background:#f0f0f0;color:#555}
-.t-essential{background:#dbeafe;color:#1e40af}
-.t-premium  {background:#dcfce7;color:#166534}
-.t-elite    {background:#fef3c7;color:#92400e}
-.multi{font-size:10px;background:#fef9ec;color:var(--accent);border:1px solid #fcd34d;padding:2px 7px;border-radius:3px;font-weight:600;white-space:nowrap}
-.alt{font-size:10px;background:#f4faf0;color:#166534;border:1px solid #bbf7d0;padding:2px 7px;border-radius:3px;font-weight:600;white-space:nowrap}
+    --navy-d:   #06233f;
 
-/* Cluster sections */
-.cluster-section{margin-bottom:36px}
-.cluster-head{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:9px 14px;background:var(--navy);color:#fff;border-radius:6px 6px 0 0;display:flex;align-items:center;gap:8px}
-.cluster-icon{font-size:16px}
+    --navy-l:   #12579b;
 
-/* Table */
-.table{width:100%;border-collapse:collapse;background:var(--white);border-radius:0 0 8px 8px;overflow:hidden;box-shadow:0 1px 4px rgba(12,68,124,.08)}
-.table th{font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text-3);background:var(--navy-xlt);padding:10px 14px;text-align:left;border-bottom:1px solid var(--navy-2)}
-.table td{font-size:12px;color:var(--text-2);padding:11px 14px;border-bottom:1px solid var(--navy-2);vertical-align:top;line-height:1.55}
-.table tr:last-child td{border-bottom:none}
-.table tr:hover td{background:var(--navy-xlt)}
-.map-id{font-size:10px;font-weight:600;color:var(--text-3);font-family:monospace;white-space:nowrap}
-.conditions em{font-style:normal;font-weight:500;color:var(--navy)}
-.team-out{display:flex;flex-direction:column;gap:3px}
-.role-row{display:flex;align-items:flex-start;gap:6px;font-size:11.5px}
-.num{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:var(--navy-2);color:var(--navy);font-size:10px;font-weight:600;flex-shrink:0}
+    --green:    #3B6D11;
 
-/* Change log */
-.changelog{background:var(--white);border:1px solid var(--navy-2);border-left:4px solid var(--navy);border-radius:8px;padding:16px 20px;margin-bottom:28px}
-.changelog h3{font-size:13px;font-weight:600;color:var(--navy);margin-bottom:8px}
-.changelog li{font-size:12px;color:var(--text-2);margin-left:16px;margin-bottom:4px;line-height:1.5}
-.new-badge{display:inline-block;font-size:9px;font-weight:700;background:#dcfce7;color:#166534;padding:1px 5px;border-radius:3px;margin-left:4px;text-transform:uppercase}
+    --green-d:  #24440a;
 
-/* Live Interactive Sandbox Classes */
-.sandbox-box { background: #ffffff; border: 1.5px dashed var(--navy-2); border-radius: 8px; padding: 20px; margin-bottom: 32px; }
-.sandbox-title { font-size: 14px; font-weight: 600; color: var(--navy); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
-.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 16px; }
-.form-field { display: flex; flex-direction: column; gap: 4px; }
-.form-field label { font-size: 11px; font-weight: 600; color: var(--text-2); text-transform: uppercase; }
-.form-field select, .form-field input[type="text"] { padding: 8px 12px; font-family: var(--sans); font-size: 13px; border: 1.5px solid var(--navy-2); border-radius: 6px; outline: none; background: var(--off); }
-.form-field select:focus { border-color: var(--navy); }
-.checkbox-group { display: flex; flex-direction: column; gap: 4px; max-height: 120px; overflow-y: auto; background: var(--off); padding: 8px; border-radius: 6px; border: 1.5px solid var(--navy-2); }
-.checkbox-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-2); cursor: pointer; }
-.sandbox-result { background: var(--navy-xlt); border-radius: 6px; padding: 16px; display: flex; flex-direction: column; gap: 10px; border: 1px solid var(--navy-2); }
-.res-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed var(--navy-2); padding-bottom: 8px; }
-.res-row:last-child { border-bottom: none; padding-bottom: 0; }
+    --green-l:  #539719;
+
+    --white:    #ffffff;
+
+    --off:      #f4f7f5;
+
+    --ink:      #111b24;
+
+    --ink-2:    #2c3a46;
+
+    --ink-3:    #526371;
+
+    --ink-4:    #8ea1b0;
+
+    --wa:       #25D366;
+
+    --wa-d:     #1aab53;
+
+    --teal:     #1b4d4d;
+
+    --teal-lt:  #2d6b6b;
+
+    --sans:     -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+    --ease-in-out:   cubic-bezier(0.4, 0, 0.2, 1);
+
+  }
+
+
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+
+
+  html, body {
+
+    height: 100%;
+
+    font-family: var(--sans);
+
+    background: var(--off);
+
+    color: var(--ink);
+
+    overflow: hidden;
+
+    -webkit-font-smoothing: antialiased;
+
+  }
+
+
+
+  #app {
+
+    position: fixed; inset: 0; z-index: 1;
+
+    display: flex; flex-direction: column;
+
+    align-items: center; justify-content: center;
+
+    padding: 20px;
+
+  }
+
+
+
+  /* Single Container Metrics matching Carrd structural layouts */
+
+  .wrap {
+
+    width: 100%;
+
+    max-width: 600px;
+
+    background: var(--white);
+
+    border-radius: 16px;
+
+    box-shadow: 0 10px 40px rgba(12, 68, 124, 0.06);
+
+    padding: 40px 32px;
+
+    position: relative;
+
+    height: 1000px; /* Forces a fixed visual box size */
+
+    max-height: none;
+
+    display: flex;
+
+    flex-direction: column;
+
+    overflow: hidden;
+
+  }
+
+
+
+  .screen {
+
+    display: none;
+
+    flex-direction: column;
+
+    opacity: 0;
+
+    transform: translateY(12px);
+
+    transition: opacity .4s var(--ease-out-expo), transform .4s var(--ease-out-expo);
+
+    overflow-y: auto;
+
+    width: 100%;
+
+  }
+
+  .screen.active {
+
+    display: flex; opacity: 1; transform: translateY(0);
+
+  }
+
+
+
+  /* ── Brand Bar ── */
+
+  .nav {
+
+    display: flex; align-items: center; justify-content: space-between;
+
+    margin-bottom: 24px;
+
+    flex-shrink: 0;
+
+    width: 100%;
+
+  }
+
+  .logo {
+
+    font-size: 20px; font-weight: 700; letter-spacing: -.02em;
+
+    color: var(--navy); text-decoration: none;
+
+  }
+
+  .logo span { color: var(--green); }
+
+
+
+  /* Progress Indicators */
+
+  .progress { display: flex; gap: 6px; align-items: center; }
+
+  .dot {
+
+    width: 6px; height: 6px; border-radius: 50%;
+
+    background: #e1e8ed;
+
+    transition: all .4s var(--ease-out-expo);
+
+  }
+
+  .dot.done { background: var(--green); width: 14px; border-radius: 3px; }
+
+  .dot.active { background: var(--navy); transform: scale(1.2); }
+
+
+
+  /* ── Header Labels ── */
+
+  .q-label {
+
+    font-size: 11px; font-weight: 600; letter-spacing: .05em;
+
+    text-transform: uppercase; color: var(--green);
+
+    margin-bottom: 8px;
+
+  }
+
+  .q-text {
+
+    font-size: 22px; font-weight: 800; line-height: 1.25;
+
+    color: var(--ink); margin-bottom: 20px;
+
+    letter-spacing: -.01em;
+
+  }
+
+  .q-text em {
+
+    font-style: normal;
+
+    background: linear-gradient(270deg, var(--green) 45%, var(--navy) 63%);
+
+    -webkit-background-clip: text;
+
+    -webkit-text-fill-color: transparent;
+
+    background-clip: text;
+
+    text-fill-color: transparent;
+
+  }
+
+
+
+  /* ── Conversational Option Buttons ── */
+
+  .answers { display: flex; flex-direction: column; gap: 8px; }
+
+  .answers.multi-col {
+
+    display: grid;
+
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+
+    gap: 8px;
+
+  }
+
+
+
+  .answer-btn {
+
+    display: flex; align-items: center; gap: 12px;
+
+    padding: 14px 16px;
+
+    background: var(--white);
+
+    border: 1.5px solid #d2dbe1;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    text-align: left;
+
+    font-family: var(--sans);
+
+    font-size: 14px; font-weight: 500;
+
+    color: var(--ink-2); line-height: 1.4;
+
+    transition: all .2s var(--ease-out-expo);
+
+    animation: fadeUp .4s var(--ease-out-expo) both;
+
+  }
+
+  .answer-btn:hover {
+
+    border-color: var(--green-l);
+
+    background: #fbfdfa;
+
+    color: var(--green-d);
+
+    transform: translateX(2px);
+
+  }
+
+  .answer-btn.selected {
+
+    border-color: var(--green);
+
+    background: #f4faf0;
+
+    color: var(--green-d);
+
+    font-weight: 600;
+
+  }
+
+
+
+  .btn-icon { font-size: 16px; flex-shrink: 0; }
+
+  .multi-hint { font-size: 12px; color: var(--ink-4); margin-bottom: 12px; font-style: italic; }
+
+
+
+  /* Navigation Buttons */
+
+  .continue-btn {
+
+    margin-top: 16px;
+
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+
+    padding: 14px 24px;
+
+    background: var(--navy); color: var(--white);
+
+    border: none; border-radius: 8px;
+
+    font-family: var(--sans); font-size: 14.5px; font-weight: 600;
+
+    cursor: pointer; transition: all .2s var(--ease-out-expo);
+
+    opacity: 0; pointer-events: none; width: 100%;
+
+  }
+
+  .continue-btn.visible { opacity: 1; pointer-events: all; }
+
+  .continue-btn:hover { background: var(--navy-l); }
+
+
+
+  /* ── Pulse Loading Screen ── */
+
+  #screen-matching { text-align: center; padding: 24px 0; }
+
+  .matching-pulse {
+
+    font-size: 40px; margin-bottom: 16px;
+
+    animation: bounce 1.5s infinite ease-in-out;
+
+  }
+
+  @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+  .matching-title { font-size: 20px; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+
+  .matching-sub { font-size: 14px; color: var(--ink-3); }
+
+
+
+  /* ── Outcome Review Screens ── */
+
+  .result-header { text-align: center; margin-bottom: 20px; }
+
+  .result-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--green); margin-bottom: 6px; }
+
+  .result-headline { font-size: 24px; font-weight: 800; color: var(--navy); margin-bottom: 6px; }
+
+  .result-sub { font-size: 13.5px; color: var(--ink-3); line-height: 1.5; }
+
+
+
+  /* Accordion Cards */
+
+  .team-grid { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+
+  .team-card { border: 1.5px solid #edf2f5; border-radius: 8px; overflow: hidden; }
+
+  .team-card-header {
+
+    display: flex; align-items: center; gap: 10px; padding: 12px 14px;
+
+    background: #f8fafc; cursor: pointer; transition: background .2s;
+
+  }
+
+  .team-card-header:hover { background: #edf2f5; }
+
+  .team-role-badge {
+
+    font-size: 9px; font-weight: 600; letter-spacing: .05em;
+
+    text-transform: uppercase; padding: 3px 6px; border-radius: 4px; white-space: nowrap;
+
+  }
+
+  .badge-anchor { background: var(--navy); color: var(--white); }
+
+  .badge-driver { background: var(--green); color: var(--white); }
+
+  .badge-accel { background: #e1e8ed; color: var(--ink-2); }
+
+  .badge-compliance { background: #e1e8ed; color: var(--ink-2); }
+
+
+
+  .team-expert-name { font-size: 14.5px; font-weight: 700; color: var(--ink); flex: 1; }
+
+  .team-card-chevron { color: var(--ink-4); font-size: 14px; transition: transform .3s; }
+
+  .team-card.open .team-card-chevron { transform: rotate(180deg); }
+
+  .team-card-body { max-height: 0; overflow: hidden; transition: max-height .3s var(--ease-out-expo); background: var(--white); }
+
+  .team-card.open .team-card-body { max-height: 150px; }
+
+  .team-card-body-inner { padding: 12px 14px; font-size: 13px; line-height: 1.5; color: var(--ink-3); border-top: 1px solid #edf2f5; }
+
+
+
+  .phase-notice { background: #f4faf0; border: 1px solid #d4ebd4; border-left: 3px solid var(--green); border-radius: 4px; padding: 12px; margin-bottom: 16px; font-size: 12.5px; color: var(--green-d); line-height: 1.5; }
+
+
+
+  /* Plan Matrices Grid */
+
+  .plan-section { margin-bottom: 20px; }
+
+  .plan-label { font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--ink-4); margin-bottom: 8px; }
+
+  .plan-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+
+  .plan-card { border: 1.5px solid #d2dbe1; border-radius: 8px; padding: 10px 12px; cursor: pointer; transition: all .2s; position: relative; }
+
+  .plan-card:hover { border-color: var(--green-l); background: #fbfdfa; }
+
+  .plan-card.selected { border-color: var(--green); background: #f4faf0; }
+
+  .plan-popular { position: absolute; top: -7px; right: 8px; background: var(--green); color: var(--white); font-size: 8px; font-weight: 700; padding: 1px 4px; border-radius: 3px; text-transform: uppercase; }
+
+  .plan-name { font-size: 14px; font-weight: 700; color: var(--ink); }
+
+  .plan-price { font-size: 13px; font-weight: 700; color: var(--green); margin: 2px 0; }
+
+  .plan-experts { font-size: 11px; color: var(--ink-4); }
+
+
+
+  /* Submit Layout Actions */
+
+  .whatsapp-btn {
+
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+
+    padding: 14px 24px; background: var(--wa); color: var(--white);
+
+    border: none; border-radius: 8px; font-size: 15px; font-weight: 600;
+
+    cursor: pointer; text-decoration: none; transition: background .2s; width: 100%;
+
+  }
+
+  .whatsapp-btn:hover { background: var(--wa-d); }
+
+  .cta-note { font-size: 11.5px; color: var(--ink-4); text-align: center; margin-top: 8px; }
+
+
+
+  .disclaimer { font-size: 10.5px; color: var(--ink-4); line-height: 1.4; margin-top: 16px; border-top: 1px solid #edf2f5; padding-top: 12px; }
+
+  .restart-btn { background: none; border: none; cursor: pointer; font-size: 12px; color: var(--ink-4); text-decoration: underline; margin-top: 12px; text-align: center; display: block; width: 100%; }
+
+
+
+  /* Welcome Screen UI Metric Settings */
+
+  #screen-welcome { text-align: center; }
+
+  .welcome-tag { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--green); background: #f4faf0; padding: 4px 10px; border-radius: 4px; margin-bottom: 16px; }
+
+  .welcome-headline { font-size: 32px; font-weight: 800; line-height: 1.15; color: var(--navy); margin-bottom: 12px; letter-spacing: -.02em; }
+
+  .welcome-headline em { font-style: normal; color: var(--green); }
+
+  .welcome-body { font-size: 14.5px; color: var(--ink-3); line-height: 1.6; margin-bottom: 24px; }
+
+  .start-btn { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; padding: 14px 24px; background: var(--navy); color: var(--white); border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background .2s; }
+
+  .start-btn:hover { background: var(--navy-l); }
+
+  .welcome-reassure { font-size: 11px; color: var(--ink-4); margin-top: 16px; }
+
+
+
+  @keyframes fadeUp {
+
+    from { opacity: 0; transform: translateY(8px); }
+
+    to   { opacity: 1; transform: translateY(0); }
+
+  }
+
 </style>
+
 </head>
+
 <body>
-<div class="page">
 
-<h1>JeevanKey — Routing Mappings v2</h1>
-<p class="sub">Reconciled with Expert Carrd role terminology · Extended to 37 mappings · BHMS integrated · Role badges aligned</p>
 
-<!-- LIVE TESTING SANDBOX ELEMENT -->
-<div class="sandbox-box">
-  <div class="sandbox-title">⚡ Live Engine Sandbox Simulator</div>
-  <div class="form-grid">
-    <div class="form-field">
-      <label>Q1: Focus Area</label>
-      <select id="sim-q1" onchange="runSimulation()">
-        <option value="mind">Stress & Mental Wellness (mind)</option>
-        <option value="gut" selected>Gut & Metabolic (gut)</option>
-        <option value="pain">Musculoskeletal & Pain (pain)</option>
-        <option value="hormonal">Hormonal & Reproductive (hormonal)</option>
-        <option value="energy">Energy & Vitality (energy)</option>
-        <option value="chronic">Chronic & Systemic Conditions (chronic)</option>
-      </select>
+
+<div id="app">
+
+  <div class="wrap">
+
+
+
+    <!-- ══ WELCOME ══ -->
+
+    <div class="screen active" id="screen-welcome">
+
+      <div class="welcome-tag">Clinical Navigator</div>
+
+      <h1 class="welcome-headline">Know exactly<br><em>who</em> can help.</h1>
+
+      <p class="welcome-body">Four questions. Ninety seconds. We match you with the precise combination of experts your health concern actually needs — no guesswork.</p>
+
+      <button class="start-btn" onclick="startNavigator()">Begin →</button>
+
+      <p class="welcome-reassure">Not a diagnosis · Expert-matched pathway</p>
+
     </div>
-    <div class="form-field">
-      <label>Q2: Duration Context</label>
-      <select id="sim-q2" onchange="runSimulation()">
-        <option value="under 6 months">Under 6 Months</option>
-        <option value="6+ months" selected>6+ Months</option>
-        <option value="recurring / years">Recurring / For Years</option>
-      </select>
-    </div>
-    <div class="form-field">
-      <label>Q3: Comorbidity Flags</label>
-      <div class="checkbox-group">
-        <label class="checkbox-item"><input type="checkbox" value="sleep" onchange="runSimulation()"> Sleep Issue</label>
-        <label class="checkbox-item"><input type="checkbox" value="weight" onchange="runSimulation()"> Weight Gain/Loss</label>
-        <label class="checkbox-item"><input type="checkbox" value="mood" onchange="runSimulation()"> Mood Swings/Low Mood</label>
-        <label class="checkbox-item"><input type="checkbox" value="motivation" onchange="runSimulation()"> Low Motivation</label>
-        <label class="checkbox-item"><input type="checkbox" value="meal fatigue" onchange="runSimulation()"> Meal Fatigue</label>
-        <label class="checkbox-item"><input type="checkbox" value="periods" onchange="runSimulation()"> Irregular Periods</label>
-        <label class="checkbox-item"><input type="checkbox" value="acne" onchange="runSimulation()"> Severe Acne</label>
-        <label class="checkbox-item"><input type="checkbox" value="skin_hair" onchange="runSimulation()"> Skin/Hair Manifestations</label>
-        <label class="checkbox-item"><input type="checkbox" value="none" onchange="runSimulation()"> None</label>
+
+
+
+    <!-- ══ Q1 ══ -->
+
+    <div class="screen" id="screen-q1">
+
+      <nav class="nav">
+
+        <a class="logo" href="#">Jeevan<span>Key</span></a>
+
+        <div class="progress"><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+
+      </nav>
+
+      <p class="q-label">Question 1 of 4</p>
+
+      <h2 class="q-text">What's been bothering you <em>the most</em>?</h2>
+
+      <div class="answers" id="q1-answers">
+
+        <button class="answer-btn" onclick="selectQ1('mind')" data-val="mind"><span class="btn-icon">🧠</span><span>My mind won't stop — stress, burnout</span></button>
+
+        <button class="answer-btn" onclick="selectQ1('gut')" data-val="gut"><span class="btn-icon">🌿</span><span>My digestion is a mess — gut, bloating</span></button>
+
+        <button class="answer-btn" onclick="selectQ1('pain')" data-val="pain"><span class="btn-icon">🦴</span><span>My body aches — back pain, joints</span></button>
+
+        <button class="answer-btn" onclick="selectQ1('hormonal')" data-val="hormonal"><span class="btn-icon">🌙</span><span>My hormones feel off — periods, PCOD</span></button>
+
+        <button class="answer-btn" onclick="selectQ1('energy')" data-val="energy"><span class="btn-icon">⚡</span><span>Low energy all the time — fatigue</span></button>
+
+        <button class="answer-btn" onclick="selectQ1('chronic')" data-val="chronic"><span class="btn-icon">📋</span><span>Managing a long-term condition</span></button>
+
       </div>
+
     </div>
-    <div class="form-field">
-      <label>Q4: Lifestyle Context</label>
-      <select id="sim-q4" onchange="runSimulation()">
-        <option value="active">Active Lifestyle</option>
-        <option value="stressed" selected>Highly Stressed</option>
-        <option value="managing">Managing Diagnosed Condition</option>
-        <option value="sedentary">Sedentary Routines</option>
-        <option value="sleep issue">Primary Sleep Complaints</option>
-      </select>
+
+
+
+    <!-- ══ Q2 ══ -->
+
+    <div class="screen" id="screen-q2">
+
+      <nav class="nav">
+
+        <a class="logo" href="#">Jeevan<span>Key</span></a>
+
+        <div class="progress"><div class="dot done"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div></div>
+
+      </nav>
+
+      <p class="q-label">Question 2 of 4</p>
+
+      <h2 class="q-text">How long has this been <em>part of your life</em>?</h2>
+
+      <div class="answers" id="q2-answers">
+
+        <button class="answer-btn" onclick="selectQ2('acute')" data-val="acute"><span class="btn-icon">🌱</span><span>Under a month</span></button>
+
+        <button class="answer-btn" onclick="selectQ2('months')" data-val="months"><span class="btn-icon">📅</span><span>A few months now</span></button>
+
+        <button class="answer-btn" onclick="selectQ2('long')" data-val="long"><span class="btn-icon">⏳</span><span>More than six months</span></button>
+
+        <button class="answer-btn" onclick="selectQ2('recurring')" data-val="recurring"><span class="btn-icon">🔄</span><span>It comes and goes — years</span></button>
+
+      </div>
+
     </div>
+
+
+
+    <!-- ══ Q3 ══ -->
+
+    <div class="screen" id="screen-q3">
+
+      <nav class="nav">
+
+        <a class="logo" href="#">Jeevan<span>Key</span></a>
+
+        <div class="progress"><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div><div class="dot"></div></div>
+
+      </nav>
+
+      <p class="q-label">Question 3 of 4</p>
+
+      <h2 class="q-text">Anything else showing up <em>alongside</em> it?</h2>
+
+      <p class="multi-hint">Tap all that apply — then continue</p>
+
+      <div class="answers multi-col" id="q3-answers">
+
+        <button class="answer-btn" onclick="toggleQ3('sleep')" data-val="sleep"><span class="btn-icon">😴</span>Sleep loops</button>
+
+        <button class="answer-btn" onclick="toggleQ3('weight')" data-val="weight"><span class="btn-icon">⚖️</span>Weight shifts</button>
+
+        <button class="answer-btn" onclick="toggleQ3('skin_hair')" data-val="skin_hair"><span class="btn-icon">✨</span>Skin/hair changes</button>
+
+        <button class="answer-btn" onclick="toggleQ3('mood')" data-val="mood"><span class="btn-icon">🌊</span>Mood swings</button>
+
+        <button class="answer-btn" onclick="toggleQ3('motivation')" data-val="motivation"><span class="btn-icon">🌫️</span>Low motivation</button>
+
+        <button class="answer-btn" onclick="toggleQ3('meal_fatigue')" data-val="meal_fatigue"><span class="btn-icon">🍽️</span>Meal fatigue</button>
+
+        <button class="answer-btn" onclick="toggleQ3('periods')" data-val="periods"><span class="btn-icon">🌺</span>Irregular cycles</button>
+
+        <button class="answer-btn" onclick="toggleQ3('acne')" data-val="acne"><span class="btn-icon">🔴</span>Breakouts</button>
+
+        <button class="answer-btn" onclick="toggleQ3('none')" data-val="none" id="q3-none"><span class="btn-icon">✓</span>None of these</button>
+
+      </div>
+
+      <button class="continue-btn" id="q3-continue" onclick="goToQ4()">Continue</button>
+
+    </div>
+
+
+
+    <!-- ══ Q4 ══ -->
+
+    <div class="screen" id="screen-q4">
+
+      <nav class="nav">
+
+        <a class="logo" href="#">Jeevan<span>Key</span></a>
+
+        <div class="progress"><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div></div>
+
+      </nav>
+
+      <p class="q-label">Question 4 of 4</p>
+
+      <h2 class="q-text">How would you describe your <em>daily life</em> right now?</h2>
+
+      <div class="answers" id="q4-answers">
+
+        <button class="answer-btn" onclick="selectQ4('sedentary')" data-val="sedentary"><span class="btn-icon">💻</span><span>Mostly desk-bound — low movement</span></button>
+
+        <button class="answer-btn" onclick="selectQ4('stressed')" data-val="stressed"><span class="btn-icon">🔥</span><span>Active but running on stress</span></button>
+
+        <button class="answer-btn" onclick="selectQ4('sleep_issue')" data-val="sleep_issue"><span class="btn-icon">🌙</span><span>Sleep is my biggest problem</span></button>
+
+        <button class="answer-btn" onclick="selectQ4('managing')" data-val="managing"><span class="btn-icon">🏥</span><span>Managing an ongoing condition</span></button>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- ══ MATCHING ══ -->
+
+    <div class="screen" id="screen-matching">
+
+      <div class="matching-pulse">🔬</div>
+
+      <h2 class="matching-title">Reading your concern profile…</h2>
+
+      <p class="matching-sub">We're matching you with the expert team best suited to your situation.</p>
+
+    </div>
+
+
+
+    <!-- ══ RESULT ══ -->
+
+    <div class="screen" id="screen-result">
+
+      <div class="result-header">
+
+        <p class="result-eyebrow" id="result-eyebrow">Optimised Care Pathway</p>
+
+        <h2 class="result-headline">Your team is ready.</h2>
+
+        <p class="result-sub" id="result-sub"></p>
+
+      </div>
+
+
+
+      <div class="team-grid" id="team-grid"></div>
+
+      <div class="phase-notice" id="phase-notice" style="display:none"></div>
+
+
+
+      <div class="plan-section">
+
+        <p class="plan-label">Choose your plan</p>
+
+        <div class="plan-grid" id="plan-grid"></div>
+
+      </div>
+
+
+
+      <div class="cta-section">
+
+        <button class="whatsapp-btn" id="whatsapp-btn" onclick="openWhatsAppRedirect()">
+
+          <span class="btn-icon">💬</span><span id="whatsapp-text">Connect on WhatsApp</span>
+
+        </button>
+
+        <p class="cta-note">Your Coordinator will confirm your team allocation within 2 hours.</p>
+
+      </div>
+
+
+
+      <div class="disclaimer">This is a care pathway recommendation. It is not a medical diagnosis. JeevanKey operates as a guided navigation platform to align specialized clinical experts.</div>
+
+      <button class="restart-btn" onclick="restart()">← Start over</button>
+
+    </div>
+
+
+
   </div>
-  <div class="form-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 16px;">
-    <div class="checkbox-item"><input type="checkbox" id="sim-fertility" onchange="runSimulation()"> 🌸 Intent: Trying to Conceive (Fertility Track Override)</div>
-    <div class="checkbox-item"><input type="checkbox" id="sim-pollution" onchange="runSimulation()"> 🛡️ Intent: Pollution/Respiratory Environment Exposure</div>
-  </div>
-  
-  <div class="sandbox-result">
-    <div class="res-row">
-      <span style="font-size: 11px; font-weight: 600; color: var(--text-3);">TRIGGERED MAP IDENTIFIER:</span>
-      <span id="res-id" style="font-family: monospace; font-weight: 700; color: var(--navy); font-size: 13px;">—</span>
-    </div>
-    <div class="res-row">
-      <span style="font-size: 11px; font-weight: 600; color: var(--text-3);">TIER BILLING ASSIGNMENT:</span>
-      <span id="res-tier">—</span>
-    </div>
-    <div class="res-row" style="border-bottom: none; align-items: flex-start;">
-      <span style="font-size: 11px; font-weight: 600; color: var(--text-3); margin-top: 4px;">RENDERED TEAM TOPOLOGY:</span>
-      <div id="res-team">—</div>
-    </div>
-  </div>
-</div>
-
-<!-- CHANGELOG -->
-<div class="changelog">
-  <h3>What changed from v1 (35 mappings)</h3>
-  <ul>
-    <li><strong>Role badge rename:</strong> Anchor → Medical Anchor (MBBS/MD) or Therapeutic Anchor (BAMS/BHMS). Driver → Active Treatment Lead. Accel → Core Accelerator. Comp → Compliance Anchor. All now match Expert Carrd exactly.</li>
-    <li><strong>BHMS integrated</strong> as alternative Therapeutic Anchor in integrative/chronic clusters (gut, chronic, hormonal) wherever BAMS appears — patient or team may indicate preference.</li>
-    <li><strong>Cluster G added — Immunity & Prevention</strong> (3 new mappings): covers patients who have no acute complaint but are proactively seeking immune support, pollution defence, or seasonal wellness.</li>
-    <li><strong>Cluster H added — Fertility & Conception</strong> (4 new mappings): separates fertility from the hormonal cluster, as fertility cases have a distinct team structure including a dedicated women's health specialist.</li>
-    <li><strong>Essential plan now always has a medical or therapeutic anchor</strong> — resolved the gap where Essential had no clinical presence.</li>
-    <li><strong>Fallback mapping updated:</strong> now routes to a BAMS/BHMS Therapeutic Anchor + Dietician on Essential, not just MBBS + Dietician — more economical for the lowest plan floor.</li>
-    <li><strong>Dynamic multi-phase flag</strong> added to all hormonal and fertility mappings above Essential tier.</li>
-  </ul>
-</div>
-
-<!-- LEGEND -->
-<div class="legend">
-  <div class="lg"><span class="rbadge b-ma">Medical Anchor</span> <strong>MBBS / MD — clinical baseline, prescriptions, rule-outs</strong></div>
-  <div class="lg"><span class="rbadge b-ta">Therapeutic Anchor</span> <strong>BAMS / BHMS — integrative baseline, constitutional support</strong></div>
-  <div class="lg"><span class="rbadge b-atl">Active Treatment Lead</span> <strong>Primary therapeutic driver for root cause</strong></div>
-  <div class="lg"><span class="rbadge b-ca">Core Accelerator</span> <strong>Removes barriers to primary plan</strong></div>
-  <div class="lg"><span class="rbadge b-co">Compliance Anchor</span> <strong>Daily habits, tracking, relapse prevention</strong></div>
-  <div class="lg"><span class="multi">Dynamic</span> Multi-phase pathway — team lead may shift at Day 60</div>
-  <div class="lg"><span class="alt">Alt</span> BHMS alternative where BAMS shown</div>
-</div>
-
-<!-- ══ CLUSTER A — MIND ══ -->
-<div class="cluster-section">
-  <div class="cluster-head"><span class="cluster-icon">🧠</span>Cluster A — Stress & Mental Wellness</div>
-  <table class="table">
-    <thead><tr><th>#</th><th>Mapping ID</th><th>Trigger conditions</th><th>Team output</th><th>Plan</th></tr></thead>
-    <tbody>
-    <tr>
-      <td><span class="num">1</span></td>
-      <td class="map-id">mind_essential</td>
-      <td>Q1: <em>mind</em> · Q2: under 6 months · Q3: no secondary signals · Q4: any</td>
-      <td><div class="team-out">
-        <div class="role-row"><span class="rbadge b-ma">Medical Anchor</span>MBBS Doctor</div>
-        <div class="role-row"><span class="rbadge b-atl">Active Treatment Lead</span>Psychotherapist</div>
-      </div></td>
-      <td><span class="tier t-essential">Essential</span></td>
-    </tr>
-    <tr>
-      <td><span class="num">2</span></td>
-      <td class="map-id">mind_premium</td>
-      <td>Q1: <em>mind</em> · Q2: 6+ months OR Q3: <em>weight / meal fatigue / motivation</em></td>
-      <td><div class="team-out">
-        <div class="role-row"><span class="rbadge b-ma">Medical Anchor</span>MBBS Doctor</div>
-        <div class="role-row"><span class="rbadge b-atl">Active Treatment Lead</span>Psychotherapist</div>
-        <div class="role-row"><span class="rbadge b-ca">Core Accelerator</span>Dietician</div>
-      </div></td>
-      <td><span class="tier t-premium">Premium</span></td>
-    </tr>
-    <tr>
-      <td><span class="num">3</span></td>
-      <td class="map-id">mind_sleep_premium</td>
-      <td>Q1: <em>mind</em> · Q3: <em>sleep</em> · Q4: <em>sleep issue</em> OR <em>stressed</em></td>
-      <td><div class="team-out">
-        <div class="role-row"><span class="rbadge b-ma">Medical Anchor</span>MBBS Doctor</div>
-        <div class="role-row"><span class="rbadge b-atl">Active Treatment Lead</span>Psychotherapist</div>
-        <div class="role-row"><span class="rbadge b-co">Compliance Anchor</span>Yoga & Breathwork</div>
-      </div></td>
-      <td><span class="tier t-premium">Premium</span></td>
-    </tr>
-    <tr>
-      <td><span class="num">4</span></td>
-      <td class="map-id">mind_burnout_premium</td>
-      <td>Q1: <em>mind</em> · Q3: <em>sleep + motivation + weight</em> · Q4: <em>sleep issue</em> OR <em>stressed</em> — burnout cluster</td>
-      <td><div class="team-out">
-        <div class="role-row"><span class="rbadge b-ma">Medical Anchor</span>MBBS Doctor</div>
-        <div class="role-row"><span class="rbadge b-atl">Active Treatment Lead</span>Psychotherapist</div>
-        <div class="role-row"><span class="rbadge b-ca">Core Accelerator</span>Dietician</div>
-        <div class="role-row"><span class="rbadge b-co">Compliance Anchor</span>Yoga & Breathwork</div>
-      </div></td>
-      <td><span class="tier t-premium">Premium</span></td>
-    </tr>
-    <tr>
-      <td><span class="num">5</span></td>
-      <td class="map-id">mind_hormonal_xcluster</td>
-      <td>Q1: <em>mind</em> · Q3: <em>periods OR acne OR skin_hair</em> · Q4: <em>stressed</em> — anxiety presenting as hormonal → routes to Cluster D</td>
-      <td><div class="team-out">
-        <div class="role-row"><span class="rbadge b-ma">Medical Anchor</span>Gynaecologist / MBBS</div>
-        <div class="role-row"><span class="rbadge b-atl">Active Treatment Lead</span>Psychotherapist</div>
-        <div class="role-row"><span class="rbadge b-ca">Core Accelerator</span>Dietician</div>
-        <span class="multi">Dynamic</span>
-      </div></td>
-      <td><span class="tier t-premium">Premium</span></td>
-    </tr>
-    </tbody>
-  </table>
-</div>
-
-<!-- ══ CLUSTER B — GUT ══ -->
-<div class="cluster-section">
-  <div class="cluster-head"><span class="cluster-icon">🌿</span>Cluster B — Gut & Metabolic</div>
-  <table class="table">
-    <thead><tr><th>#</th><th>Mapping ID</th><th>Trigger conditions</th><th>Team output</th><th>Plan</th></tr></thead>
-    <tbody>
-    <tr>
-      <td><span class="num">6</span></td>
-      <td class="map-id">gut_essential</td>
-      <td>Q1: <em>gut</em> · Q2: under 6 months · Q3: no secondary signals</td>
-      <td><div class="team-out">
-        <div class="role-row"><span class="rbadge b-ma">Medical Anchor</span>MBBS Doctor</div>
-        <div class="role-row"><span class="rbadge b-atl">Active Treatment Lead</span>Dietician</div>
-      </div></td>
-      <td><span class="tier t-essential">Essential</span></td>
-    </tr>
-    <tr>
-      <td><span class="num">7</span></td>
-      <td class="map-id">gut_premium</td>
-      <td>Q1: <em>gut</em> · Q2: 6+ months · Q3: no strong stress/weight signals</td>
-      <td><div class="team-out">
-        <div class="role-row"><span class="rbadge b-ma">Medical Anchor</span>MBBS Doctor</div>
-        <div class="role-row"><span class="rbadge b-atl">Active Treatment Lead</span>Dietician</div>
-        <div class="role-row"><span class="rbadge b-co">Compliance Anchor</span>Yoga & Breathwork</div>
-      </div></td>
-      <td><span class="tier t-premium">Premium</span></td>
-    </tr>
-    <tr>
-      <td><span class="num">8</span></td>
-      <td class="map-id">gut_weight_premium</td>
-      <td>Q1: <em>gut</em> · Q3: <em>weight</em> selected · No periods/acne signals</td>
-      <td><div class="team-out">
-        <div class="role-row"><span class="rbadge b-ma">Medical Anchor</span>MBBS Doctor</div>
-        <div class="role-row"><span class="rbadge b-atl">Active Treatment Lead</span>Dietician</div>
-        <div class="role-row"><span class="rbadge b-ca">Core Accelerator</span>Yoga & Fitness Specialist</div>
-      </div></td>
-      <td><span class="tier t-premium">Premium</span></td>
-    </tr>
-    <tr>
-      <td><span class="num">9</span></td>
-      <td class="map-id">gut_stress_premium</td>
-      <td>Q1: <em>gut</em> · Q3: <em>mood OR motivation OR sleep</em> · Q4: <em>stressed</em> — gut-brain axis</td>
-      <td><div class="team-out">
-        <div class="role-row"><span class="rbadge b-ma">Medical Anchor</span>MBBS Doctor</div>
-        <div class="role-row"><span class="rbadge b-atl">Active Treatment Lead</span>Dietician</div>
-        <div class="role-row"><span class="rbadge b-ca">Core Accelerator</span>Psychotherapist</div>
-      </div></td>
-      <td><span class="tier t-premium">Premium</span></td>
-    </tr>
-    <tr>
-      <td><span class="num">10</span></td>
-      <td class="map-id">gut_integrative_premium</td>
-      <td>Q1: <em>gut</em> · Q2: <em>recurring / years</em> · Q3: <em>meal fatigue</em> · Q4: <em>sedentary</em> — chronic functional gut</td>
-      <td><div class="team-out">
-        <div class="role-row"><span class="rbadge b-ma">Medical Anchor</span>MBBS Doctor</div>
-        <div class="role-row"><span class="rbadge b-atl">Active Treatment Lead</span>Dietician</div>
-        <div class="role-row"><span class="rbadge b-ca">Core Accelerator</span>BAMS / BHMS <span class="alt">Alt</span></div>
-      </div></td>
-      <td><span class="tier t-premium">Premium</span></td>
-    </tr>
-    </tbody>
-  </table>
-</div>
-
-<!-- ══ CLUSTER C — PAIN ══ -->
-<div class="cluster-section">
-  <div class="cluster-head"><span class="cluster-icon">🦴</span>Cluster C — Musculoskeletal & Pain</div>
-  <table class="table">
-    <thead><tr><th>#</th><th>Mapping ID</th><th>Trigger conditions</th><th>Team output</th><th>Plan</th></tr></thead>
-    <tbody>
-    <tr>
-      <td><span class="num">11</span></td>
-      <td class="map-id">pain_essential</td>
-      <td>Q1: <em>pain</em> · Q2: under 6 months · Q3: no stress/sleep signals</td>
-      <td><div class="team-out">
-        <div class="role-row"><span class="rbadge b-ma">Medical Anchor</span>MBBS Doctor</div>
-        <div class="role-row"><span class="rbadge b-atl">Active Treatment Lead</span>Physiotherapist</div>
-      </div></td>
-      <td><span class="tier t-essential">Essential</span></td>
-    </tr>
-    <tr>
-      <td><span class="num">12</span></td>
-      <td class="map-id">pain_stress_premium</td>
-      <td>Q1: <em>pain</em> · Q3: <em>mood OR sleep</em> OR Q4: <em>stressed</em></td>
-      <td><div class="team-out">
-        <div class="role-row"><span class="rbadge b-ma">Medical Anchor</span>MBBS Doctor</div>
-        <div class="role-row"><span class="rbadge b-atl">Active Treatment Lead</span>Physiotherapist</div>
-        <div class="role-row"><span class="rbadge b-ca">Core Accelerator</span>Psychotherapist</div>
-      </div></td>
-      <td><span class="tier t-premium">Premium</span></td>
-    </tr>
-    <tr>
-      <td><span class="num">13</span></td>
-      <td class="map-id">pain_full_premium</td>
-      <td>Q1: <em>pain</em> · Q2: 6+ months · Q3: <em>sleep + mood + motivation</em> — full pain-stress-sleep cluster</td>
-      <td><div class="team-out">
-        <div class="role-row"><span class="rbadge b-ma">Medical Anchor</span>MBBS Doctor</div>
-        <div class="role-row"><span class="rbadge b-atl">Active Treatment Lead</span>Physiotherapist</div>
-        <div class="role-row"><span class="rbadge b-ca">Core Accelerator</span>Psychotherapist</div>
-        <div class="role-row"><span class="rbadge b-co">Compliance Anchor</span>Yoga & Breathwork</div>
-      </div></td>
-      <td><span class="tier t-premium">Premium</span></td>
-    </tr>
-    <tr>
-      <td><span class="num">14</span></td>
-      <td class="map-id">pain_diet_premium</td>
-      <td>Q1: <em>pain</em> · Q3: <em>weight</em> · Q4: <em>sedentary</em> — pain exacerbated by weight and low mobility</td>
-      <td><div class="team-out">
-        <div class="role-row"><span class="rbadge b-ma">Medical Anchor</span>MBBS Doctor</div>
-        <div class="role-row"><span class="rbadge b-atl">Active Treatment Lead</span>Physiotherapist</div>
-        <div class="role-row"><span class="rbadge b-ca">Core Accelerator</span>Dietician</div>
-      </div></td>
-      <td><span class="tier t-premium">Premium</span></td>
-    </tr>
-    </tbody>
-  </table>
-</div>
-
-<!-- ══ CLUSTER D — HORMONAL ══ -->
-<div class="cluster-section">
-  <div class="cluster-head"><span class="cluster-icon">🌙</span>Cluster D — Hormonal & Reproductive</div>
-  <table class="table">
-    <thead><tr><th>#</th><th>Mapping ID</th><th>Trigger conditions</th><th>Team output</th><th>Plan</th></tr></thead>
-    <tbody>
-    <tr>
-      <td><span class="num">15</span></td>
-      <td class="map-id">hormonal_essential</td>
-      <td>Q1: <em>hormonal</em> · Q2: under 6 months · Q3: no stress/mood signals</td>
-      <td><div class="team-out">
-        <div class="role-row"><span class="rbadge b-ma">Medical Anchor</span>Gynaecologist / MBBS</div>
-        <div class="role-row"><span class="rbadge b-ca">Core Accelerator</span>Dietician</div>
-      </div></td>
-      <td><span class="tier t-essential">Essential</span></td>
-    </tr>
-    <tr>
-      <td><span class="num">16</span></td>
-      <td class="map-id">hormonal_stress_premium</td>
-      <td>Q1: <em>hormonal</em> · Q2: 6+ months OR Q3: <em>mood / motivation / sleep</em> — stress-PCOD loop</td>
-      <td><div class="team-out">
-        <div class="role-row"><span class="rbadge b-ma">Medical Anchor</span>Gynaecologist / Endocrinologist</div>
-        <div class="role-row"><span class="rbadge b-atl">Active Treatment Lead</span>Psychotherapist</div>
-        <div class="role-row"><span class="rbadge b-ca">Core Accelerator</span>Dietician</div>
-        <span class="multi">Dynamic</span>
-      </div></td>
-      <td><span class="tier t-premium">Premium</span></td>
-    </tr>
-    <tr>
-      <td><span class="num">17</span></td>
-      <td class="map-id">hormonal_skin_premium</td>
-      <td>Q1: <em>hormonal</em> · Q3: <em>skin_hair OR acne</em> · No strong mood signals</td>
-      <td><div class="team-out">
-        <div class="role-row"><span class="rbadge b-ma">Medical Anchor</span>MBBS / Gynaecologist</div>
-        <div class="role-row"><span class="rbadge b-atl">Active Treatment Lead</span>Dietician</div>
-        <div class="role-row"><span class="rbadge b-ca">Core Accelerator</span>Psychotherapist</div>
-      </div></td>
-      <td><span class="tier t-premium">Premium</span></td>
-    </tr>
-    <tr>
-      <td><span class="num">18</span></td>
-      <td class="map-id">hormonal_full_elite</td>
-      <td>Q1: <em>hormonal</em> · Q3: <em>periods + acne + mood + motivation</em> · Q2: <em>long / recurring</em> — full PCOD cluster</td>
-      <td><div class="team-out">
-        <div class="role-row"><span class="rbadge b-ma">Medical Anchor</span>Gynaecologist / MD Specialist</div>
-        <div class="role-row"><span class="rbadge b-atl">Active Treatment Lead</span>Dietician</div>
-        <div class="role-row"><span class="rbadge b-ca">Core Accelerator</span>Psychotherapist</div>
-        <div class="role-row"><span class="rbadge b-co">Compliance Anchor</span>Yoga & Breathwork</div>
-        <span class="multi">Dynamic</span>
-      </div></td>
-      <td><span class="tier t-elite">Elite</span></td>
-    </tr>
-    <tr>
-      <td><span class="num">19</span></td>
-      <td class="map-id">hormonal_ayur_premium</td>
-      <td>Q1: <em>hormonal</em> · Q2: <em>recurring / years</em> · Q3: <em>skin_hair + meal fatigue</em> — integrative hormonal support needed</td>
-      <td><div class="team-out">
-        <div class="role-row"><span class="rbadge b-ma">Medical Anchor</span>MBBS / Gynaecologist</div>
-        <div class="role-row"><span class="rbadge b-atl">Active Treatment Lead</span>Dietician</div>
-        <div class="role-row"><span class="rbadge b-ca">Core Accelerator</span>BAMS / BHMS <span class="alt">Alt</span></div>
-        <span class="multi">Dynamic</span>
-      </div></td>
-      <td><span class="tier t-premium">Premium</span></td>
-    </tr>
-    </tbody>
-  </table>
-</div>
-
-<!-- ══ CLUSTER E — ENERGY ══ -->
-<div class="cluster-section">
-  <div class="cluster-head"><span class="cluster-icon">⚡</span>Cluster E — Energy & Vitality</div>
-  <table class="table">
-    <thead><tr><th>#</th><th>Mapping ID</th><th>Trigger conditions</th><th>Team output</th><th>Plan</th></tr></thead>
-    <tbody>
-    <tr>
-      <td><span class="num">20</span></td>
-      <td class="map-id">energy_essential</td>
-      <td>Q3: <em>none</em> OR <em>motivation</em> only · No hormonal/gut/stress overlay</td>
-      <td><div class="team-out">
-        <div class="role-row"><span class="rbadge b-ma">Medical Anchor</span>MBBS Doctor</div>
-        <div class="role-row"><span class="rbadge b-atl">Active Treatment Lead</span>Dietician</div>
-      </div></td>
-      <td><span class="tier t-essential">Essential</span></td>
-    </tr>
-    <tr>
-      <td><span class="num">21</span></td>
-      <td class="map-id">energy_stress_premium</td>
-      <td>Q1: <em>energy</em> · Q3: <em>mood / motivation / sleep</em> OR Q4: <em>stressed</em></td>
-      <td><div class="team-out">
-        <div class="role-row"><span class="rbadge b-ma">Medical Anchor</span>MBBS Doctor</div>
-        <div class="role-row"><span class="rbadge b-atl">Active Treatment Lead</span>Dietician</div>
-        <div class="role-row"><span class="rbadge b-ca">Core Accelerator</span>Psychotherapist</div>
-      </div></td>
-      <td><span class="tier t-premium">Premium</span></td>
-    </tr>
-    <tr>
-      <td><span class="num">22</span></td>
-      <td class="map-id">energy_gut_premium</td>
-      <td>Q1: <em>energy</em> · Q3: <em>meal fatigue + weight</em> · No mood/sleep/hormonal signals</td>
-      <td><div class="team-out">
-        <div class="role-row"><span class="rbadge b-ma">Medical Anchor</span>MBBS Doctor</div>
-        <div class="role-row"><span class="rbadge b-atl">Active Treatment Lead</span>Dietician</div>
-        <div class="role-row"><span class="rbadge b-co">Compliance Anchor</span>Yoga & Breathwork</div>
-      </div></td>
-      <td><span class="tier t-premium">Premium</span></td>
-    </tr>
-    <tr>
-      <td><span class="num">23</span></td>
-      <td class="map-id">energy_hormonal_premium</td>
-      <td>Q1: <em>energy</em> · Q3: <em>periods OR acne OR skin_hair</em> — thyroid or reproductive root</td>
-      <td><div class="team-out">
-        <div class="role-row"><span class="rbadge b-ma">Medical Anchor</span>MBBS / Gynaecologist</div>
-        <div class="role-row"><span class="rbadge b-atl">Active Treatment Lead</span>Dietician</div>
-        <div class="role-row"><span class="rbadge b-ca">Core Accelerator</span>Yoga & Breathwork</div>
-        <span class="multi">Dynamic</span>
-      </div></td>
-      <td><span class="tier t-premium">Premium</span></td>
-    </tr>
-    </tbody>
-  </table>
-</div>
-
-<!-- ══ CLUSTER F — CHRONIC ══ -->
-<div class="cluster-section">
-  <div class="cluster-head"><span class="cluster-icon">📋</span>Cluster F — Chronic & Systemic Conditions</div>
-  <table class="table">
-    <thead><tr><th>#</th><th>Mapping ID</th><th>Trigger conditions</th><th>Team output</th><th>Plan</th></tr></thead>
-    <tbody>
-    <tr>
-      <td><span class="num">24</span></td>
-      <td class="map-id">chronic_essential</td>
-      <td>Q1: <em>chronic</em> · Q2: under 6 months · Q3: no mental health signals · Q4: not <em>managing</em></td>
-      <td><div class="team-out">
-        <div class="role-row"><span class="rbadge b-ma">Medical Anchor</span>MBBS Doctor</div>
-        <div class="role-row"><span class="rbadge b-ca">Core Accelerator</span>Dietician</div>
-      </div></td>
-      <td><span class="tier t-essential">Essential</span></td>
-    </tr>
-    <tr>
-      <td><span class="num">25</span></td>
-      <td class="map-id">chronic_premium</td>
-      <td>Q1: <em>chronic</em> · Q2: 6+ months · Q3: standard signals · Q4: <em>managing</em></td>
-      <td><div class="team-out">
-        <div class="role-row"><span class="rbadge b-ma">Medical Anchor</span>MBBS Doctor</div>
-        <div class="role-row"><span class="rbadge b-ca">Core Accelerator</span>Dietician</div>
-        <div class="role-row"><span class="rbadge b-co">Compliance Anchor</span>Yoga & Breathwork</div>
-      </div></td>
-      <td><span class="tier t-premium">Premium</span></td>
-    </tr>
-    <tr>
-      <td><span class="num">26</span></td>
-      <td class="map-id">chronic_complex_elite</td>
-      <td>Q1: <em>chronic</em> · Q2: <em>recurring / years</em> · Q3: multiple signals · Q4: <em>managing</em></td>
-      <td><div class="team-out">
-        <div class="role-row"><span class="rbadge b-ma">Medical Anchor</span>MD Specialist</div>
-        <div class="role-row"><span class="rbadge b-ca">Core Accelerator</span>MBBS Doctor</div>
-        <div class="role-row"><span class="rbadge b-ca">Core Accelerator</span>Dietician</div>
-        <div class="role-row"><span class="rbadge b-co">Compliance Anchor</span>Yoga & Breathwork</div>
-      </div></td>
-      <td><span class="tier t-elite">Elite</span></td>
-    </tr>
-    <tr>
-      <td><span class="num">27</span></td>
-      <td class="map-id">chronic_psych_elite</td>
-      <td>Q1: <em>chronic</em> · Q2: 6+ months · Q3: <em>mood + motivation + sleep</em> — chronic + psychological load</td>
-      <td><div class="team-out">
-        <div class="role-row"><span class="rbadge b-ma">Medical Anchor</span>MBBS / MD Specialist</div>
-        <div class="role-row"><span class="rbadge b-atl">Active Treatment Lead</span>Psychotherapist</div>
-        <div class="role-row"><span class="rbadge b-ca">Core Accelerator</span>Dietician</div>
-        <div class="role-row"><span class="rbadge b-co">Compliance Anchor</span>Yoga & Breathwork</div>
-      </div></td>
-      <td><span class="tier t-elite">Elite</span></td>
-    </tr>
-    <tr>
-      <td><span class="num">28</span></td>
-      <td class="map-id">chronic_integrative_elite</td>
-      <td>Q1: <em>chronic</em> · Q2: <em>recurring / years</em> · Q3: <em>skin_hair + meal fatigue</em> — long-term integrative need</td>
-      <td><div class="team-out">
-        <div class="role-row"><span class="rbadge b-ma">Medical Anchor</span>MBBS / MD Specialist</div>
-        <div class="role-row"><span class="rbadge b-ca">Core Accelerator</span>Dietician</div>
-        <div class="role-row"><span class="rbadge b-ca">Core Accelerator</span>BAMS / BHMS <span class="alt">Alt</span></div>
-        <div class="role-row"><span class="rbadge b-co">Compliance Anchor</span>Yoga & Breathwork</div>
-      </div></td>
-      <td><span class="tier t-elite">Elite</span></td>
-    </tr>
-    </tbody>
-  </table>
-</div>
-
-<!-- ══ CLUSTER G — IMMUNITY (NEW) ══ -->
-<div class="cluster-section">
-  <div class="cluster-head"><span class="cluster-icon">🛡️</span>Cluster G — Immunity & Prevention <span class="new-badge">NEW</span></div>
-  <table class="table">
-    <thead><tr><th>#</th><th>Mapping ID</th><th>Trigger conditions</th><th>Team output</th><th>Plan</th></tr></thead>
-    <tbody>
-    <tr>
-      <td><span class="num">29</span></td>
-      <td class="map-id">immunity_essential</td>
-      <td>Q1: <em>energy</em> OR <em>gut</em> · Q2: <em>acute / months</em> · Q3: <em>none</em> · Q4: <em>sedentary</em> · Patient explicitly seeking prevention — no acute complaint</td>
-      <td><div class="team-out">
-        <div class="role-row"><span class="rbadge b-ta">Therapeutic Anchor</span>BAMS / BHMS <span class="alt">Alt</span></div>
-        <div class="role-row"><span class="rbadge b-atl">Active Treatment Lead</span>Dietician</div>
-      </div></td>
-      <td><span class="tier t-essential">Essential</span></td>
-    </tr>
-    <tr>
-      <td><span class="num">30</span></td>
-      <td class="map-id">immunity_premium</td>
-      <td>Same as above + Q3: <em>sleep OR motivation</em> — lifestyle factors reducing immunity</td>
-      <td><div class="team-out">
-        <div class="role-row"><span class="rbadge b-ta">Therapeutic Anchor</span>BAMS / BHMS <span class="alt">Alt</span></div>
-        <div class="role-row"><span class="rbadge b-atl">Active Treatment Lead</span>Dietician</div>
-        <div class="role-row"><span class="rbadge b-co">Compliance Anchor</span>Wellness Coach</div>
-      </div></td>
-      <td><span class="tier t-premium">Premium</span></td>
-    </tr>
-    <tr>
-      <td><span class="num">31</span></td>
-      <td class="map-id">immunity_pollution_premium</td>
-      <td>Patient explicitly mentions pollution exposure, commute, respiratory issues — immunity + environment cluster</td>
-      <td><div class="team-out">
-        <div class="role-row"><span class="rbadge b-ma">Medical Anchor</span>MBBS Doctor</div>
-        <div class="role-row"><span class="rbadge b-ta">Therapeutic Anchor</span>BAMS / BHMS <span class="alt">Alt</span></div>
-        <div class="role-row"><span class="rbadge b-atl">Active Treatment Lead</span>Dietician</div>
-      </div></td>
-      <td><span class="tier t-premium">Premium</span></td>
-    </tr>
-    </tbody>
-  </table>
-</div>
-
-<!-- ══ CLUSTER H — FERTILITY (NEW) ══ -->
-<div class="cluster-section">
-  <div class="cluster-head"><span class="cluster-icon">🌸</span>Cluster H — Fertility & Conception <span class="new-badge">NEW</span></div>
-  <table class="table">
-    <thead><tr><th>#</th><th>Mapping ID</th><th>Trigger conditions</th><th>Team output</th><th>Plan</th></tr></thead>
-    <tbody>
-    <tr>
-      <td><span class="num">32</span></td>
-      <td class="map-id">fertility_essential</td>
-      <td>Q1: <em>hormonal</em> · Q3: <em>periods</em> · Patient mentions trying to conceive · Q2: under 6 months · No mood/stress signals</td>
-      <td><div class="team-out">
-        <div class="role-row"><span class="rbadge b-ma">Medical Anchor</span>Gynaecologist</div>
-        <div class="role-row"><span class="rbadge b-ca">Core Accelerator</span>Dietician</div>
-      </div></td>
-      <td><span class="tier t-essential">Essential</span></td>
-    </tr>
-    <tr>
-      <td><span class="num">33</span></td>
-      <td class="map-id">fertility_premium</td>
-      <td>Q1: <em>hormonal</em> · Q3: <em>periods + weight</em> · Fertility intent · Q2: 6+ months</td>
-      <td><div class="team-out">
-        <div class="role-row"><span class="rbadge b-ma">Medical Anchor</span>Gynaecologist</div>
-        <div class="role-row"><span class="rbadge b-atl">Active Treatment Lead</span>Dietician</div>
-        <div class="role-row"><span class="rbadge b-co">Compliance Anchor</span>Yoga & Breathwork</div>
-        <span class="multi">Dynamic</span>
-      </div></td>
-      <td><span class="tier t-premium">Premium</span></td>
-    </tr>
-    <tr>
-      <td><span class="num">34</span></td>
-      <td class="map-id">fertility_stress_elite</td>
-      <td>Q1: <em>hormonal</em> · Q3: <em>periods + mood + motivation</em> · Fertility intent · Q2: <em>recurring</em> — fertility + stress load</td>
-      <td><div class="team-out">
-        <div class="role-row"><span class="rbadge b-ma">Medical Anchor</span>Gynaecologist / MD</div>
-        <div class="role-row"><span class="rbadge b-atl">Psychotherapist</span>Psychotherapist</div>
-        <div class="role-row"><span class="rbadge b-ca">Core Accelerator</span>Dietician</div>
-        <div class="role-row"><span class="rbadge b-co">Compliance Anchor</span>Yoga & Breathwork</div>
-        <span class="multi">Dynamic</span>
-      </div></td>
-      <td><span class="tier t-elite">Elite</span></td>
-    </tr>
-    <tr>
-      <td><span class="num">35</span></td>
-      <td class="map-id">fertility_full_elite</td>
-      <td>Q1: <em>hormonal</em> · Q3: <em>periods + acne + mood + weight</em> · Fertility intent · Q2: <em>recurring / years</em> — complex fertility journey</td>
-      <td><div class="team-out">
-        <div class="role-row"><span class="rbadge b-ma">Medical Anchor</span>Gynaecologist / MD Specialist</div>
-        <div class="role-row"><span class="rbadge b-atl">Active Treatment Lead</span>Dietician</div>
-        <div class="role-row"><span class="rbadge b-ca">Core Accelerator</span>Psychotherapist</div>
-        <div class="role-row"><span class="rbadge b-ca">Core Accelerator</span>BAMS / BHMS <span class="alt">Alt</span></div>
-        <div class="role-row"><span class="rbadge b-co">Compliance Anchor</span>Yoga & Breathwork</div>
-        <span class="multi">Dynamic</span>
-      </div></td>
-      <td><span class="tier t-elite">Elite</span></td>
-    </tr>
-    </tbody>
-  </table>
-</div>
-
-<!-- ══ CLUSTER I — FALLBACK ══ -->
-<div class="cluster-section">
-  <div class="cluster-head"><span class="cluster-icon">🔄</span>Cluster I — Fallback & Ambiguous Profiles</div>
-  <table class="table">
-    <thead><tr><th>#</th><th>Mapping ID</th><th>Trigger conditions</th><th>Team output</th><th>Plan</th></tr></thead>
-    <tbody>
-    <tr>
-      <td><span class="num">36</span></td>
-      <td class="map-id">fallback_essential</td>
-      <td>Ambiguous profile · Multiple Q3 signals across 3+ clusters · No dominant Q1 signal · Cannot be cleanly assigned</td>
-      <td><div class="team-out">
-        <div class="role-row"><span class="rbadge b-ta">Therapeutic Anchor</span>BAMS / BHMS <span class="alt">Alt</span></div>
-        <div class="role-row"><span class="rbadge b-atl">Active Treatment Lead</span>Dietician</div>
-        <div style="font-size:11px;color:#6b8ba4;margin-top:4px">Coordinator follows up to refine profile within 24 hours</div>
-      </div></td>
-      <td><span class="tier t-essential">Essential</span></td>
-    </tr>
-    <tr>
-      <td><span class="num">37</span></td>
-      <td class="map-id">fallback_q4_managing</td>
-      <td>Q4: <em>managing</em> selected · Q1 is ambiguous or <em>chronic</em> · Override — route directly to chronic cluster</td>
-      <td><div class="team-out">
-        <div class="role-row"><span class="rbadge b-ma">Medical Anchor</span>MBBS / MD Specialist</div>
-        <div class="role-row"><span class="rbadge b-ca">Core Accelerator</span>Dietician</div>
-        <div style="font-size:11px;color:#6b8ba4;margin-top:4px">Coordinator qualifies specific condition before team assignment</div>
-      </div></td>
-      <td><span class="tier t-premium">Premium</span></td>
-    </tr>
-    </tbody>
-  </table>
-</div>
-
-<!-- IMPLEMENTATION NOTE -->
-<div style="background:var(--white);border:1px solid var(--navy-2);border-left:4px solid var(--navy);border-radius:8px;padding:16px 20px;font-size:12px;color:var(--text-3);line-height:1.7;margin-bottom:32px">
-  <strong style="color:var(--text);font-weight:600;display:block;margin-bottom:8px">Implementation notes for navigator JS update</strong>
-  <strong style="color:var(--text-2)">Role badge class rename:</strong> b-a → b-ma (Medical Anchor), add b-ta (Therapeutic Anchor), b-d → b-atl (Active Treatment Lead), b-ac → b-ca (Core Accelerator), b-c → b-co (Compliance Anchor).<br><br>
-  <strong style="color:var(--text-2)">New profile keys needed:</strong> immunity_essential, immunity_premium, immunity_pollution_premium, fertility_essential, fertility_premium, fertility_stress_elite, fertility_full_elite, fallback_essential, fallback_q4_managing.<br><br>
-  <strong style="color:var(--text-2)">computeProfile() logic additions:</strong> Detect fertility intent via Q3 'periods' + coordinator follow-up flag. Add immunity branch when Q3 is 'none' + Q4 is 'sedentary'. Add BHMS as displayed alternative wherever BAMS appears — show as "BAMS / BHMS" in team output.<br><br>
-  <strong style="color:var(--text-2)">WhatsApp number:</strong> Confirm 919259684363 is correct — currently set in pickPlan() and selectPlan().<br><br>
-  <strong style="color:var(--text-2)">Total mappings: 37</strong> (up from 35). Two new clusters (G: Immunity, H: Fertility). One fallback cluster restructured into two mappings.
-</div>
 
 </div>
 
-<!-- ══ ENGINE ARCHITECTURE EXECUTION V2 ══ -->
+
+
 <script>
+
+/* ── STATE ── */
+
+const state = { q1: null, q2: null, q3: [], q4: null, selectedPlan: null, activeWaUrl: '#' };
+
+
+
+/* ── NAVIGATION ── */
+
+function showScreen(id) {
+
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+
+  const target = document.getElementById('screen-' + id);
+
+  if (target) {
+
+    target.classList.add('active');
+
+    target.scrollTop = 0;
+
+  }
+
+}
+
+
+
+function startNavigator() { showScreen('q1'); }
+
+
+
+/* ── CONVERSATIONAL LOOPS ── */
+
+function selectQ1(val) {
+
+  state.q1 = val;
+
+  highlightSelected('q1-answers', val);
+
+  setTimeout(() => showScreen('q2'), 250);
+
+}
+
+
+
+function selectQ2(val) {
+
+  state.q2 = val;
+
+  highlightSelected('q2-answers', val);
+
+  setTimeout(() => showScreen('q3'), 250);
+
+}
+
+
+
+function toggleQ3(val) {
+
+  const btn = document.querySelector(`#q3-answers [data-val="${val}"]`);
+
+  const noneBtn = document.getElementById('q3-none');
+
+
+
+  if (val === 'none') {
+
+    state.q3 = ['none'];
+
+    document.querySelectorAll('#q3-answers .answer-btn').forEach(b => b.classList.remove('selected'));
+
+    btn.classList.add('selected');
+
+  } else {
+
+    noneBtn.classList.remove('selected');
+
+    state.q3 = state.q3.filter(v => v !== 'none');
+
+    if (state.q3.includes(val)) {
+
+      state.q3 = state.q3.filter(v => v !== val);
+
+      btn.classList.remove('selected');
+
+    } else {
+
+      state.q3.push(val);
+
+      btn.classList.add('selected');
+
+    }
+
+  }
+
+  document.getElementById('q3-continue').classList.toggle('visible', state.q3.length > 0);
+
+}
+
+
+
+function goToQ4() { if (state.q3.length > 0) showScreen('q4'); }
+
+
+
+function selectQ4(val) {
+
+  state.q4 = val;
+
+  highlightSelected('q4-answers', val);
+
+  setTimeout(() => {
+
+    showScreen('matching');
+
+    setTimeout(() => computeResult(), 2000);
+
+  }, 250);
+
+}
+
+
+
+function highlightSelected(containerId, val) {
+
+  document.querySelectorAll(`#${containerId} .answer-btn`).forEach(b => {
+
+    b.classList.toggle('selected', b.dataset.val === val);
+
+  });
+
+}
+
+
+
+/* ── PROFILE ROUTING OBJECT MATRIX ── */
+
 const PROFILES = {
-  // CLUSTER A — MIND
-  "mind_essential": { plan: "Essential", tags: [], team: [["ma", "MBBS Doctor"], ["atl", "Psychotherapist"]] },
-  "mind_premium": { plan: "Premium", tags: [], team: [["ma", "MBBS Doctor"], ["atl", "Psychotherapist"], ["ca", "Dietician"]] },
-  "mind_sleep_premium": { plan: "Premium", tags: [], team: [["ma", "MBBS Doctor"], ["atl", "Psychotherapist"], ["co", "Yoga & Breathwork"]] },
-  "mind_burnout_premium": { plan: "Premium", tags: [], team: [["ma", "MBBS Doctor"], ["atl", "Psychotherapist"], ["ca", "Dietician"], ["co", "Yoga & Breathwork"]] },
-  "mind_hormonal_xcluster": { plan: "Premium", tags: ["Dynamic"], team: [["ma", "Gynaecologist / MBBS"], ["atl", "Psychotherapist"], ["ca", "Dietician"]] },
 
-  // CLUSTER B — GUT
-  "gut_essential": { plan: "Essential", tags: [], team: [["ma", "MBBS Doctor"], ["atl", "Dietician"]] },
-  "gut_premium": { plan: "Premium", tags: [], team: [["ma", "MBBS Doctor"], ["atl", "Dietician"], ["co", "Yoga & Breathwork"]] },
-  "gut_weight_premium": { plan: "Premium", tags: [], team: [["ma", "MBBS Doctor"], ["atl", "Dietician"], ["ca", "Yoga & Fitness Specialist"]] },
-  "gut_stress_premium": { plan: "Premium", tags: [], team: [["ma", "MBBS Doctor"], ["atl", "Dietician"], ["ca", "Psychotherapist"]] },
-  "gut_integrative_premium": { plan: "Premium", tags: ["Alt"], team: [["ma", "MBBS Doctor"], ["atl", "Dietician"], ["ca", "BAMS / BHMS"]] },
+  hormonal: {
 
-  // CLUSTER C — PAIN
-  "pain_essential": { plan: "Essential", tags: [], team: [["ma", "MBBS Doctor"], ["atl", "Physiotherapist"]] },
-  "pain_stress_premium": { plan: "Premium", tags: [], team: [["ma", "MBBS Doctor"], ["atl", "Physiotherapist"], ["ca", "Psychotherapist"]] },
-  "pain_full_premium": { plan: "Premium", tags: [], team: [["ma", "MBBS Doctor"], ["atl", "Physiotherapist"], ["ca", "Psychotherapist"], ["co", "Yoga & Breathwork"]] },
-  "pain_diet_premium": { plan: "Premium", tags: [], team: [["ma", "MBBS Doctor"], ["atl", "Physiotherapist"], ["ca", "Dietician"]] },
+    eyebrow: 'Hormonal — Dynamic Care Track',
 
-  // CLUSTER D — HORMONAL
-  "hormonal_essential": { plan: "Essential", tags: [], team: [["ma", "Gynaecologist / MBBS"], ["ca", "Dietician"]] },
-  "hormonal_stress_premium": { plan: "Premium", tags: ["Dynamic"], team: [["ma", "Gynaecologist / Endocrinologist"], ["atl", "Psychotherapist"], ["ca", "Dietician"]] },
-  "hormonal_skin_premium": { plan: "Premium", tags: [], team: [["ma", "MBBS / Gynaecologist"], ["atl", "Dietician"], ["ca", "Psychotherapist"]] },
-  "hormonal_full_elite": { plan: "Elite", tags: ["Dynamic"], team: [["ma", "Gynaecologist / MD Specialist"], ["atl", "Dietician"], ["ca", "Psychotherapist"], ["co", "Yoga & Breathwork"]] },
-  "hormonal_ayur_premium": { plan: "Premium", tags: ["Dynamic", "Alt"], team: [["ma", "MBBS / Gynaecologist"], ["atl", "Dietician"], ["ca", "BAMS / BHMS"]] },
+    sub: 'Your profile reflects a hormonal-stress cluster. We have aligned clinical confirmation leads with underlying cortisol recovery paths.',
 
-  // CLUSTER E — ENERGY
-  "energy_essential": { plan: "Essential", tags: [], team: [["ma", "MBBS Doctor"], ["atl", "Dietician"]] },
-  "energy_stress_premium": { plan: "Premium", tags: [], team: [["ma", "MBBS Doctor"], ["atl", "Dietician"], ["ca", "Psychotherapist"]] },
-  "energy_gut_premium": { plan: "Premium", tags: [], team: [["ma", "MBBS Doctor"], ["atl", "Dietician"], ["co", "Yoga & Breathwork"]] },
-  "energy_hormonal_premium": { plan: "Premium", tags: ["Dynamic"], team: [["ma", "MBBS / Gynaecologist"], ["atl", "Dietician"], ["ca", "Yoga & Breathwork"]] },
+    team: [
 
-  // CLUSTER F — CHRONIC
-  "chronic_essential": { plan: "Essential", tags: [], team: [["ma", "MBBS Doctor"], ["ca", "Dietician"]] },
-  "chronic_premium": { plan: "Premium", tags: [], team: [["ma", "MBBS Doctor"], ["ca", "Dietician"], ["co", "Yoga & Breathwork"]] },
-  "chronic_complex_elite": { plan: "Elite", tags: [], team: [["ma", "MD Specialist"], ["ca", "MBBS Doctor"], ["ca", "Dietician"], ["co", "Yoga & Breathwork"]] },
-  "chronic_psych_elite": { plan: "Elite", tags: [], team: [["ma", "MBBS / MD Specialist"], ["atl", "Psychotherapist"], ["ca", "Dietician"], ["co", "Yoga & Breathwork"]] },
-  "chronic_integrative_elite": { plan: "Elite", tags: ["Alt"], team: [["ma", "MBBS / MD Specialist"], ["ca", "Dietician"], ["ca", "BAMS / BHMS"], ["co", "Yoga & Breathwork"]] },
+      { role: 'Diagnostic Anchor', badge: 'badge-anchor', name: 'Gynaecologist / Endocrinologist', detail: 'Establishes clinical baseline tracking panels (LH/FSH, fasting insulin, androgen profiles).' },
 
-  // CLUSTER G — IMMUNITY
-  "immunity_essential": { plan: "Essential", tags: ["Alt"], team: [["ta", "BAMS / BHMS"], ["atl", "Dietician"]] },
-  "immunity_premium": { plan: "Premium", tags: ["Alt"], team: [["ta", "BAMS / BHMS"], ["atl", "Dietician"], ["co", "Wellness Coach"]] },
-  "immunity_pollution_premium": { plan: "Premium", tags: ["Alt"], team: [["ma", "MBBS Doctor"], ["ta", "BAMS / BHMS"], ["atl", "Dietician"]] },
+      { role: 'Active Treatment Lead', badge: 'badge-driver', name: 'Psychotherapist', detail: 'Targets cortisol stabilization loops directly linked to PCOD loop flare-ups.' },
 
-  // CLUSTER H — FERTILITY
-  "fertility_essential": { plan: "Essential", tags: [], team: [["ma", "Gynaecologist"], ["ca", "Dietician"]] },
-  "fertility_premium": { plan: "Premium", tags: ["Dynamic"], team: [["ma", "Gynaecologist"], ["atl", "Dietician"], ["co", "Yoga & Breathwork"]] },
-  "fertility_stress_elite": { plan: "Elite", tags: ["Dynamic"], team: [["ma", "Gynaecologist / MD"], ["atl", "Psychotherapist"], ["ca", "Dietician"], ["co", "Yoga & Breathwork"]] },
-  "fertility_full_elite": { plan: "Elite", tags: ["Dynamic", "Alt"], team: [["ma", "Gynaecologist / MD Specialist"], ["atl", "Dietician"], ["ca", "Psychotherapist"], ["ca", "BAMS / BHMS"], ["co", "Yoga & Breathwork"]] },
+      { role: 'Accelerator', badge: 'badge-accel', name: 'Dietician', detail: 'Deploys target low-GI meal tracking configurations for insulin optimizations.' }
 
-  // CLUSTER I — FALLBACK
-  "fallback_essential": { plan: "Essential", tags: ["Alt"], team: [["ta", "BAMS / BHMS"], ["atl", "Dietician"]] },
-  "fallback_q4_managing": { plan: "Premium", tags: [], team: [["ma", "MBBS / MD Specialist"], ["ca", "Dietician"]] }
+    ],
+
+    multiphase: true,
+
+    phaseNotice: '<strong>Dynamic Review Protocol:</strong> At day 60, if nervous load stabilizes but physical indicators persist, your Gynaecologist assumes structural treatment leadership.',
+
+    planFloor: 'premium',
+
+    waCopy: 'Hello JeevanKey, I completed the Clinical Navigator. Result: Hormonal Cluster.'
+
+  },
+
+  mind: {
+
+    eyebrow: 'Nervous System Stabilization',
+
+    sub: 'Profile points heavily toward stress exhaustion and neural tracking loops. Focus is placed on systemic behavioral recovery mechanics.',
+
+    team: [
+
+      { role: 'Diagnostic Anchor', badge: 'badge-anchor', name: 'MBBS General Practitioner', detail: 'Rules out nutritional deficiencies, thyroid fluctuations, or biochemical mimics.' },
+
+      { role: 'Active Treatment Lead', badge: 'badge-driver', name: 'Psychotherapist', detail: 'Manages evidence-backed cognitive interventions for nervous system de-escalation.' }
+
+    ],
+
+    multiphase: false,
+
+    planFloor: 'essential',
+
+    waCopy: 'Hello JeevanKey, I completed the Clinical Navigator. Result: Stress and Mental Wellness.'
+
+  },
+
+  gut: {
+
+    eyebrow: 'Metabolic & Gut Restoration',
+
+    sub: 'Focused on functional gastrointestinal optimization pathways supervised under baseline medical rule-outs.',
+
+    team: [
+
+      { role: 'Diagnostic Anchor', badge: 'badge-anchor', name: 'MBBS Clinician', detail: 'Reviews blood biomarker baselines and systemic inflammatory markers.' },
+
+      { role: 'Active Treatment Lead', badge: 'badge-driver', name: 'Dietician', detail: 'Runs tailored element elimination matrices to isolate persistent food triggers.' }
+
+    ],
+
+    multiphase: false,
+
+    planFloor: 'essential',
+
+    waCopy: 'Hello JeevanKey, I completed the Clinical Navigator. Result: Gut & Metabolic Cluster.'
+
+  },
+
+  movement: {
+
+    eyebrow: 'Musculoskeletal Rehabilitation',
+
+    sub: 'Aligns mechanical posture correction pipelines while addressing the pain-stress amplification loop.',
+
+    team: [
+
+      { role: 'Diagnostic Anchor', badge: 'badge-anchor', name: 'MBBS Doctor', detail: 'Assesses structural nerve radiculopathy or decompression indicators.' },
+
+      { role: 'Active Treatment Lead', badge: 'badge-driver', name: 'Physiotherapist', detail: 'Deploys customized physical spinal alignment and tracking exercises.' }
+
+    ],
+
+    multiphase: false,
+
+    planFloor: 'premium',
+
+    waCopy: 'Hello JeevanKey, I completed the Clinical Navigator. Result: Musculoskeletal Rehab.'
+
+  },
+
+  chronic: {
+
+    eyebrow: 'Chronic Systematic Care Plan',
+
+    sub: 'Engineered for consistent biological management of systemic long-term tracking metrics.',
+
+    team: [
+
+      { role: 'Diagnostic Anchor & Lead', badge: 'badge-anchor', name: 'MD Specialist Consultation', detail: 'Central medical authority monitoring blood markers and adjusting prescriptions.' },
+
+      { role: 'Accelerator', badge: 'badge-accel', name: 'Dietician', detail: 'Configures glycemic or cardiovascular disease-focused restriction parameters.' }
+
+    ],
+
+    multiphase: false,
+
+    planFloor: 'elite',
+
+    waCopy: 'Hello JeevanKey, I completed the Clinical Navigator. Result: Chronic Condition Management.'
+
+  }
+
 };
 
-function computeProfile(answers) {
-  const q1 = (answers.q1 || "").toLowerCase().trim();
-  const q2 = (answers.q2 || "").toLowerCase().trim();
-  const q3 = Array.isArray(answers.q3) ? answers.q3.map(v => v.toLowerCase().trim()) : [];
-  const q4 = (answers.q4 || "").toLowerCase().trim();
-  
-  const isChronic = q1 === 'chronic';
-  const isLongTerm = q2 === '6+ months' || q2 === 'recurring / years';
-  const hasSleep = q3.includes('sleep');
-  const hasWeight = q3.includes('weight');
-  const hasMood = q3.includes('mood');
-  const hasMotivation = q3.includes('motivation');
-  const hasMealFatigue = q3.includes('meal fatigue');
-  const hasPeriods = q3.includes('periods');
-  const hasSkinHair = q3.includes('skin_hair');
-  const hasAcne = q3.includes('acne');
-  const isStressed = q4 === 'stressed';
-  const isManaging = q4 === 'managing';
-  const isSedentary = q4 === 'sedentary';
-  const isFertilityIntent = answers.fertilityIntent === true; 
-  const isPollutionExposure = answers.pollutionExposure === true;
 
-  // 1. CLUSTER H — FERTILITY ROUTING RULES
-  if (q1 === 'hormonal' && isFertilityIntent) {
-    if (hasPeriods && hasAcne && hasMood && hasWeight && isLongTerm) return "fertility_full_elite";
-    if (hasPeriods && hasMood && hasMotivation) return "fertility_stress_elite";
-    if (hasPeriods && hasWeight && q2 === '6+ months') return "fertility_premium";
-    if (hasPeriods) return "fertility_essential";
-  }
 
-  // 2. CLUSTER A — STRESS & MIND ROUTING RULES
-  if (q1 === 'mind') {
-    if (hasPeriods || hasAcne || hasSkinHair) return "mind_hormonal_xcluster";
-    if (hasSleep && hasMotivation && hasWeight && isStressed) return "mind_burnout_premium";
-    if (hasSleep && (isStressed || q4 === 'sleep issue')) return "mind_sleep_premium";
-    if (q2 === '6+ months' || hasWeight || hasMealFatigue || hasMotivation) return "mind_premium";
-    return "mind_essential";
-  }
+const PLANS = [
 
-  // 3. CLUSTER B — GUT ROUTING RULES
-  if (q1 === 'gut') {
-    if (q2 === 'recurring / years' && hasMealFatigue && isSedentary) return "gut_integrative_premium";
-    if (hasMood || hasMotivation || hasSleep || isStressed) return "gut_stress_premium";
-    if (hasWeight) return "gut_weight_premium";
-    if (q2 === '6+ months') return "gut_premium";
-    return "gut_essential";
-  }
+  { id: 'trial', name: 'Trial', price: '₹499', period: 'one-time', experts: '1 Expert Consultation', featured: false },
 
-  // 4. CLUSTER C — PAIN ROUTING RULES
-  if (q1 === 'pain') {
-    if (hasWeight && isSedentary) return "pain_diet_premium";
-    if (isLongTerm && hasSleep && hasMood && hasMotivation) return "pain_full_premium";
-    if (hasMood || hasSleep || isStressed) return "pain_stress_premium";
-    return "pain_essential";
-  }
+  { id: 'essential', name: 'Essential', price: '₹2,499', period: '/month', experts: '2 Coordinated Experts', featured: false },
 
-  // 5. CLUSTER D — HORMONAL ROUTING RULES
-  if (q1 === 'hormonal') {
-    if (q2 === 'recurring / years' && hasSkinHair && hasMealFatigue) return "hormonal_ayur_premium";
-    if (hasPeriods && hasAcne && hasMood && hasMotivation && isLongTerm) return "hormonal_full_elite";
-    if (hasSkinHair || hasAcne) return "hormonal_skin_premium";
-    if (q2 === '6+ months' || hasMood || hasMotivation || hasSleep) return "hormonal_stress_premium";
-    return "hormonal_essential";
-  }
+  { id: 'premium', name: 'Premium', price: '₹4,499', period: '/month', experts: '3 Specialized Experts', featured: true },
 
-  // 6. CLUSTER E — ENERGY ROUTING RULES
-  if (q1 === 'energy') {
-    if (hasPeriods || hasAcne || hasSkinHair) return "energy_hormonal_premium";
-    if (hasMealFatigue && hasWeight) return "energy_gut_premium";
-    if (hasMood || hasMotivation || hasSleep || isStressed) return "energy_stress_premium";
-    return "energy_essential";
-  }
+  { id: 'elite', name: 'Elite', price: '₹7,499', period: '/month', experts: '4+ Clinical Experts', featured: false }
 
-  // 7. CLUSTER F — CHRONIC ROUTING RULES
-  if (isChronic || isManaging) {
-    if (q2 === 'recurring / years' && hasSkinHair && hasMealFatigue) return "chronic_integrative_elite";
-    if (q2 === '6+ months' && hasMood && hasMotivation && hasSleep) return "chronic_psych_elite";
-    if (q2 === 'recurring / years') return "chronic_complex_elite";
-    if (q2 === '6+ months') return "chronic_premium";
-    return "chronic_essential";
-  }
+];
 
-  // 8. CLUSTER G — PROACTIVE IMMUNITY ROUTING RULES
-  if (q3.length === 0 || q3.includes('none')) {
-    if (isPollutionExposure) return "immunity_pollution_premium";
-    if (hasMotivation || hasSleep) return "immunity_premium";
-    if (isSedentary && (q1 === 'energy' || q1 === 'gut')) return "immunity_essential";
-  }
 
-  // 9. CLUSTER I — FALLBACK OVERRIDES
-  if (isManaging) return "fallback_q4_managing";
-  return "fallback_essential";
+
+function computeProfile() {
+
+  if (state.q1 === 'chronic' || state.q4 === 'managing') return 'chronic';
+
+  if (state.q1 === 'hormonal') return 'hormonal';
+
+  if (state.q1 === 'mind' && state.q3.some(v => ['periods','acne','skin_hair'].includes(v))) return 'hormonal';
+
+  if (state.q1 === 'pain') return 'movement';
+
+  if (state.q1 === 'gut') return 'gut';
+
+  return 'mind';
+
 }
 
-function renderTeamBadges(profileId) {
-  const profile = PROFILES[profileId];
-  if (!profile) return `<span style='color:red;'>Unknown Map Profile</span>`;
 
-  let html = `<div class="team-out">`;
-  profile.team.forEach(member => {
-    const roleKey = member[0]; 
-    const roleName = member[1];
-    let fullRoleTitle = "Expert Advisor";
-    if (roleKey === "ma") fullRoleTitle = "Medical Anchor";
-    if (roleKey === "ta") fullRoleTitle = "Therapeutic Anchor";
-    if (roleKey === "atl") fullRoleTitle = "Active Treatment Lead";
-    if (roleKey === "ca") fullRoleTitle = "Core Accelerator";
-    if (roleKey === "co") fullRoleTitle = "Compliance Anchor";
 
-    html += `
-      <div class="role-row">
-        <span class="rbadge b-${roleKey}">${fullRoleTitle}</span>
-        <strong>${roleName}</strong>
-      </div>`;
+function computeResult() {
+
+  const pKey = computeProfile();
+
+  const profile = PROFILES[pKey];
+
+
+
+  document.getElementById('result-eyebrow').textContent = profile.eyebrow;
+
+  document.getElementById('result-sub').textContent = profile.sub;
+
+
+
+  const grid = document.getElementById('team-grid');
+
+  grid.innerHTML = '';
+
+  profile.team.forEach((m, idx) => {
+
+    const card = document.createElement('div');
+
+    card.className = 'team-card';
+
+    card.innerHTML = `
+
+      <div class="team-card-header" onclick="this.parentElement.classList.toggle('open')">
+
+        <span class="team-role-badge ${m.badge}">${m.role}</span>
+
+        <span class="team-expert-name">${m.name}</span>
+
+        <span class="team-card-chevron">▼</span>
+
+      </div>
+
+      <div class="team-card-body"><div class="team-card-body-inner">${m.detail}</div></div>
+
+    `;
+
+    grid.appendChild(card);
+
+    if (idx === 0) card.classList.add('open');
+
   });
 
-  profile.tags.forEach(tag => {
-    if (tag === "Dynamic") html += `<span class="multi" style="margin-top:4px; align-self: flex-start;">Dynamic Matrix</span>`;
-    if (tag === "Alt") html += `<span class="alt" style="margin-top:4px; align-self: flex-start;">Alt Track Active</span>`;
-  });
 
-  html += `</div>`;
-  return html;
-}
 
-/* SANDBOX SIMULATOR CONTROLLER HOOK */
-function runSimulation() {
-  const q1 = document.getElementById('sim-q1').value;
-  const q2 = document.getElementById('sim-q2').value;
-  const q4 = document.getElementById('sim-q4').value;
-  
-  const q3 = [];
-  document.querySelectorAll('.checkbox-group input:checked').forEach(cb => {
-    q3.push(cb.value);
-  });
-  
-  const fertilityIntent = document.getElementById('sim-fertility').checked;
-  const pollutionExposure = document.getElementById('sim-pollution').checked;
-  
-  const mockAnswers = { q1, q2, q3, q4, fertilityIntent, pollutionExposure };
-  const matchedId = computeProfile(mockAnswers);
-  const profileData = PROFILES[matchedId];
-  
-  document.getElementById('res-id').textContent = matchedId;
-  
-  if(profileData) {
-    const tierEl = document.getElementById('res-tier');
-    tierEl.textContent = profileData.plan;
-    tierEl.className = 'tier t-' + profileData.plan.toLowerCase();
-    document.getElementById('res-team').innerHTML = renderTeamBadges(matchedId);
+  const pNotice = document.getElementById('phase-notice');
+
+  if (profile.multiphase && profile.phaseNotice) {
+
+    pNotice.style.display = 'block';
+
+    pNotice.innerHTML = profile.phaseNotice;
+
+  } else {
+
+    pNotice.style.display = 'none';
+
   }
+
+
+
+  const planGrid = document.getElementById('plan-grid');
+
+  planGrid.innerHTML = '';
+
+  PLANS.forEach(p => {
+
+    const card = document.createElement('div');
+
+    card.className = 'plan-card' + (p.featured ? ' featured' : '');
+
+    card.dataset.planId = p.id;
+
+    card.innerHTML = `
+
+      ${p.featured ? '<div class="plan-popular">Popular</div>' : ''}
+
+      <div class="plan-name">${p.name}</div>
+
+      <div class="plan-price">${p.price}<span style="font-size:10px;color:var(--ink-4)"> ${p.period}</span></div>
+
+      <div class="plan-experts">${p.experts}</div>
+
+    `;
+
+    card.onclick = () => selectPlan(p.id, profile.waCopy);
+
+    planGrid.appendChild(card);
+
+  });
+
+
+
+  selectPlan(profile.planFloor, profile.waCopy);
+
+  showScreen('result');
+
 }
 
-// Auto running simulation engine configuration values on baseline instance startup
-document.addEventListener('DOMContentLoaded', runSimulation);
+
+
+function selectPlan(pId, waCopy) {
+
+  state.selectedPlan = pId;
+
+  document.querySelectorAll('.plan-card').forEach(c => {
+
+    c.classList.toggle('selected', c.dataset.planId === pId);
+
+  });
+
+  const plan = PLANS.find(p => p.id === pId);
+
+  const consentText = '\n\nI accept the Terms of Service and consent to care coordination via WhatsApp.';
+
+  const fullText = waCopy + (plan ? ` Plan Interest: ${plan.name} Tier.` : '') + consentText;
+
+  state.activeWaUrl = 'https://wa.me/919259684363?text=' + encodeURIComponent(fullText);
+
+  document.getElementById('whatsapp-text').textContent = plan ? `Start with ${plan.name} Pathway →` : 'Connect on WhatsApp →';
+
+}
+
+
+
+function openWhatsAppRedirect() {
+
+  if (state.activeWaUrl && state.activeWaUrl !== '#') {
+
+    window.open(state.activeWaUrl, '_blank');
+
+  }
+
+}
+
+
+
+function restart() {
+
+  state.q1 = null; state.q2 = null; state.q3 = []; state.q4 = null; state.selectedPlan = null;
+
+  document.querySelectorAll('#q3-answers .answer-btn').forEach(b => b.classList.remove('selected'));
+
+  document.getElementById('q3-continue').classList.remove('visible');
+
+  showScreen('welcome');
+
+}
+
+
+
+showScreen('welcome');
+
 </script>
+
 </body>
+
 </html>
+
