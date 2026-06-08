@@ -66,7 +66,6 @@ html, body {
   padding: 40px 32px;
   position: relative;
   height: auto;
-  min-height: 580px;
   max-height: 92vh;
   display: flex;
   flex-direction: column;
@@ -1161,6 +1160,22 @@ function restart() {
   document.getElementById('q3-conceive').style.display = 'none';
   showScreen('welcome');
 }
+// Add this block inside your script tag right before the final setProgress/initialization runs:
+const resizeObserver = new ResizeObserver(entries => {
+  for (let entry of entries) {
+    window.parent.postMessage({
+      type: 'resize',
+      height: entry.contentRect.height
+    }, '*');
+  }
+});
+
+// Selects the master responsive container card of your v5 UI layout
+const targetWrap = document.querySelector('.wrap');
+if (targetWrap) {
+  resizeObserver.observe(targetWrap);
+}
+
 showScreen('welcome');
 </script>
 </body>
