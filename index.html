@@ -77,6 +77,14 @@ html, body {
 }
 .screen::-webkit-scrollbar { display: none; }
 .screen.active { display: flex; opacity: 1; transform: translateY(0); overflow: visible; }
+#screen-result.active, #screen-q3.active {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  max-height: calc(100svh - 40px);
+  scrollbar-width: none;
+}
+#screen-result.active::-webkit-scrollbar,
+#screen-q3.active::-webkit-scrollbar { display: none; }
 
 /* ── Brand Bar ── */
 .nav {
@@ -155,7 +163,7 @@ html, body {
 .answers { display: flex; flex-direction: column; gap: 8px; }
 .answers.multi-col {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 8px;
 }
 .answer-btn {
@@ -373,7 +381,7 @@ html, body {
 
 @media (max-width: 480px) {
   #app { padding: 0; }
-  .wrap { padding: 22px 16px; height: auto; border-radius: 0; width: 100%; }
+  .wrap { padding: 20px 16px 32px; height: auto; border-radius: 0; width: 100%; overflow: visible; }
   .q-text { font-size: 18px; }
   .welcome-headline { font-size: 24px; }
   .answers.multi-col { grid-template-columns: 1fr 1fr; }
@@ -1834,6 +1842,7 @@ function computeResult(){
 
   selectPlan(tier,profile.waCopy);
   showScreen('result');
+  setTimeout(_broadcastHeight, 600);
 }
 
 function selectPlan(pId,waCopy){
