@@ -20,7 +20,7 @@
   --green-d:       #24440a;
   --green-l:       #539719;
   --white:         #ffffff;
-  --off:           #f4f7f5;
+  --off:           #8EDBF5;
   --ink:           #111b24;
   --ink-2:         #2c3a46;
   --ink-3:         #526371;
@@ -41,19 +41,19 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body {
-  height: 100%;
+  height: auto;
   font-family: var(--sans);
   background: var(--off);
   color: var(--ink);
-  overflow: hidden;
+  overflow: visible;
   -webkit-font-smoothing: antialiased;
 }
 
 #app {
-  position: fixed; inset: 0; z-index: 1;
+  position: relative; z-index: 1;
   display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  padding: 20px;
+  align-items: center; justify-content: flex-start;
+  padding: 10px 0;
 }
 
 /* ── Container ── */
@@ -66,10 +66,9 @@ html, body {
   padding: 40px 32px;
   position: relative;
   height: auto;
-  min-height: 500px;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible;
 }
 
 /* ── Screen transitions ── */
@@ -79,16 +78,12 @@ html, body {
   opacity: 0;
   transform: translateY(12px);
   transition: opacity .4s var(--ease-out-expo), transform .4s var(--ease-out-expo);
-  overflow-y: auto;
+  overflow: visible;
   width: 100%;
-  flex: 1;
-  scrollbar-width: thin;
-  scrollbar-color: #d2dbe1 transparent;
+  scrollbar-width: none;
 }
-.screen::-webkit-scrollbar { width: 4px; }
-.screen::-webkit-scrollbar-track { background: transparent; }
-.screen::-webkit-scrollbar-thumb { background: #d2dbe1; border-radius: 2px; }
-.screen.active { display: flex; opacity: 1; transform: translateY(0); }
+.screen::-webkit-scrollbar { display: none; }
+.screen.active { display: flex; opacity: 1; transform: translateY(0); overflow: visible; }
 
 /* ── Brand Bar ── */
 .nav {
@@ -409,7 +404,8 @@ html, body {
 
 /* ── Mobile responsive tightening ── */
 @media (max-width: 480px) {
-  .wrap { padding: 28px 20px; height: 96vh; max-height: none; border-radius: 12px; }
+  #app { padding: 0; }
+  .wrap { padding: 24px 16px; height: auto; max-height: none; border-radius: 0; width: 100%; }
   .q-text { font-size: 19px; }
   .welcome-headline { font-size: 26px; }
   .answers.multi-col { grid-template-columns: 1fr 1fr; }
@@ -1159,21 +1155,6 @@ function restart() {
   document.getElementById('q3-continue').classList.remove('visible');
   document.getElementById('q3-conceive').style.display = 'none';
   showScreen('welcome');
-}
-// Add this block inside your script tag right before the final setProgress/initialization runs:
-const resizeObserver = new ResizeObserver(entries => {
-  for (let entry of entries) {
-    window.parent.postMessage({
-      type: 'resize',
-      height: entry.contentRect.height
-    }, '*');
-  }
-});
-
-// Selects the master responsive container card of your v5 UI layout
-const targetWrap = document.querySelector('.wrap');
-if (targetWrap) {
-  resizeObserver.observe(targetWrap);
 }
 
 showScreen('welcome');
