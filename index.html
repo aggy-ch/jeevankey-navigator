@@ -1,1208 +1,1167 @@
 <!DOCTYPE html>
-
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>JeevanKey Navigator — Find Your Care Team</title>
-
 <style>
-
-  :root {
-
-    --navy:     #0C447C;
-
-    --navy-d:   #06233f;
-
-    --navy-l:   #12579b;
-
-    --green:    #3B6D11;
-
-    --green-d:  #24440a;
-
-    --green-l:  #539719;
-
-    --white:    #ffffff;
-
-    --off:      #f4f7f5;
-
-    --ink:      #111b24;
-
-    --ink-2:    #2c3a46;
-
-    --ink-3:    #526371;
-
-    --ink-4:    #8ea1b0;
-
-    --wa:       #25D366;
-
-    --wa-d:     #1aab53;
-
-    --teal:     #1b4d4d;
-
-    --teal-lt:  #2d6b6b;
-
-    --sans:     -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-
-    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-
-    --ease-in-out:   cubic-bezier(0.4, 0, 0.2, 1);
-
-  }
-
-
-
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-
-
-  html, body {
-
-    height: 100%;
-
-    font-family: var(--sans);
-
-    background: var(--off);
-
-    color: var(--ink);
-
-    overflow: hidden;
-
-    -webkit-font-smoothing: antialiased;
-
-  }
-
-
-
-  #app {
-
-    position: fixed; inset: 0; z-index: 1;
-
-    display: flex; flex-direction: column;
-
-    align-items: center; justify-content: center;
-
-    padding: 20px;
-
-  }
-
-
-
-  /* Single Container Metrics matching Carrd structural layouts */
-
-  .wrap {
-
-    width: 100%;
-
-    max-width: 600px;
-
-    background: var(--white);
-
-    border-radius: 16px;
-
-    box-shadow: 0 10px 40px rgba(12, 68, 124, 0.06);
-
-    padding: 40px 32px;
-
-    position: relative;
-
-    height: 1000px; /* Forces a fixed visual box size */
-
-    max-height: none;
-
-    display: flex;
-
-    flex-direction: column;
-
-    overflow: hidden;
-
-  }
-
-
-
-  .screen {
-
-    display: none;
-
-    flex-direction: column;
-
-    opacity: 0;
-
-    transform: translateY(12px);
-
-    transition: opacity .4s var(--ease-out-expo), transform .4s var(--ease-out-expo);
-
-    overflow-y: auto;
-
-    width: 100%;
-
-  }
-
-  .screen.active {
-
-    display: flex; opacity: 1; transform: translateY(0);
-
-  }
-
-
-
-  /* ── Brand Bar ── */
-
-  .nav {
-
-    display: flex; align-items: center; justify-content: space-between;
-
-    margin-bottom: 24px;
-
-    flex-shrink: 0;
-
-    width: 100%;
-
-  }
-
-  .logo {
-
-    font-size: 20px; font-weight: 700; letter-spacing: -.02em;
-
-    color: var(--navy); text-decoration: none;
-
-  }
-
-  .logo span { color: var(--green); }
-
-
-
-  /* Progress Indicators */
-
-  .progress { display: flex; gap: 6px; align-items: center; }
-
-  .dot {
-
-    width: 6px; height: 6px; border-radius: 50%;
-
-    background: #e1e8ed;
-
-    transition: all .4s var(--ease-out-expo);
-
-  }
-
-  .dot.done { background: var(--green); width: 14px; border-radius: 3px; }
-
-  .dot.active { background: var(--navy); transform: scale(1.2); }
-
-
-
-  /* ── Header Labels ── */
-
-  .q-label {
-
-    font-size: 11px; font-weight: 600; letter-spacing: .05em;
-
-    text-transform: uppercase; color: var(--green);
-
-    margin-bottom: 8px;
-
-  }
-
-  .q-text {
-
-    font-size: 22px; font-weight: 800; line-height: 1.25;
-
-    color: var(--ink); margin-bottom: 20px;
-
-    letter-spacing: -.01em;
-
-  }
-
-  .q-text em {
-
-    font-style: normal;
-
-    background: linear-gradient(270deg, var(--green) 45%, var(--navy) 63%);
-
-    -webkit-background-clip: text;
-
-    -webkit-text-fill-color: transparent;
-
-    background-clip: text;
-
-    text-fill-color: transparent;
-
-  }
-
-
-
-  /* ── Conversational Option Buttons ── */
-
-  .answers { display: flex; flex-direction: column; gap: 8px; }
-
-  .answers.multi-col {
-
-    display: grid;
-
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-
-    gap: 8px;
-
-  }
-
-
-
-  .answer-btn {
-
-    display: flex; align-items: center; gap: 12px;
-
-    padding: 14px 16px;
-
-    background: var(--white);
-
-    border: 1.5px solid #d2dbe1;
-
-    border-radius: 8px;
-
-    cursor: pointer;
-
-    text-align: left;
-
-    font-family: var(--sans);
-
-    font-size: 14px; font-weight: 500;
-
-    color: var(--ink-2); line-height: 1.4;
-
-    transition: all .2s var(--ease-out-expo);
-
-    animation: fadeUp .4s var(--ease-out-expo) both;
-
-  }
-
-  .answer-btn:hover {
-
-    border-color: var(--green-l);
-
-    background: #fbfdfa;
-
-    color: var(--green-d);
-
-    transform: translateX(2px);
-
-  }
-
-  .answer-btn.selected {
-
-    border-color: var(--green);
-
-    background: #f4faf0;
-
-    color: var(--green-d);
-
-    font-weight: 600;
-
-  }
-
-
-
-  .btn-icon { font-size: 16px; flex-shrink: 0; }
-
-  .multi-hint { font-size: 12px; color: var(--ink-4); margin-bottom: 12px; font-style: italic; }
-
-
-
-  /* Navigation Buttons */
-
-  .continue-btn {
-
-    margin-top: 16px;
-
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-
-    padding: 14px 24px;
-
-    background: var(--navy); color: var(--white);
-
-    border: none; border-radius: 8px;
-
-    font-family: var(--sans); font-size: 14.5px; font-weight: 600;
-
-    cursor: pointer; transition: all .2s var(--ease-out-expo);
-
-    opacity: 0; pointer-events: none; width: 100%;
-
-  }
-
-  .continue-btn.visible { opacity: 1; pointer-events: all; }
-
-  .continue-btn:hover { background: var(--navy-l); }
-
-
-
-  /* ── Pulse Loading Screen ── */
-
-  #screen-matching { text-align: center; padding: 24px 0; }
-
-  .matching-pulse {
-
-    font-size: 40px; margin-bottom: 16px;
-
-    animation: bounce 1.5s infinite ease-in-out;
-
-  }
-
-  @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-
-  .matching-title { font-size: 20px; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
-
-  .matching-sub { font-size: 14px; color: var(--ink-3); }
-
-
-
-  /* ── Outcome Review Screens ── */
-
-  .result-header { text-align: center; margin-bottom: 20px; }
-
-  .result-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--green); margin-bottom: 6px; }
-
-  .result-headline { font-size: 24px; font-weight: 800; color: var(--navy); margin-bottom: 6px; }
-
-  .result-sub { font-size: 13.5px; color: var(--ink-3); line-height: 1.5; }
-
-
-
-  /* Accordion Cards */
-
-  .team-grid { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
-
-  .team-card { border: 1.5px solid #edf2f5; border-radius: 8px; overflow: hidden; }
-
-  .team-card-header {
-
-    display: flex; align-items: center; gap: 10px; padding: 12px 14px;
-
-    background: #f8fafc; cursor: pointer; transition: background .2s;
-
-  }
-
-  .team-card-header:hover { background: #edf2f5; }
-
-  .team-role-badge {
-
-    font-size: 9px; font-weight: 600; letter-spacing: .05em;
-
-    text-transform: uppercase; padding: 3px 6px; border-radius: 4px; white-space: nowrap;
-
-  }
-
-  .badge-anchor { background: var(--navy); color: var(--white); }
-
-  .badge-driver { background: var(--green); color: var(--white); }
-
-  .badge-accel { background: #e1e8ed; color: var(--ink-2); }
-
-  .badge-compliance { background: #e1e8ed; color: var(--ink-2); }
-
-
-
-  .team-expert-name { font-size: 14.5px; font-weight: 700; color: var(--ink); flex: 1; }
-
-  .team-card-chevron { color: var(--ink-4); font-size: 14px; transition: transform .3s; }
-
-  .team-card.open .team-card-chevron { transform: rotate(180deg); }
-
-  .team-card-body { max-height: 0; overflow: hidden; transition: max-height .3s var(--ease-out-expo); background: var(--white); }
-
-  .team-card.open .team-card-body { max-height: 150px; }
-
-  .team-card-body-inner { padding: 12px 14px; font-size: 13px; line-height: 1.5; color: var(--ink-3); border-top: 1px solid #edf2f5; }
-
-
-
-  .phase-notice { background: #f4faf0; border: 1px solid #d4ebd4; border-left: 3px solid var(--green); border-radius: 4px; padding: 12px; margin-bottom: 16px; font-size: 12.5px; color: var(--green-d); line-height: 1.5; }
-
-
-
-  /* Plan Matrices Grid */
-
-  .plan-section { margin-bottom: 20px; }
-
-  .plan-label { font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--ink-4); margin-bottom: 8px; }
-
-  .plan-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
-
-  .plan-card { border: 1.5px solid #d2dbe1; border-radius: 8px; padding: 10px 12px; cursor: pointer; transition: all .2s; position: relative; }
-
-  .plan-card:hover { border-color: var(--green-l); background: #fbfdfa; }
-
-  .plan-card.selected { border-color: var(--green); background: #f4faf0; }
-
-  .plan-popular { position: absolute; top: -7px; right: 8px; background: var(--green); color: var(--white); font-size: 8px; font-weight: 700; padding: 1px 4px; border-radius: 3px; text-transform: uppercase; }
-
-  .plan-name { font-size: 14px; font-weight: 700; color: var(--ink); }
-
-  .plan-price { font-size: 13px; font-weight: 700; color: var(--green); margin: 2px 0; }
-
-  .plan-experts { font-size: 11px; color: var(--ink-4); }
-
-
-
-  /* Submit Layout Actions */
-
-  .whatsapp-btn {
-
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-
-    padding: 14px 24px; background: var(--wa); color: var(--white);
-
-    border: none; border-radius: 8px; font-size: 15px; font-weight: 600;
-
-    cursor: pointer; text-decoration: none; transition: background .2s; width: 100%;
-
-  }
-
-  .whatsapp-btn:hover { background: var(--wa-d); }
-
-  .cta-note { font-size: 11.5px; color: var(--ink-4); text-align: center; margin-top: 8px; }
-
-
-
-  .disclaimer { font-size: 10.5px; color: var(--ink-4); line-height: 1.4; margin-top: 16px; border-top: 1px solid #edf2f5; padding-top: 12px; }
-
-  .restart-btn { background: none; border: none; cursor: pointer; font-size: 12px; color: var(--ink-4); text-decoration: underline; margin-top: 12px; text-align: center; display: block; width: 100%; }
-
-
-
-  /* Welcome Screen UI Metric Settings */
-
-  #screen-welcome { text-align: center; }
-
-  .welcome-tag { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--green); background: #f4faf0; padding: 4px 10px; border-radius: 4px; margin-bottom: 16px; }
-
-  .welcome-headline { font-size: 32px; font-weight: 800; line-height: 1.15; color: var(--navy); margin-bottom: 12px; letter-spacing: -.02em; }
-
-  .welcome-headline em { font-style: normal; color: var(--green); }
-
-  .welcome-body { font-size: 14.5px; color: var(--ink-3); line-height: 1.6; margin-bottom: 24px; }
-
-  .start-btn { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; padding: 14px 24px; background: var(--navy); color: var(--white); border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background .2s; }
-
-  .start-btn:hover { background: var(--navy-l); }
-
-  .welcome-reassure { font-size: 11px; color: var(--ink-4); margin-top: 16px; }
-
-
-
-  @keyframes fadeUp {
-
-    from { opacity: 0; transform: translateY(8px); }
-
-    to   { opacity: 1; transform: translateY(0); }
-
-  }
-
+/* ══════════════════════════════════════════════
+   JEEVANKEY NAVIGATOR v5 — PRODUCTION CSS
+   Design tokens: aligned to v1 brand system.
+   New tokens added for badge-therapeutic and
+   ALT paradigm track differentiation.
+══════════════════════════════════════════════ */
+
+:root {
+  --navy:          #0C447C;
+  --navy-d:        #06233f;
+  --navy-l:        #12579b;
+  --green:         #3B6D11;
+  --green-d:       #24440a;
+  --green-l:       #539719;
+  --white:         #ffffff;
+  --off:           #f4f7f5;
+  --ink:           #111b24;
+  --ink-2:         #2c3a46;
+  --ink-3:         #526371;
+  --ink-4:         #8ea1b0;
+  --wa:            #25D366;
+  --wa-d:          #1aab53;
+  --teal:          #1b4d4d;
+  --teal-lt:       #2d6b6b;
+  --saffron:       #b45309; /* ALT paradigm accent */
+  --saffron-l:     #d97706;
+  --saffron-bg:    #fffbeb;
+  --saffron-bd:    #fde68a;
+  --sans:          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out:   cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  font-family: var(--sans);
+  background: var(--off);
+  color: var(--ink);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  position: fixed; inset: 0; z-index: 1;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 20px;
+}
+
+/* ── Container ── */
+.wrap {
+  width: 100%;
+  max-width: 600px;
+  background: var(--white);
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(12, 68, 124, 0.06);
+  padding: 40px 32px;
+  position: relative;
+  height: 680px;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── Screen transitions ── */
+.screen {
+  display: none;
+  flex-direction: column;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity .4s var(--ease-out-expo), transform .4s var(--ease-out-expo);
+  overflow-y: auto;
+  width: 100%;
+  flex: 1;
+  scrollbar-width: thin;
+  scrollbar-color: #d2dbe1 transparent;
+}
+.screen::-webkit-scrollbar { width: 4px; }
+.screen::-webkit-scrollbar-track { background: transparent; }
+.screen::-webkit-scrollbar-thumb { background: #d2dbe1; border-radius: 2px; }
+.screen.active { display: flex; opacity: 1; transform: translateY(0); }
+
+/* ── Brand Bar ── */
+.nav {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 24px;
+  flex-shrink: 0;
+  width: 100%;
+}
+.logo {
+  font-size: 20px; font-weight: 700; letter-spacing: -.02em;
+  color: var(--navy); text-decoration: none;
+}
+.logo span { color: var(--green); }
+
+/* ── Progress Dots ── */
+.progress { display: flex; gap: 6px; align-items: center; }
+.dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #e1e8ed;
+  transition: all .4s var(--ease-out-expo);
+}
+.dot.done { background: var(--green); width: 14px; border-radius: 3px; }
+.dot.active { background: var(--navy); transform: scale(1.2); }
+
+/* ── Question Typography ── */
+.q-label {
+  font-size: 11px; font-weight: 600; letter-spacing: .05em;
+  text-transform: uppercase; color: var(--green);
+  margin-bottom: 8px;
+  flex-shrink: 0;
+}
+.q-text {
+  font-size: 22px; font-weight: 800; line-height: 1.25;
+  color: var(--ink); margin-bottom: 20px;
+  letter-spacing: -.01em;
+  flex-shrink: 0;
+}
+.q-text em {
+  font-style: normal;
+  background: linear-gradient(270deg, var(--green) 45%, var(--navy) 63%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Answer Buttons ── */
+.answers { display: flex; flex-direction: column; gap: 8px; }
+.answers.multi-col {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 8px;
+}
+.answer-btn {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px;
+  background: var(--white);
+  border: 1.5px solid #d2dbe1;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--sans);
+  font-size: 14px; font-weight: 500;
+  color: var(--ink-2); line-height: 1.4;
+  transition: all .2s var(--ease-out-expo);
+  animation: fadeUp .4s var(--ease-out-expo) both;
+}
+.answer-btn:hover {
+  border-color: var(--green-l);
+  background: #fbfdfa;
+  color: var(--green-d);
+  transform: translateX(2px);
+}
+.answer-btn.selected {
+  border-color: var(--green);
+  background: #f4faf0;
+  color: var(--green-d);
+  font-weight: 600;
+}
+.btn-icon { font-size: 16px; flex-shrink: 0; }
+.multi-hint { font-size: 12px; color: var(--ink-4); margin-bottom: 12px; font-style: italic; flex-shrink: 0; }
+
+/* Continue Button */
+.continue-btn {
+  margin-top: 16px;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 14px 24px;
+  background: var(--navy); color: var(--white);
+  border: none; border-radius: 8px;
+  font-family: var(--sans); font-size: 14.5px; font-weight: 600;
+  cursor: pointer; transition: all .2s var(--ease-out-expo);
+  opacity: 0; pointer-events: none; width: 100%;
+  flex-shrink: 0;
+}
+.continue-btn.visible { opacity: 1; pointer-events: all; }
+.continue-btn:hover { background: var(--navy-l); }
+
+/* ── Matching Pulse ── */
+#screen-matching { text-align: center; padding: 24px 0; justify-content: center; }
+.matching-pulse {
+  font-size: 40px; margin-bottom: 16px;
+  animation: bounce 1.5s infinite ease-in-out;
+}
+@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+.matching-title { font-size: 20px; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+.matching-sub { font-size: 14px; color: var(--ink-3); }
+
+/* ── Result Screen ── */
+.result-header { text-align: center; margin-bottom: 20px; flex-shrink: 0; }
+.result-eyebrow {
+  font-size: 11px; font-weight: 600; letter-spacing: .05em;
+  text-transform: uppercase; color: var(--green); margin-bottom: 6px;
+}
+.result-eyebrow.alt-track { color: var(--saffron); }
+.result-headline { font-size: 24px; font-weight: 800; color: var(--navy); margin-bottom: 6px; }
+.result-sub { font-size: 13.5px; color: var(--ink-3); line-height: 1.5; }
+
+/* ALT paradigm track indicator strip */
+.alt-track-banner {
+  display: none;
+  background: var(--saffron-bg);
+  border: 1px solid var(--saffron-bd);
+  border-left: 3px solid var(--saffron);
+  border-radius: 4px;
+  padding: 8px 12px;
+  margin-bottom: 16px;
+  font-size: 12px;
+  color: var(--saffron);
+  font-weight: 600;
+}
+.alt-track-banner.visible { display: block; }
+
+/* ══════════════════════════════════════════════
+   DELIVERABLE 2A — TEAM CARD + BADGE ARCHITECTURE
+   Semantic HTML templates for all 5 role types:
+   Diagnostic Anchor, Therapeutic Anchor,
+   Active Treatment Lead, Core Accelerator,
+   Compliance Anchor.
+══════════════════════════════════════════════ */
+
+.team-grid { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+
+.team-card { border: 1.5px solid #edf2f5; border-radius: 8px; overflow: hidden; }
+
+.team-card-header {
+  display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px;
+  background: #f8fafc; cursor: pointer; transition: background .2s;
+}
+.team-card-header:hover { background: #edf2f5; }
+
+/* ── Role Badge Utility Classes ── */
+.team-role-badge {
+  font-size: 9px; font-weight: 700; letter-spacing: .05em;
+  text-transform: uppercase; padding: 3px 7px; border-radius: 4px;
+  white-space: nowrap; flex-shrink: 0; margin-top: 1px;
+}
+
+/* Diagnostic Anchor — navy: primary clinical foundation */
+.badge-anchor      { background: var(--navy);  color: var(--white); }
+
+/* Therapeutic Anchor — teal: ALT paradigm primary */
+.badge-therapeutic { background: var(--teal);  color: var(--white); }
+
+/* Active Treatment Lead — green: daily recovery driver */
+.badge-driver      { background: var(--green); color: var(--white); }
+
+/* Core Accelerator — slate tint: secondary support */
+.badge-accel       { background: #e1e8ed; color: var(--ink-2); }
+
+/* Compliance Anchor — off-white tint: tertiary habit layer */
+.badge-compliance  { background: #edf2f5; color: var(--ink-3); }
+
+/* ── Expert Name + Active Lead Subtitle Block ── */
+.team-expert-info { flex: 1; min-width: 0; }
+.team-expert-name { font-size: 14.5px; font-weight: 700; color: var(--ink); line-height: 1.3; }
+
+/* DELIVERABLE 2C — Active Treatment Lead subtitle */
+.active-lead-subtitle {
+  font-size: 10.5px; font-weight: 600; color: var(--green);
+  margin-top: 2px; line-height: 1.3; letter-spacing: .01em;
+}
+
+.team-card-chevron { color: var(--ink-4); font-size: 14px; transition: transform .3s; flex-shrink: 0; margin-top: 2px; }
+.team-card.open .team-card-chevron { transform: rotate(180deg); }
+.team-card-body { max-height: 0; overflow: hidden; transition: max-height .35s var(--ease-out-expo); background: var(--white); }
+.team-card.open .team-card-body { max-height: 200px; }
+.team-card-body-inner { padding: 12px 14px; font-size: 13px; line-height: 1.55; color: var(--ink-3); border-top: 1px solid #edf2f5; }
+
+/* ── Triage Notice ── */
+.triage-notice {
+  display: none;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-left: 3px solid var(--navy);
+  border-radius: 4px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  font-size: 12.5px;
+  color: var(--navy-d);
+  line-height: 1.5;
+}
+.triage-notice.visible { display: block; }
+
+/* ══════════════════════════════════════════════
+   DELIVERABLE 2D — SENIORITY ESCALATION NOTICE
+   Renders post-Stage-7 when seniority_escalation
+   flag is active.
+══════════════════════════════════════════════ */
+.seniority-notice {
+  display: none;
+  background: #fdf4ff;
+  border: 1px solid #e9d5ff;
+  border-left: 3px solid #7c3aed;
+  border-radius: 4px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  font-size: 12.5px;
+  color: #4c1d95;
+  line-height: 1.5;
+}
+.seniority-notice.visible { display: block; }
+.seniority-notice strong { font-weight: 700; }
+
+/* ── Plan Grid ── */
+.plan-section { margin-bottom: 16px; flex-shrink: 0; }
+.plan-label {
+  font-size: 11px; font-weight: 600; text-transform: uppercase;
+  color: var(--ink-4); margin-bottom: 8px; letter-spacing: .05em;
+}
+.plan-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+.plan-card {
+  border: 1.5px solid #d2dbe1;
+  border-radius: 8px; padding: 10px 12px;
+  cursor: pointer; transition: all .2s var(--ease-out-expo);
+  position: relative;
+}
+.plan-card:hover  { border-color: var(--green-l); background: #fbfdfa; }
+.plan-card.selected { border-color: var(--green); background: #f4faf0; }
+.plan-card.dimmed { opacity: 0.5; pointer-events: none; }
+.plan-popular {
+  position: absolute; top: -7px; right: 8px;
+  background: var(--green); color: var(--white);
+  font-size: 8px; font-weight: 700; padding: 1px 5px;
+  border-radius: 3px; text-transform: uppercase;
+}
+.plan-matched {
+  position: absolute; top: -7px; left: 8px;
+  background: var(--navy); color: var(--white);
+  font-size: 8px; font-weight: 700; padding: 1px 5px;
+  border-radius: 3px; text-transform: uppercase;
+}
+.plan-name  { font-size: 14px; font-weight: 700; color: var(--ink); }
+.plan-price { font-size: 13px; font-weight: 700; color: var(--green); margin: 2px 0; }
+.plan-experts { font-size: 11px; color: var(--ink-4); }
+.plan-trial-note {
+  font-size: 10px; color: var(--ink-4); margin-top: 3px;
+  font-style: italic; line-height: 1.3;
+}
+
+/* ── WhatsApp CTA ── */
+.cta-section { flex-shrink: 0; }
+.whatsapp-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 14px 24px; background: var(--wa); color: var(--white);
+  border: none; border-radius: 8px; font-size: 15px; font-weight: 600;
+  cursor: pointer; text-decoration: none; transition: background .2s; width: 100%;
+  font-family: var(--sans);
+}
+.whatsapp-btn:hover { background: var(--wa-d); }
+.cta-note { font-size: 11.5px; color: var(--ink-4); text-align: center; margin-top: 8px; }
+
+.disclaimer {
+  font-size: 10.5px; color: var(--ink-4); line-height: 1.4;
+  margin-top: 16px; border-top: 1px solid #edf2f5; padding-top: 12px;
+  flex-shrink: 0;
+}
+.restart-btn {
+  background: none; border: none; cursor: pointer;
+  font-size: 12px; color: var(--ink-4); text-decoration: underline;
+  margin-top: 12px; text-align: center; display: block; width: 100%;
+  font-family: var(--sans);
+  flex-shrink: 0;
+}
+
+/* ── Welcome Screen ── */
+#screen-welcome { text-align: center; justify-content: center; }
+.welcome-tag {
+  display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: .05em;
+  text-transform: uppercase; color: var(--green); background: #f4faf0;
+  padding: 4px 10px; border-radius: 4px; margin-bottom: 16px;
+}
+.welcome-headline {
+  font-size: 32px; font-weight: 800; line-height: 1.15;
+  color: var(--navy); margin-bottom: 12px; letter-spacing: -.02em;
+}
+.welcome-headline em { font-style: normal; color: var(--green); }
+.welcome-body {
+  font-size: 14.5px; color: var(--ink-3); line-height: 1.6; margin-bottom: 24px;
+}
+.start-btn {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  width: 100%; padding: 14px 24px; background: var(--navy); color: var(--white);
+  border: none; border-radius: 8px; font-size: 15px; font-weight: 600;
+  cursor: pointer; transition: background .2s; font-family: var(--sans);
+}
+.start-btn:hover { background: var(--navy-l); }
+.welcome-reassure { font-size: 11px; color: var(--ink-4); margin-top: 16px; }
+
+/* ── Guided Triage Screen ── */
+#screen-triage { text-align: center; justify-content: center; }
+.triage-icon { font-size: 40px; margin-bottom: 16px; }
+.triage-title { font-size: 20px; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+.triage-body { font-size: 14px; color: var(--ink-3); line-height: 1.6; margin-bottom: 24px; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Mobile responsive tightening ── */
+@media (max-width: 480px) {
+  .wrap { padding: 28px 20px; height: 96vh; max-height: none; border-radius: 12px; }
+  .q-text { font-size: 19px; }
+  .welcome-headline { font-size: 26px; }
+  .answers.multi-col { grid-template-columns: 1fr 1fr; }
+  .plan-grid { grid-template-columns: 1fr 1fr; }
+}
 </style>
-
 </head>
-
 <body>
 
-
-
 <div id="app">
-
   <div class="wrap">
 
-
-
     <!-- ══ WELCOME ══ -->
-
     <div class="screen active" id="screen-welcome">
-
-      <div class="welcome-tag">Clinical Navigator</div>
-
+      <div class="welcome-tag">Clinical Navigator — v5</div>
       <h1 class="welcome-headline">Know exactly<br><em>who</em> can help.</h1>
-
-      <p class="welcome-body">Four questions. Ninety seconds. We match you with the precise combination of experts your health concern actually needs — no guesswork.</p>
-
+      <p class="welcome-body">Five questions. Two minutes. We match you with the precise combination of experts your health concern actually needs — no guesswork, no generic advice.</p>
       <button class="start-btn" onclick="startNavigator()">Begin →</button>
-
-      <p class="welcome-reassure">Not a diagnosis · Expert-matched pathway</p>
-
+      <p class="welcome-reassure">Not a diagnosis &nbsp;·&nbsp; Expert-matched pathway &nbsp;·&nbsp; 46 care routes</p>
     </div>
 
+    <!-- ══ Q0 — PARADIGM GATE ══ -->
+    <div class="screen" id="screen-q0">
+      <nav class="nav">
+        <a class="logo" href="#">Jeevan<span>Key</span></a>
+        <div class="progress">
+          <div class="dot active"></div><div class="dot"></div>
+          <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+      </nav>
+      <p class="q-label">Question 1 of 5</p>
+      <h2 class="q-text">How do you prefer to <em>approach</em> your health?</h2>
+      <div class="answers" id="q0-answers">
+        <button class="answer-btn" onclick="selectQ0('allopathic')" data-val="allopathic">
+          <span class="btn-icon">🏥</span>
+          <span>Modern medicine — I want a doctor-led plan with clinical tests and prescriptions where needed</span>
+        </button>
+        <button class="answer-btn" onclick="selectQ0('alternative')" data-val="alternative">
+          <span class="btn-icon">🌿</span>
+          <span>Natural and root-cause — I want Ayurvedic or holistic care that works with my body's patterns</span>
+        </button>
+        <button class="answer-btn" onclick="selectQ0('open')" data-val="open">
+          <span class="btn-icon">⚖️</span>
+          <span>I'm open to both — guide me based on what my symptoms need</span>
+        </button>
+        <button class="answer-btn" onclick="selectQ0('guided')" data-val="guided">
+          <span class="btn-icon">🤔</span>
+          <span>I'm not sure — I just know something feels wrong, help me figure it out</span>
+        </button>
+      </div>
+    </div>
 
+    <!-- ══ Q5 — CONFIDENCE CHECK (shown only for 'open' paradigm) ══ -->
+    <div class="screen" id="screen-q5">
+      <nav class="nav">
+        <a class="logo" href="#">Jeevan<span>Key</span></a>
+        <div class="progress">
+          <div class="dot done"></div><div class="dot active"></div>
+          <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+      </nav>
+      <p class="q-label">One more question</p>
+      <h2 class="q-text">How would you describe your <em>health history</em>?</h2>
+      <div class="answers" id="q5-answers">
+        <button class="answer-btn" onclick="selectQ5('clear')" data-val="clear">
+          <span class="btn-icon">🎯</span>
+          <span>I have a clear sense of what's wrong — match me to the right experts</span>
+        </button>
+        <button class="answer-btn" onclick="selectQ5('dissatisfied')" data-val="dissatisfied">
+          <span class="btn-icon">🔄</span>
+          <span>I've tried multiple doctors and nothing has stuck — I need a different approach</span>
+        </button>
+        <button class="answer-btn" onclick="selectQ5('confused')" data-val="confused">
+          <span class="btn-icon">🌫️</span>
+          <span>I genuinely don't know what's wrong — just guide me through it</span>
+        </button>
+      </div>
+    </div>
 
-    <!-- ══ Q1 ══ -->
-
+    <!-- ══ Q1 — PRIMARY CONCERN ══ -->
     <div class="screen" id="screen-q1">
-
       <nav class="nav">
-
         <a class="logo" href="#">Jeevan<span>Key</span></a>
-
-        <div class="progress"><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
-
+        <div class="progress" id="q1-progress">
+          <div class="dot done"></div><div class="dot done"></div>
+          <div class="dot active"></div><div class="dot"></div><div class="dot"></div>
+        </div>
       </nav>
-
-      <p class="q-label">Question 1 of 4</p>
-
+      <p class="q-label" id="q1-label">Question 2 of 5</p>
       <h2 class="q-text">What's been bothering you <em>the most</em>?</h2>
-
       <div class="answers" id="q1-answers">
-
-        <button class="answer-btn" onclick="selectQ1('mind')" data-val="mind"><span class="btn-icon">🧠</span><span>My mind won't stop — stress, burnout</span></button>
-
-        <button class="answer-btn" onclick="selectQ1('gut')" data-val="gut"><span class="btn-icon">🌿</span><span>My digestion is a mess — gut, bloating</span></button>
-
-        <button class="answer-btn" onclick="selectQ1('pain')" data-val="pain"><span class="btn-icon">🦴</span><span>My body aches — back pain, joints</span></button>
-
-        <button class="answer-btn" onclick="selectQ1('hormonal')" data-val="hormonal"><span class="btn-icon">🌙</span><span>My hormones feel off — periods, PCOD</span></button>
-
-        <button class="answer-btn" onclick="selectQ1('energy')" data-val="energy"><span class="btn-icon">⚡</span><span>Low energy all the time — fatigue</span></button>
-
-        <button class="answer-btn" onclick="selectQ1('chronic')" data-val="chronic"><span class="btn-icon">📋</span><span>Managing a long-term condition</span></button>
-
+        <button class="answer-btn" onclick="selectQ1('mind')" data-val="mind">
+          <span class="btn-icon">🧠</span><span>My mind won't stop — stress, burnout, anxiety</span>
+        </button>
+        <button class="answer-btn" onclick="selectQ1('gut')" data-val="gut">
+          <span class="btn-icon">🌿</span><span>My digestion is a mess — gut, bloating, IBS</span>
+        </button>
+        <button class="answer-btn" onclick="selectQ1('pain')" data-val="pain">
+          <span class="btn-icon">🦴</span><span>My body aches — back pain, joints, posture</span>
+        </button>
+        <button class="answer-btn" onclick="selectQ1('hormonal')" data-val="hormonal">
+          <span class="btn-icon">🌙</span><span>My hormones feel off — periods, PCOD, skin</span>
+        </button>
+        <button class="answer-btn" onclick="selectQ1('energy')" data-val="energy">
+          <span class="btn-icon">⚡</span><span>Low energy all the time — fatigue, motivation</span>
+        </button>
+        <button class="answer-btn" onclick="selectQ1('chronic')" data-val="chronic">
+          <span class="btn-icon">📋</span><span>Managing a long-term condition — diabetes, thyroid, BP</span>
+        </button>
       </div>
-
     </div>
 
-
-
-    <!-- ══ Q2 ══ -->
-
+    <!-- ══ Q2 — DURATION ══ -->
     <div class="screen" id="screen-q2">
-
       <nav class="nav">
-
         <a class="logo" href="#">Jeevan<span>Key</span></a>
-
-        <div class="progress"><div class="dot done"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div></div>
-
+        <div class="progress" id="q2-progress">
+          <div class="dot done"></div><div class="dot done"></div>
+          <div class="dot done"></div><div class="dot active"></div><div class="dot"></div>
+        </div>
       </nav>
-
-      <p class="q-label">Question 2 of 4</p>
-
+      <p class="q-label" id="q2-label">Question 3 of 5</p>
       <h2 class="q-text">How long has this been <em>part of your life</em>?</h2>
-
       <div class="answers" id="q2-answers">
-
-        <button class="answer-btn" onclick="selectQ2('acute')" data-val="acute"><span class="btn-icon">🌱</span><span>Under a month</span></button>
-
-        <button class="answer-btn" onclick="selectQ2('months')" data-val="months"><span class="btn-icon">📅</span><span>A few months now</span></button>
-
-        <button class="answer-btn" onclick="selectQ2('long')" data-val="long"><span class="btn-icon">⏳</span><span>More than six months</span></button>
-
-        <button class="answer-btn" onclick="selectQ2('recurring')" data-val="recurring"><span class="btn-icon">🔄</span><span>It comes and goes — years</span></button>
-
+        <button class="answer-btn" onclick="selectQ2('acute')" data-val="acute">
+          <span class="btn-icon">🌱</span><span>Under a month</span>
+        </button>
+        <button class="answer-btn" onclick="selectQ2('months')" data-val="months">
+          <span class="btn-icon">📅</span><span>A few months now</span>
+        </button>
+        <button class="answer-btn" onclick="selectQ2('long')" data-val="long">
+          <span class="btn-icon">⏳</span><span>More than six months</span>
+        </button>
+        <button class="answer-btn" onclick="selectQ2('recurring')" data-val="recurring">
+          <span class="btn-icon">🔄</span><span>It comes and goes — years</span>
+        </button>
       </div>
-
     </div>
 
-
-
-    <!-- ══ Q3 ══ -->
-
+    <!-- ══ Q3 — SECONDARY SIGNALS ══ -->
     <div class="screen" id="screen-q3">
-
       <nav class="nav">
-
         <a class="logo" href="#">Jeevan<span>Key</span></a>
-
-        <div class="progress"><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div><div class="dot"></div></div>
-
+        <div class="progress">
+          <div class="dot done"></div><div class="dot done"></div>
+          <div class="dot done"></div><div class="dot done"></div><div class="dot active"></div>
+        </div>
       </nav>
-
-      <p class="q-label">Question 3 of 4</p>
-
+      <p class="q-label">Question 4 of 5</p>
       <h2 class="q-text">Anything else showing up <em>alongside</em> it?</h2>
-
       <p class="multi-hint">Tap all that apply — then continue</p>
-
       <div class="answers multi-col" id="q3-answers">
-
-        <button class="answer-btn" onclick="toggleQ3('sleep')" data-val="sleep"><span class="btn-icon">😴</span>Sleep loops</button>
-
-        <button class="answer-btn" onclick="toggleQ3('weight')" data-val="weight"><span class="btn-icon">⚖️</span>Weight shifts</button>
-
-        <button class="answer-btn" onclick="toggleQ3('skin_hair')" data-val="skin_hair"><span class="btn-icon">✨</span>Skin/hair changes</button>
-
-        <button class="answer-btn" onclick="toggleQ3('mood')" data-val="mood"><span class="btn-icon">🌊</span>Mood swings</button>
-
-        <button class="answer-btn" onclick="toggleQ3('motivation')" data-val="motivation"><span class="btn-icon">🌫️</span>Low motivation</button>
-
-        <button class="answer-btn" onclick="toggleQ3('meal_fatigue')" data-val="meal_fatigue"><span class="btn-icon">🍽️</span>Meal fatigue</button>
-
-        <button class="answer-btn" onclick="toggleQ3('periods')" data-val="periods"><span class="btn-icon">🌺</span>Irregular cycles</button>
-
-        <button class="answer-btn" onclick="toggleQ3('acne')" data-val="acne"><span class="btn-icon">🔴</span>Breakouts</button>
-
-        <button class="answer-btn" onclick="toggleQ3('none')" data-val="none" id="q3-none"><span class="btn-icon">✓</span>None of these</button>
-
+        <button class="answer-btn" onclick="toggleQ3('sleep')" data-val="sleep">
+          <span class="btn-icon">😴</span>Sleep loops
+        </button>
+        <button class="answer-btn" onclick="toggleQ3('weight')" data-val="weight">
+          <span class="btn-icon">⚖️</span>Weight shifts
+        </button>
+        <button class="answer-btn" onclick="toggleQ3('skin_hair')" data-val="skin_hair">
+          <span class="btn-icon">✨</span>Skin/hair changes
+        </button>
+        <button class="answer-btn" onclick="toggleQ3('mood')" data-val="mood">
+          <span class="btn-icon">🌊</span>Mood swings
+        </button>
+        <button class="answer-btn" onclick="toggleQ3('motivation')" data-val="motivation">
+          <span class="btn-icon">🌫️</span>Low motivation
+        </button>
+        <button class="answer-btn" onclick="toggleQ3('meal_fatigue')" data-val="meal_fatigue">
+          <span class="btn-icon">🍽️</span>Meal fatigue
+        </button>
+        <button class="answer-btn" onclick="toggleQ3('periods')" data-val="periods" id="q3-periods">
+          <span class="btn-icon">🌺</span>Irregular cycles
+        </button>
+        <button class="answer-btn" onclick="toggleQ3('acne')" data-val="acne">
+          <span class="btn-icon">🔴</span>Breakouts
+        </button>
+        <button class="answer-btn" onclick="toggleQ3('conceive')" data-val="conceive" id="q3-conceive" style="display:none">
+          <span class="btn-icon">🌸</span>Planning to conceive
+        </button>
+        <button class="answer-btn" onclick="toggleQ3('none')" data-val="none" id="q3-none">
+          <span class="btn-icon">✓</span>None of these
+        </button>
       </div>
-
-      <button class="continue-btn" id="q3-continue" onclick="goToQ4()">Continue</button>
-
+      <button class="continue-btn" id="q3-continue" onclick="goToQ4()">Continue →</button>
     </div>
 
-
-
-    <!-- ══ Q4 ══ -->
-
+    <!-- ══ Q4 — LIFESTYLE ══ -->
     <div class="screen" id="screen-q4">
-
       <nav class="nav">
-
         <a class="logo" href="#">Jeevan<span>Key</span></a>
-
-        <div class="progress"><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div></div>
-
+        <div class="progress">
+          <div class="dot done"></div><div class="dot done"></div>
+          <div class="dot done"></div><div class="dot done"></div><div class="dot done"></div>
+        </div>
       </nav>
-
-      <p class="q-label">Question 4 of 4</p>
-
+      <p class="q-label">Question 5 of 5</p>
       <h2 class="q-text">How would you describe your <em>daily life</em> right now?</h2>
-
       <div class="answers" id="q4-answers">
-
-        <button class="answer-btn" onclick="selectQ4('sedentary')" data-val="sedentary"><span class="btn-icon">💻</span><span>Mostly desk-bound — low movement</span></button>
-
-        <button class="answer-btn" onclick="selectQ4('stressed')" data-val="stressed"><span class="btn-icon">🔥</span><span>Active but running on stress</span></button>
-
-        <button class="answer-btn" onclick="selectQ4('sleep_issue')" data-val="sleep_issue"><span class="btn-icon">🌙</span><span>Sleep is my biggest problem</span></button>
-
-        <button class="answer-btn" onclick="selectQ4('managing')" data-val="managing"><span class="btn-icon">🏥</span><span>Managing an ongoing condition</span></button>
-
+        <button class="answer-btn" onclick="selectQ4('sedentary')" data-val="sedentary">
+          <span class="btn-icon">💻</span><span>Mostly desk-bound — low movement</span>
+        </button>
+        <button class="answer-btn" onclick="selectQ4('stressed')" data-val="stressed">
+          <span class="btn-icon">🔥</span><span>Active but running on stress</span>
+        </button>
+        <button class="answer-btn" onclick="selectQ4('sleep_issue')" data-val="sleep_issue">
+          <span class="btn-icon">🌙</span><span>Sleep is my biggest problem right now</span>
+        </button>
+        <button class="answer-btn" onclick="selectQ4('managing')" data-val="managing">
+          <span class="btn-icon">🏥</span><span>Managing an ongoing condition daily</span>
+        </button>
       </div>
-
     </div>
-
-
 
     <!-- ══ MATCHING ══ -->
-
     <div class="screen" id="screen-matching">
-
       <div class="matching-pulse">🔬</div>
-
       <h2 class="matching-title">Reading your concern profile…</h2>
-
-      <p class="matching-sub">We're matching you with the expert team best suited to your situation.</p>
-
+      <p class="matching-sub">Matching you with the expert team best suited to your situation.</p>
     </div>
 
-
+    <!-- ══ GUIDED TRIAGE ══ -->
+    <div class="screen" id="screen-triage">
+      <div class="triage-icon">🤝</div>
+      <h2 class="triage-title">Your profile needs a personal review.</h2>
+      <p class="triage-body">Your responses cover several health dimensions. Rather than routing you to an automated team, your JeevanKey Coordinator will review your profile personally and confirm the right care path for you.</p>
+      <button class="whatsapp-btn" onclick="openTriageWhatsApp()">
+        <span class="btn-icon">💬</span><span>Connect with a Coordinator →</span>
+      </button>
+      <p class="cta-note">Coordinator will respond within 2 hours on working days.</p>
+      <button class="restart-btn" onclick="restart()">← Start over</button>
+    </div>
 
     <!-- ══ RESULT ══ -->
-
     <div class="screen" id="screen-result">
-
       <div class="result-header">
-
         <p class="result-eyebrow" id="result-eyebrow">Optimised Care Pathway</p>
-
         <h2 class="result-headline">Your team is ready.</h2>
-
         <p class="result-sub" id="result-sub"></p>
-
       </div>
 
+      <!-- ALT paradigm track banner -->
+      <div class="alt-track-banner" id="alt-track-banner">
+        🌿 Ayurvedic / Root-Cause Pathway — All practitioners operate under CCIM statutory framework.
+      </div>
 
+      <!-- Seniority Escalation Notice (DELIVERABLE 2D) -->
+      <div class="seniority-notice" id="seniority-notice">
+        <strong>Senior Practitioner Assignment:</strong> Given your history with previous treatments, we will personally review your case brief before confirming your team.
+      </div>
 
+      <!-- Triage coordination notice -->
+      <div class="triage-notice" id="triage-notice">
+        Your profile has been flagged for Coordinator review before final team assembly is confirmed.
+      </div>
+
+      <!-- DELIVERABLE 2B — Team card grid with full badge architecture -->
       <div class="team-grid" id="team-grid"></div>
 
-      <div class="phase-notice" id="phase-notice" style="display:none"></div>
-
-
-
+      <!-- Plan Selection -->
       <div class="plan-section">
-
         <p class="plan-label">Choose your plan</p>
-
         <div class="plan-grid" id="plan-grid"></div>
-
       </div>
-
-
 
       <div class="cta-section">
-
         <button class="whatsapp-btn" id="whatsapp-btn" onclick="openWhatsAppRedirect()">
-
           <span class="btn-icon">💬</span><span id="whatsapp-text">Connect on WhatsApp</span>
-
         </button>
-
         <p class="cta-note">Your Coordinator will confirm your team allocation within 2 hours.</p>
-
       </div>
 
-
-
-      <div class="disclaimer">This is a care pathway recommendation. It is not a medical diagnosis. JeevanKey operates as a guided navigation platform to align specialized clinical experts.</div>
-
+      <div class="disclaimer">
+        This is a care pathway recommendation — not a medical diagnosis. JeevanKey operates as a health management and coordination service under India's Telemedicine Practice Guidelines 2020.
+      </div>
       <button class="restart-btn" onclick="restart()">← Start over</button>
-
     </div>
 
-
-
   </div>
-
 </div>
 
-
-
 <script>
+/* ══════════════════════════════════════════════
+   JeevanKey Navigator v5 — Production Engine
+   Inline embed of navigator-v5-engine.js
+   + UI integration layer.
+   WA number: 919259684363 (confirm before deploy)
+══════════════════════════════════════════════ */
+
+'use strict';
 
 /* ── STATE ── */
+const state = {
+  q0: null, q1: null, q2: null, q3: [], q4: null, q5: null,
+  selectedPlan: null, activeWaUrl: '#',
+  result: null
+};
 
-const state = { q1: null, q2: null, q3: [], q4: null, selectedPlan: null, activeWaUrl: '#' };
+/* ══════════════════════════════════════
+   PLANS
+══════════════════════════════════════ */
+const PLANS = [
+  { id: 'trial',     name: 'Trial',     price: '₹499',   period: 'one-time', experts: '1 Expert Consultation',  featured: false },
+  { id: 'essential', name: 'Essential', price: '₹2,499', period: '/month',   experts: '2 Coordinated Experts',  featured: false },
+  { id: 'premium',   name: 'Premium',   price: '₹4,499', period: '/month',   experts: '3 Specialized Experts',  featured: true  },
+  { id: 'elite',     name: 'Elite',     price: '₹7,499', period: '/month',   experts: '4+ Clinical Experts',    featured: false }
+];
 
+/* ══════════════════════════════════════
+   PROFILES — ALL 46 MAPPINGS
+══════════════════════════════════════ */
+const PROFILES = {
+  A1_mind_essential:{cluster:'A',paradigm:'A',tier:'essential',eyebrow:'Nervous System — Essential Track',sub:'Your profile points toward early-stage stress and psychological load. The focus is clinical baseline confirmation paired with direct cognitive intervention.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS General Practitioner',detail:'Rules out nutritional deficiencies, thyroid fluctuations, and biochemical mimics before treatment begins.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Psychotherapist',detail:'Your primary point of daily contact and the driver of your recovery plan. Delivers evidence-backed cognitive interventions for nervous system de-escalation.',isActiveLead:true}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Stress & Mental Wellness — Essential.'},
+  A2_mind_premium_diet:{cluster:'A',paradigm:'A',tier:'premium',eyebrow:'Nervous System — Metabolic Overlay',sub:'Your profile shows stress load compounded by nutritional depletion or weight-related fatigue loops. Recovery requires parallel clinical, psychological, and dietary work.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS General Practitioner',detail:'Reviews biochemical baselines and rules out underlying metabolic contributors to the stress presentation.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Psychotherapist',detail:'Your primary point of daily contact and the driver of your recovery plan. Manages cortisol de-escalation loops and behavioural recovery mechanics.',isActiveLead:true},{role:'Core Accelerator',badge:'badge-accel',name:'Dietician',detail:'Addresses nutritional depletion and meal-energy patterns that sustain the stress-fatigue cycle.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Stress & Mental Wellness — Metabolic Overlay.'},
+  A3_mind_premium_sleep:{cluster:'A',paradigm:'A',tier:'premium',eyebrow:'Nervous System — Sleep Disruption Track',sub:'Your profile shows a stress-sleep feedback loop as the dominant driver. The team is structured around breaking the arousal cycle and restoring circadian rhythm.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS General Practitioner',detail:'Confirms no underlying thyroid, cortisol, or sleep apnea pathology driving the insomnia presentation.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Psychotherapist',detail:'Your primary point of daily contact and the driver of your recovery plan. Applies CBT-I and nervous system regulation protocols.',isActiveLead:true},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Specialist',detail:'Maintains daily sleep hygiene rituals, breathwork protocols, and circadian anchoring practices.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Stress & Mental Wellness — Sleep Disruption.'},
+  A4_mind_elite:{cluster:'A',paradigm:'A',tier:'elite',eyebrow:'Nervous System — Full Burnout Recovery',sub:'Your profile reflects deep, multi-dimensional burnout with metabolic, sleep, and motivational collapse. Recovery requires a fully coordinated four-expert team.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS General Practitioner',detail:'Rules out thyroid dysfunction, adrenal fatigue markers, and nutritional collapse as biological maintainers of the burnout state.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Psychotherapist',detail:'Your primary point of daily contact and the driver of your recovery plan. Leads systematic nervous system rebuilding through structured cognitive and somatic protocols.',isActiveLead:true},{role:'Core Accelerator',badge:'badge-accel',name:'Dietician',detail:'Rebuilds energy substrate through anti-inflammatory nutrition, adrenal support meal timing, and metabolic restoration.',isActiveLead:false},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Specialist',detail:'Sustains the daily recovery rhythm through breathwork, movement, and nervous system down-regulation practices.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Stress & Mental Wellness — Full Burnout Recovery.'},
+  A5_mind_hormonal_xcluster:{cluster:'A',paradigm:'A',tier:'premium',eyebrow:'Nervous System — Hormonal Overlap',sub:'Your profile shows a stress presentation with hormonal signals embedded — the mind and endocrine systems are reinforcing each other. The team addresses both simultaneously.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'Gynaecologist / MBBS GP',detail:'Reviews hormonal panel and rules out endocrine contributors — PCOS, thyroid, androgen imbalance — as upstream stress drivers.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Psychotherapist',detail:'Your primary point of daily contact and the driver of your recovery plan. Targets the cortisol-hormonal feedback loop through structured psychological intervention.',isActiveLead:true},{role:'Core Accelerator',badge:'badge-accel',name:'Dietician',detail:'Manages the insulin-cortisol-hormone interaction through targeted nutritional protocol.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Stress & Mental Wellness — Hormonal Overlap.'},
+  A6_mind_alt_essential:{cluster:'A',paradigm:'ALT',tier:'essential',eyebrow:'Nervous System — Ayurvedic Root-Cause Track',sub:'Your profile indicates a Vata-Pitta imbalance driving mental load and exhaustion. The approach focuses on constitutional assessment and nervous system nourishment.',team:[{role:'Therapeutic Anchor',badge:'badge-therapeutic',name:'BAMS / BHMS Doctor',detail:'Conducts constitutional assessment, identifies dosha imbalance, and prescribes Ayurvedic nervine and adaptogenic support within the AYUSH formulary.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Psychotherapist',detail:'Your primary point of daily contact and the driver of your recovery plan. Integrates cognitive recovery with the constitutional framework established by the Therapeutic Anchor.',isActiveLead:true}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Stress & Mental Wellness — Ayurvedic Essential.'},
+  A7_mind_alt_premium:{cluster:'A',paradigm:'ALT',tier:'premium',eyebrow:'Nervous System — Ayurvedic Deep Recovery',sub:'Your profile shows a chronic, multi-signal mental wellness concern rooted in constitutional depletion. Recovery integrates Ayurvedic protocol, psychological care, and breathwork.',team:[{role:'Therapeutic Anchor',badge:'badge-therapeutic',name:'BAMS / BHMS Doctor',detail:'Manages Ayurvedic treatment protocol — rasayana, shodhana guidance, and ashwagandha-based nervous system restoration.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Psychotherapist',detail:'Your primary point of daily contact and the driver of your recovery plan. Leads cognitive and behavioural recovery alongside the Ayurvedic protocol.',isActiveLead:true},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Specialist',detail:'Anchors daily practice in pranayama, yoga nidra, and Ayurvedic lifestyle rhythms for sustained recovery.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Stress & Mental Wellness — Ayurvedic Deep Recovery.'},
+  B1_gut_essential:{cluster:'B',paradigm:'A',tier:'essential',eyebrow:'Gut & Metabolic — Essential Track',sub:'Your profile shows an early-stage gut concern requiring clinical rule-out and targeted dietary correction.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS Clinician',detail:'Reviews blood biomarker baselines, inflammatory markers, and rules out structural GI pathology.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician',detail:'Your primary point of daily contact and the driver of your recovery plan. Runs tailored elimination protocols to isolate persistent food triggers and restore gut function.',isActiveLead:true}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Gut & Metabolic — Essential.'},
+  B2_gut_premium_chronic:{cluster:'B',paradigm:'A',tier:'premium',eyebrow:'Gut & Metabolic — Chronic Restoration',sub:'Your persistent gut profile requires medical oversight, sustained dietary correction, and a lifestyle compliance layer to prevent relapse.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS Clinician',detail:'Monitors ongoing GI markers and rules out inflammatory bowel conditions requiring escalation.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician',detail:'Your primary point of daily contact and the driver of your recovery plan. Manages phased dietary restoration with progressive reintroduction protocols.',isActiveLead:true},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Specialist',detail:'Supports gut motility, vagal tone, and daily stress-digestion regulation through targeted practice.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Gut & Metabolic — Chronic Restoration.'},
+  B3_gut_premium_weight:{cluster:'B',paradigm:'A',tier:'premium',eyebrow:'Gut & Metabolic — Weight Overlay',sub:'Your gut concern is compounded by weight-related metabolic disruption. The team addresses both through integrated nutrition and movement protocols.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS Clinician',detail:'Reviews metabolic panel, rules out insulin resistance and thyroid contribution to weight-gut interaction.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician',detail:'Your primary point of daily contact and the driver of your recovery plan. Addresses the gut-weight metabolic axis through targeted nutritional restructuring.',isActiveLead:true},{role:'Core Accelerator',badge:'badge-accel',name:'Yoga & Fitness Specialist',detail:'Delivers a low-impact movement protocol to support gut motility, metabolic rate, and visceral fat reduction.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Gut & Metabolic — Weight Overlay.'},
+  B4_gut_premium_stress:{cluster:'B',paradigm:'A',tier:'premium',eyebrow:'Gut & Metabolic — Stress-Gut Axis',sub:'Your gut presentation is driven by the stress-gut axis. Psychological stress is maintaining the digestive dysfunction — recovery must address both simultaneously.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS Clinician',detail:'Confirms gut presentation and rules out structural pathology. Monitors cortisol-gut biomarker interaction.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician',detail:'Your primary point of daily contact and the driver of your recovery plan. Implements gut-calming nutrition protocol alongside stress-diet pattern correction.',isActiveLead:true},{role:'Core Accelerator',badge:'badge-accel',name:'Psychotherapist',detail:'Addresses the neurological stress loops that are sustaining the gut-brain axis dysfunction.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Gut & Metabolic — Stress-Gut Axis.'},
+  B5_gut_alt_essential:{cluster:'B',paradigm:'ALT',tier:'essential',eyebrow:'Gut & Metabolic — Ayurvedic Essential',sub:'Your profile shows Agni imbalance as the root cause. The approach uses Ayurvedic digestive restoration and targeted nutritional correction.',team:[{role:'Therapeutic Anchor',badge:'badge-therapeutic',name:'BAMS / BHMS Doctor',detail:'Assesses digestive Agni, identifies Ama accumulation patterns, and prescribes Ayurvedic digestive and hepatic support.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician',detail:'Your primary point of daily contact and the driver of your recovery plan. Implements an Ayurveda-aligned elimination and restoration dietary protocol.',isActiveLead:true}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Gut & Metabolic — Ayurvedic Essential.'},
+  B6_gut_alt_premium:{cluster:'B',paradigm:'ALT',tier:'premium',eyebrow:'Gut & Metabolic — Ayurvedic Deep Restoration',sub:'Your chronic gut and metabolic profile requires sustained Ayurvedic protocol, dietary restructuring, and lifestyle anchoring for lasting recovery.',team:[{role:'Therapeutic Anchor',badge:'badge-therapeutic',name:'BAMS / BHMS Doctor',detail:'Manages Panchakarma-adjacent gut restoration and constitutional Agni rebuilding protocol.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician',detail:'Your primary point of daily contact and the driver of your recovery plan. Delivers phased dietary restoration aligned with Ayurvedic seasonal and constitutional principles.',isActiveLead:true},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Specialist',detail:'Maintains daily digestive yoga, dinacharya practices, and breathwork for gut motility and Agni support.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Gut & Metabolic — Ayurvedic Deep Restoration.'},
+  C1_pain_essential:{cluster:'C',paradigm:'A',tier:'essential',eyebrow:'Musculoskeletal — Essential Rehabilitation',sub:'Your profile indicates an acute or sub-acute pain concern requiring clinical assessment and targeted physical rehabilitation.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS Doctor',detail:'Assesses for structural nerve radiculopathy, decompression indicators, or inflammatory joint pathology requiring clinical management.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Physiotherapist',detail:'Your primary point of daily contact and the driver of your recovery plan. Delivers a customised spinal alignment, joint mobilisation, and progressive rehabilitation programme.',isActiveLead:true}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Musculoskeletal — Essential Rehabilitation.'},
+  C2_pain_premium_stress:{cluster:'C',paradigm:'A',tier:'premium',eyebrow:'Musculoskeletal — Pain-Stress Amplification',sub:'Your pain is being amplified by a psychological stress overlay. Recovery requires physical rehabilitation supported by targeted psychological intervention.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS Doctor',detail:'Reviews structural indicators and rules out systemic inflammatory conditions contributing to the pain-stress loop.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Physiotherapist',detail:'Your primary point of daily contact and the driver of your recovery plan. Manages physical rehabilitation while coordinating with the psychotherapist on pain-sensitisation mechanics.',isActiveLead:true},{role:'Core Accelerator',badge:'badge-accel',name:'Psychotherapist',detail:'Addresses central sensitisation, pain catastrophising, and the psychological maintenance of the pain experience.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Musculoskeletal — Pain-Stress Amplification.'},
+  C3_pain_premium_weight:{cluster:'C',paradigm:'A',tier:'premium',eyebrow:'Musculoskeletal — Load & Lifestyle Track',sub:'Your pain profile has a significant weight and sedentary lifestyle contribution. Reducing joint load through nutrition and movement is essential to recovery.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS Doctor',detail:'Assesses structural joint load, inflammatory markers, and BMI-related mechanical contributors.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Physiotherapist',detail:'Your primary point of daily contact and the driver of your recovery plan. Designs a low-impact, load-appropriate rehabilitation protocol to reduce pain while preserving mobility.',isActiveLead:true},{role:'Core Accelerator',badge:'badge-accel',name:'Dietician',detail:'Implements an anti-inflammatory nutrition plan to reduce joint load and support tissue repair.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Musculoskeletal — Load & Lifestyle.'},
+  C4_pain_elite:{cluster:'C',paradigm:'A',tier:'elite',eyebrow:'Musculoskeletal — Full Recovery Programme',sub:'Your chronic, multi-signal pain profile requires a fully coordinated four-expert team addressing physical, psychological, and lifestyle dimensions simultaneously.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS Doctor',detail:'Manages medical oversight, monitors inflammatory markers, and coordinates escalation if structural intervention becomes necessary.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Physiotherapist',detail:'Your primary point of daily contact and the driver of your recovery plan. Leads the full physical rehabilitation protocol across pain reduction, mobility, and strength phases.',isActiveLead:true},{role:'Core Accelerator',badge:'badge-accel',name:'Psychotherapist',detail:'Manages the chronic pain-psychology loop — catastrophising, avoidance behaviour, and sleep-pain interaction.',isActiveLead:false},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Specialist',detail:'Delivers daily pain-regulation practices, breathwork for nervous system modulation, and mobility maintenance.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Musculoskeletal — Full Recovery Programme.'},
+  D1_hormonal_essential:{cluster:'D',paradigm:'A',tier:'essential',eyebrow:'Hormonal — Clinical Foundation Track',sub:'Your hormonal profile is in the early-to-moderate stage, requiring clinical baseline confirmation and targeted nutritional correction.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'Gynaecologist / MBBS GP',detail:'Establishes clinical baseline — reviews hormonal panels, confirms diagnostic picture, and manages prescriptions where applicable under Telemedicine Guidelines 2020.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician',detail:'Your primary point of daily contact and the driver of your recovery plan. Leads insulin resistance correction, low-GI nutritional restructuring, and hormonal dietary support.',isActiveLead:true}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Hormonal — Clinical Foundation.'},
+  D2_hormonal_premium_stress:{cluster:'D',paradigm:'A',tier:'premium',eyebrow:'Hormonal — Cortisol-Cycle Disruption',sub:'Your hormonal profile shows a stress-cortisol feedback loop disrupting your cycle and endocrine stability. Recovery requires coordinated clinical, psychological, and nutritional work.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'Gynaecologist / Endocrinologist',detail:'Reviews full hormonal panel, manages prescriptions for cycle regulation, and monitors endocrine markers across the care period.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Psychotherapist',detail:'Your primary point of daily contact and the driver of your recovery plan. Targets the cortisol-hormonal axis through structured nervous system regulation and stress recovery protocols.',isActiveLead:true},{role:'Core Accelerator',badge:'badge-accel',name:'Dietician',detail:'Manages the insulin-cortisol interaction through targeted low-GI planning and hormonal nutritional support.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Hormonal — Cortisol-Cycle Disruption.'},
+  D3_hormonal_premium_skin:{cluster:'D',paradigm:'A',tier:'premium',eyebrow:'Hormonal — Skin & Hair Manifestation',sub:'Your hormonal imbalance is presenting visibly through skin and hair. The team addresses the endocrine root cause alongside nutritional and psychological support.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS GP / Gynaecologist',detail:'Reviews androgen panel, DHEA-S, and DHT markers — confirms hormonal contribution to skin and hair presentation.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician',detail:'Your primary point of daily contact and the driver of your recovery plan. Implements anti-androgen nutritional protocol and micronutrient restoration for skin and hair recovery.',isActiveLead:true},{role:'Core Accelerator',badge:'badge-accel',name:'Psychotherapist',detail:'Addresses the psychological load of visible hormonal symptoms, body image, and stress-cortisol amplification of androgenic activity.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Hormonal — Skin & Hair Manifestation.'},
+  D4_hormonal_elite:{cluster:'D',paradigm:'A',tier:'elite',eyebrow:'Hormonal — Full Spectrum PCOD Recovery',sub:'Your multi-signal hormonal profile — cycles, acne, mood, and motivation — requires a fully coordinated four-expert team for comprehensive endocrine recovery.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'Gynaecologist / MD Specialist',detail:'Leads hormonal management — LH/FSH panels, metformin dosing, cycle regulation prescriptions — in full compliance with Telemedicine Guidelines 2020.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician',detail:'Your primary point of daily contact and the driver of your recovery plan. Manages insulin resistance, low-GI protocol, and hormonal nutritional strategy across the care cycle.',isActiveLead:true},{role:'Core Accelerator',badge:'badge-accel',name:'Psychotherapist',detail:'Addresses cortisol-driven PCOD flare maintenance and the psychological loop sustaining hormonal disruption.',isActiveLead:false},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Specialist',detail:'Delivers pelvic-opening protocols, cycle-supportive yoga, and breathwork for cortisol regulation.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Hormonal — Full Spectrum PCOD Recovery.'},
+  D5_hormonal_alt_essential:{cluster:'D',paradigm:'ALT',tier:'essential',eyebrow:'Hormonal — Ayurvedic Foundation Track',sub:'Your profile indicates constitutional hormonal imbalance best addressed through Ayurvedic root-cause correction and targeted dietary support.',team:[{role:'Therapeutic Anchor',badge:'badge-therapeutic',name:'BAMS / BHMS Doctor',detail:'Conducts constitutional assessment, identifies hormonal dosha patterns, and prescribes Ayurvedic hormonal balancing protocol within the AYUSH formulary.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician',detail:'Your primary point of daily contact and the driver of your recovery plan. Implements an Ayurveda-aligned nutritional protocol supporting hormonal restoration.',isActiveLead:true}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Hormonal — Ayurvedic Foundation.'},
+  D6_hormonal_alt_premium:{cluster:'D',paradigm:'ALT',tier:'premium',eyebrow:'Hormonal — Ayurvedic Deep Rebalancing',sub:'Your chronic hormonal pattern with skin and lifestyle signals requires sustained Ayurvedic protocol, nutritional correction, and daily practice compliance.',team:[{role:'Therapeutic Anchor',badge:'badge-therapeutic',name:'BAMS / BHMS Doctor',detail:'Manages Ayurvedic hormonal restoration — rasayana protocols, shodhana guidance, and constitutional cycle support.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician',detail:'Your primary point of daily contact and the driver of your recovery plan. Leads Ayurveda-integrated dietary restructuring for hormonal and skin-hair recovery.',isActiveLead:true},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Specialist',detail:'Maintains cycle-supportive yoga, pranayama, and dinacharya practices for hormonal rhythm stabilisation.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Hormonal — Ayurvedic Deep Rebalancing.'},
+  E1_energy_essential:{cluster:'E',paradigm:'A',tier:'essential',eyebrow:'Energy & Vitality — Foundation Track',sub:'Your fatigue profile shows a single-domain energy concern requiring clinical ruling-out and nutritional restoration.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS General Practitioner',detail:'Rules out anaemia, thyroid dysfunction, B12/D3 deficiency, and metabolic contributors to chronic fatigue.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician',detail:'Your primary point of daily contact and the driver of your recovery plan. Designs a targeted energy-restoration nutritional protocol addressing identified deficiency patterns.',isActiveLead:true}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Energy & Vitality — Foundation.'},
+  E2_energy_premium_stress:{cluster:'E',paradigm:'A',tier:'premium',eyebrow:'Energy & Vitality — Stress Drain Track',sub:'Your energy depletion is being driven by chronic psychological stress. Nutritional restoration alone is insufficient — the stress drain must be addressed directly.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS General Practitioner',detail:'Reviews adrenal and cortisol markers alongside standard fatigue panel to confirm stress as the primary energy drain mechanism.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician',detail:'Your primary point of daily contact and the driver of your recovery plan. Implements adrenal-support nutrition and energy-stabilising dietary structure.',isActiveLead:true},{role:'Core Accelerator',badge:'badge-accel',name:'Psychotherapist',detail:'Directly addresses the psychological stress load depleting energy reserves and disrupting sleep-recovery cycles.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Energy & Vitality — Stress Drain.'},
+  E3_energy_premium_gut:{cluster:'E',paradigm:'A',tier:'premium',eyebrow:'Energy & Vitality — Absorption Deficit Track',sub:'Your fatigue is driven by a gut-absorption failure — your body is not converting food into energy efficiently. The team addresses nutrition and gut function simultaneously.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS General Practitioner',detail:'Rules out malabsorption syndromes, micronutrient depletion, and functional gut contributors to energy deficit.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician',detail:'Your primary point of daily contact and the driver of your recovery plan. Corrects the energy-absorption deficit through gut-first nutritional restructuring.',isActiveLead:true},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Specialist',detail:'Supports gut motility, digestive fire, and daily movement to enhance nutrient absorption and metabolic energy.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Energy & Vitality — Absorption Deficit.'},
+  E4_energy_premium_hormonal:{cluster:'E',paradigm:'A',tier:'premium',eyebrow:'Energy & Vitality — Hormonal Fatigue Track',sub:'Your low energy has a hormonal signature — irregular cycles, skin changes, or androgen imbalance are depleting your vitality.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS GP / Gynaecologist',detail:'Reviews hormonal panel and confirms the endocrine contribution to chronic fatigue presentation.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician',detail:'Your primary point of daily contact and the driver of your recovery plan. Implements hormonal-supportive nutritional protocol to restore energy substrate.',isActiveLead:true},{role:'Core Accelerator',badge:'badge-accel',name:'Yoga & Breathwork Specialist',detail:'Delivers cycle-sensitive movement and breathwork to support hormonal energy restoration.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Energy & Vitality — Hormonal Fatigue.'},
+  E5_energy_alt_essential:{cluster:'E',paradigm:'ALT',tier:'essential',eyebrow:'Energy & Vitality — Ayurvedic Foundation',sub:'Your energy depletion reflects Ojas depletion and Vata imbalance. The Ayurvedic approach rebuilds vital essence through constitutional protocol and nutritional support.',team:[{role:'Therapeutic Anchor',badge:'badge-therapeutic',name:'BAMS / BHMS Doctor',detail:'Assesses Ojas depletion, Vata aggravation, and prescribes Ayurvedic adaptogenic and rasayana protocol for vitality restoration.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician',detail:'Your primary point of daily contact and the driver of your recovery plan. Implements Ayurveda-aligned energy-building nutrition and meal rhythm protocol.',isActiveLead:true}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Energy & Vitality — Ayurvedic Foundation.'},
+  E6_energy_alt_premium:{cluster:'E',paradigm:'ALT',tier:'premium',eyebrow:'Energy & Vitality — Ayurvedic Deep Restoration',sub:'Your chronic energy depletion with gut and motivational signals requires Ayurvedic systemic restoration, nutritional rebuilding, and daily practice compliance.',team:[{role:'Therapeutic Anchor',badge:'badge-therapeutic',name:'BAMS / BHMS Doctor',detail:'Manages Ojas-rasayana protocol, Agni rebuilding, and constitutional vitality restoration across the care period.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician',detail:'Your primary point of daily contact and the driver of your recovery plan. Delivers energy-restorative nutrition aligned with Ayurvedic seasonal and constitutional principles.',isActiveLead:true},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Specialist',detail:'Anchors daily vitality practices — pranayama, restorative yoga, and dinacharya — for sustained energy recovery.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Energy & Vitality — Ayurvedic Deep Restoration.'},
+  F1_chronic_essential:{cluster:'F',paradigm:'A',tier:'essential',eyebrow:'Chronic Condition — Foundation Management',sub:'Your condition is in an early management phase. The team establishes clinical oversight and dietary structure to prevent progression.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS General Practitioner',detail:'Establishes monitoring protocol, reviews baseline markers, and manages prescriptions appropriate to the condition profile.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician',detail:'Your primary point of daily contact and the driver of your recovery plan. Implements condition-specific dietary management — glycaemic, cardiovascular, or metabolic protocol as indicated.',isActiveLead:true}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Chronic Condition — Foundation Management.'},
+  F2_chronic_premium:{cluster:'F',paradigm:'A',tier:'premium',eyebrow:'Chronic Condition — Active Management Track',sub:'Your condition requires active multi-expert management with clinical oversight, dietary control, and daily compliance support.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS General Practitioner',detail:'Manages ongoing prescriptions, monitors condition markers, and coordinates escalation triggers.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician',detail:'Your primary point of daily contact and the driver of your recovery plan. Delivers condition-optimised dietary protocol with progressive monitoring milestones.',isActiveLead:true},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Specialist',detail:'Supports daily movement, stress regulation, and condition-appropriate lifestyle compliance.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Chronic Condition — Active Management.'},
+  F3_chronic_elite_complex:{cluster:'F',paradigm:'A',tier:'elite',eyebrow:'Chronic Condition — Complex Systemic Management',sub:'Your long-standing, multi-signal chronic condition requires specialist medical leadership with a full supporting team across nutrition and lifestyle domains.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MD Specialist',detail:'Central medical authority — monitors systemic markers, adjusts prescriptions, and manages complication risk across the care cycle.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'MBBS General Practitioner',detail:"Your primary point of daily contact and the driver of your recovery plan. Manages ongoing clinical continuity under the MD Specialist's direction.",isActiveLead:true},{role:'Core Accelerator',badge:'badge-accel',name:'Dietician',detail:"Implements condition-specific nutritional protocol — glycaemic, cardiovascular, or inflammatory — aligned to the specialist's clinical targets.",isActiveLead:false},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Specialist',detail:'Delivers daily movement, breathwork, and lifestyle compliance practices appropriate to the condition severity.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Chronic Condition — Complex Systemic Management.'},
+  F4_chronic_elite_psych:{cluster:'F',paradigm:'A',tier:'elite',eyebrow:'Chronic Condition — Psychological Burden Track',sub:'Your chronic condition carries a significant psychological load — mood, motivation, and sleep disruption are compounding the physical management challenge.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS GP / MD Specialist',detail:'Manages clinical oversight, medication, and condition monitoring across the full care cycle.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Psychotherapist',detail:'Your primary point of daily contact and the driver of your recovery plan. Addresses illness burden, chronic pain psychology, and motivational depletion alongside the medical team.',isActiveLead:true},{role:'Core Accelerator',badge:'badge-accel',name:'Dietician',detail:'Manages the dietary dimension of the chronic condition with particular attention to mood-nutrition interaction.',isActiveLead:false},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Specialist',detail:'Delivers daily coping practices, breathwork, and movement appropriate to the physical and psychological load.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Chronic Condition — Psychological Burden.'},
+  F5_chronic_alt_premium:{cluster:'F',paradigm:'ALT',tier:'premium',eyebrow:'Chronic Condition — Ayurvedic Management Track',sub:'Your chronic systemic pattern is best addressed through Ayurvedic constitutional management, targeted nutrition, and daily practice compliance.',team:[{role:'Therapeutic Anchor',badge:'badge-therapeutic',name:'BAMS / BHMS Doctor',detail:'Manages Ayurvedic chronic condition protocol — constitutional treatment, Panchakarma-adjacent approaches, and systemic rebalancing.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician',detail:'Your primary point of daily contact and the driver of your recovery plan. Delivers Ayurveda-integrated dietary management for the chronic condition pattern.',isActiveLead:true},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Specialist',detail:'Supports daily dinacharya, condition-appropriate yoga, and breathwork for systemic recovery.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Chronic Condition — Ayurvedic Management.'},
+  G1_immunity_essential_allopathic:{cluster:'G',paradigm:'A',tier:'essential',eyebrow:'Immunity & Prevention — Clinical Foundation',sub:'Your profile shows a proactive prevention intent with sedentary lifestyle risk. Clinical screening and nutritional optimisation form the foundation.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS General Practitioner',detail:'Reviews immunity baseline — CBC, Vitamin D, B12, and metabolic panel — to confirm no active deficiency or inflammatory process.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician',detail:'Your primary point of daily contact and the driver of your recovery plan. Implements an immunity-optimising nutritional protocol targeting identified deficiencies.',isActiveLead:true}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Immunity & Prevention — Clinical Foundation.'},
+  G2_immunity_essential_ayurvedic:{cluster:'G',paradigm:'ALT',tier:'essential',eyebrow:'Immunity & Prevention — Ayurvedic Foundation',sub:'Your profile reflects Ojas depletion and low Bala. The Ayurvedic approach builds innate immunity through constitutional protocol and nutritional support.',team:[{role:'Therapeutic Anchor',badge:'badge-therapeutic',name:'BAMS / BHMS Doctor',detail:'Assesses Ojas and Bala, prescribes Rasayana immunity protocol — ashwagandha, guduchi, amalaki — within the AYUSH formulary.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician',detail:'Your primary point of daily contact and the driver of your recovery plan. Implements Ayurveda-aligned immunity-building nutrition and Agni-strengthening meal protocol.',isActiveLead:true}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Immunity & Prevention — Ayurvedic Foundation.'},
+  G3_immunity_premium_allopathic:{cluster:'G',paradigm:'A',tier:'premium',eyebrow:'Immunity & Prevention — Active Optimisation',sub:'Your immunity profile with sleep and motivation signals indicates systemic depletion. A three-expert team addresses the clinical, nutritional, and lifestyle dimensions.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS General Practitioner',detail:'Reviews expanded immunity panel and identifies the primary depletion mechanism requiring correction.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician',detail:'Your primary point of daily contact and the driver of your recovery plan. Delivers a phased immunity-restoration nutritional programme.',isActiveLead:true},{role:'Compliance Anchor',badge:'badge-compliance',name:'Wellness Coach',detail:'Tracks sleep hygiene, stress load, and daily lifestyle compliance — the primary determinants of sustained immunity.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Immunity & Prevention — Active Optimisation.'},
+  G4_immunity_premium_ayurvedic:{cluster:'G',paradigm:'ALT',tier:'premium',eyebrow:'Immunity & Prevention — Ayurvedic Deep Build',sub:'Your immunity depletion with sleep and motivational signals requires sustained Ayurvedic rebuilding, nutritional support, and daily wellness compliance.',team:[{role:'Therapeutic Anchor',badge:'badge-therapeutic',name:'BAMS / BHMS Doctor',detail:'Manages comprehensive Rasayana protocol and Ojas-rebuilding Ayurvedic intervention across the care period.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician',detail:'Your primary point of daily contact and the driver of your recovery plan. Delivers immunity-building nutrition aligned with Ayurvedic seasonal and constitutional principles.',isActiveLead:true},{role:'Compliance Anchor',badge:'badge-compliance',name:'Wellness Coach',detail:'Tracks dinacharya adherence, sleep rhythm, and daily Ayurvedic lifestyle compliance.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Immunity & Prevention — Ayurvedic Deep Build.'},
+  G5_immunity_pollution_allopathic:{cluster:'G',paradigm:'A',tier:'premium',eyebrow:'Immunity & Prevention — Environmental Exposure',sub:'Your profile includes significant environmental or pollution exposure. The team focuses on clinical oxidative stress management, nutritional defence, and respiratory resilience.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS General Practitioner',detail:'Reviews respiratory and oxidative stress markers — AQI-related inflammatory indicators and lung function baseline.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician',detail:'Your primary point of daily contact and the driver of your recovery plan. Implements an antioxidant-dense, anti-inflammatory nutritional protocol for pollution defence.',isActiveLead:true},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Specialist',detail:'Delivers pranayama and respiratory resilience practices to counteract pollution-related lung stress.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Immunity — Environmental Exposure (Allopathic).'},
+  G6_immunity_pollution_ayurvedic:{cluster:'G',paradigm:'ALT',tier:'premium',eyebrow:'Immunity & Prevention — Environmental Exposure (Ayurvedic)',sub:'Your environmental exposure profile is addressed through Ayurvedic Rasayana and Svastha Vrtta — building constitutional resilience against external pollutant load.',team:[{role:'Therapeutic Anchor',badge:'badge-therapeutic',name:'BAMS / BHMS Doctor',detail:'Prescribes Ayurvedic anti-pollution protocol — tulsi, turmeric-based Rasayana, and Pranakarma support — within AYUSH formulary.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician',detail:'Your primary point of daily contact and the driver of your recovery plan. Implements antioxidant-rich Ayurvedic dietary protocol for pollution resilience.',isActiveLead:true},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Specialist',detail:'Delivers Nasya-adjacent breathwork, pranayama, and respiratory yoga for Ayurvedic respiratory resilience.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Immunity — Environmental Exposure (Ayurvedic).'},
+  H1_fertility_essential:{cluster:'H',paradigm:'A',tier:'essential',eyebrow:'Fertility — Clinical Foundation Track',sub:'Your preconception profile is in the early stage — the team establishes hormonal baseline and nutritional optimisation for conception readiness.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'Gynaecologist',detail:'Establishes reproductive baseline — LH/FSH, AMH, and cycle mapping — and manages prescriptions for preconception preparation.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician',detail:'Your primary point of daily contact and the driver of your recovery plan. Implements folate-forward, fertility-optimised nutritional protocol for conception readiness.',isActiveLead:true}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Fertility — Clinical Foundation.'},
+  H2_fertility_premium:{cluster:'H',paradigm:'A',tier:'premium',eyebrow:'Fertility — Metabolic Optimisation Track',sub:'Your fertility profile includes a weight-cycle interaction that requires coordinated clinical, nutritional, and movement support for optimal conception preparation.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'Gynaecologist',detail:'Manages hormonal panel, insulin sensitivity assessment, and cycle regulation prescriptions for fertility preparation.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician',detail:'Your primary point of daily contact and the driver of your recovery plan. Implements fertility-optimised nutrition addressing weight, insulin resistance, and cycle regularity.',isActiveLead:true},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Specialist',detail:'Delivers pelvic-supportive yoga, stress-reduction breathwork, and movement protocols for fertility optimisation.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Fertility — Metabolic Optimisation.'},
+  H3_fertility_elite_stress:{cluster:'H',paradigm:'A',tier:'elite',eyebrow:'Fertility — Stress-Cycle Recovery Track',sub:'Your fertility profile shows a significant stress-cortisol disruption of the reproductive cycle. A four-expert team addresses the clinical, psychological, nutritional, and movement dimensions.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'Gynaecologist / MD',detail:'Manages full reproductive panel, cortisol-cycle interaction, and clinical fertility preparation prescriptions.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Psychotherapist',detail:'Your primary point of daily contact and the driver of your recovery plan. Addresses the cortisol-reproductive axis through targeted psychological intervention and stress recovery protocol.',isActiveLead:true},{role:'Core Accelerator',badge:'badge-accel',name:'Dietician',detail:'Implements fertility-supportive nutrition targeting insulin sensitivity, folate optimisation, and hormonal dietary support.',isActiveLead:false},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Specialist',detail:'Delivers pelvic yoga, cortisol-reducing breathwork, and cycle-supportive movement practices.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Fertility — Stress-Cycle Recovery.'},
+  H4_fertility_elite_full:{cluster:'H',paradigm:'A',tier:'elite',eyebrow:'Fertility — Comprehensive Preconception Programme',sub:'Your multi-signal fertility profile — cycles, acne, mood, and weight — requires the full four-expert team for comprehensive preconception preparation.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'Gynaecologist / MD Specialist',detail:'Leads full hormonal management — LH/FSH, AMH, androgen panel — and manages fertility preparation prescriptions in compliance with Telemedicine Guidelines 2020.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician',detail:'Your primary point of daily contact and the driver of your recovery plan. Manages comprehensive fertility nutrition — insulin resistance, anti-androgen protocol, and preconception supplementation.',isActiveLead:true},{role:'Core Accelerator',badge:'badge-accel',name:'Psychotherapist',detail:'Addresses the psychological dimension of fertility preparation — stress, anxiety, and the cortisol-reproductive loop.',isActiveLead:false},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Specialist',detail:'Delivers pelvic-opening yoga, breathwork for cortisol regulation, and cycle-supportive daily practice.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Fertility — Comprehensive Preconception Programme.'},
+  H5_fertility_alt_essential:{cluster:'H',paradigm:'ALT',tier:'essential',eyebrow:'Fertility — Ayurvedic Foundation Track',sub:'Your preconception profile is addressed through Prasuti Tantra — Ayurvedic reproductive medicine — focusing on Shukra dhatu and Artava restoration for natural conception preparation.',team:[{role:'Therapeutic Anchor',badge:'badge-therapeutic',name:'BAMS MD — Prasuti Tantra & Stri Roga',detail:'Specialist in Ayurvedic reproductive medicine. Conducts reproductive assessment, Artava and Shukra dhatu evaluation, and prescribes fertility Rasayana within full CCIM-defined scope of practice.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician',detail:'Your primary point of daily contact and the driver of your recovery plan. Implements Ayurveda-aligned fertility nutrition — Shukra-nourishing foods, preconception micronutrient support.',isActiveLead:true}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Fertility — Ayurvedic Foundation.'},
+  H6_fertility_alt_premium:{cluster:'H',paradigm:'ALT',tier:'premium',eyebrow:'Fertility — Ayurvedic Metabolic Optimisation',sub:'Your Ayurvedic fertility profile with cycle-weight interaction requires Prasuti Tantra expertise, nutritional support, and daily practice compliance for conception readiness.',team:[{role:'Therapeutic Anchor',badge:'badge-therapeutic',name:'BAMS MD — Prasuti Tantra & Stri Roga',detail:'Manages Ayurvedic fertility protocol — cycle regulation through Artava shodhana, Pushpa doshahara, and constitutional Rasayana for metabolic-reproductive restoration.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician',detail:'Your primary point of daily contact and the driver of your recovery plan. Delivers Ayurveda-aligned fertility nutrition targeting the weight-cycle metabolic axis.',isActiveLead:true},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Specialist',detail:'Delivers pelvic yoga sequences, pranayama for reproductive support, and Ayurvedic dinacharya for cycle regularity.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Fertility — Ayurvedic Metabolic Optimisation.'},
+  H7_fertility_alt_elite_stress:{cluster:'H',paradigm:'ALT',tier:'elite',eyebrow:'Fertility — Ayurvedic Stress-Cycle Recovery',sub:'Your Ayurvedic fertility profile with significant stress-cycle disruption requires a full four-expert team — Prasuti Tantra expertise, psychological recovery, nutritional support, and daily practice.',team:[{role:'Therapeutic Anchor',badge:'badge-therapeutic',name:'BAMS MD — Prasuti Tantra & Stri Roga',detail:'Manages Manasika stress-Artava disruption through Ayurvedic nervine and Medhya Rasayana protocol alongside Stri Roga reproductive management.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Psychotherapist',detail:'Your primary point of daily contact and the driver of your recovery plan. Addresses the psychological stress-reproductive axis and cortisol-cycle disruption through structured intervention.',isActiveLead:true},{role:'Core Accelerator',badge:'badge-accel',name:'Dietician',detail:'Implements Ayurveda-integrated fertility nutrition — Shukra-nourishing, stress-countering nutritional protocol.',isActiveLead:false},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Specialist',detail:'Delivers pelvic yoga, Nadi Shodhana pranayama for cortisol regulation, and Ayurvedic lifestyle anchoring for cycle support.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Fertility — Ayurvedic Stress-Cycle Recovery.'},
+  H8_fertility_alt_elite_full:{cluster:'H',paradigm:'ALT',tier:'elite',eyebrow:'Fertility — Comprehensive Ayurvedic Preconception Programme',sub:'Your multi-signal Ayurvedic fertility profile requires the complete four-expert team — Prasuti Tantra specialist leadership with full psychological, nutritional, and practice support.',team:[{role:'Therapeutic Anchor',badge:'badge-therapeutic',name:'BAMS MD — Prasuti Tantra & Stri Roga',detail:'Leads comprehensive Ayurvedic preconception programme — Artava shuddhi, Shukra Rasayana, Beeja samskarana protocols — within full CCIM-defined Prasuti Tantra scope.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician',detail:'Your primary point of daily contact and the driver of your recovery plan. Manages comprehensive Ayurvedic fertility nutrition across Shukra, Ojas, and anti-androgenic nutritional dimensions.',isActiveLead:true},{role:'Core Accelerator',badge:'badge-accel',name:'Psychotherapist',detail:'Addresses preconception psychological load — anxiety, stress, cortisol-reproductive disruption — alongside the Ayurvedic framework.',isActiveLead:false},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Specialist',detail:'Delivers the full Ayurvedic fertility practice protocol — pelvic yoga, pranayama, dinacharya, and Ritucharya compliance for cycle alignment.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Fertility — Comprehensive Ayurvedic Preconception Programme.'},
+  I1_fallback_triage:{cluster:'I',paradigm:'A',tier:'essential',eyebrow:'Personal Review Required',sub:'Your profile covers multiple health dimensions that our system wants to review with you personally before finalising your team.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS General Practitioner',detail:'Conducts red-flag screening and clinical orientation — confirming no serious pathology is present before a longer-term care team is assembled.',isActiveLead:false}],isTriage:true,waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Personal Review Requested.'},
+  I2_fallback_managing:{cluster:'I',paradigm:'A',tier:'premium',eyebrow:'Chronic Condition — Coordinator Review',sub:'You are actively managing an ongoing condition. Your Coordinator will confirm your specialist allocation after reviewing your case brief.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS GP / MD Specialist',detail:'Manages clinical oversight, reviews existing treatment history, and establishes the medical framework for the care team.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician',detail:'Your primary point of daily contact and the driver of your recovery plan. Implements condition-specific dietary management while Coordinator finalises specialist allocation.',isActiveLead:true}],isTriage:true,waCopy:'Hello JeevanKey, I completed the Clinical Navigator. Result: Chronic Condition — Coordinator Review.'}
+};
 
-
-/* ── NAVIGATION ── */
-
+/* ══════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════ */
 function showScreen(id) {
-
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-
-  const target = document.getElementById('screen-' + id);
-
-  if (target) {
-
-    target.classList.add('active');
-
-    target.scrollTop = 0;
-
-  }
-
+  const t = document.getElementById('screen-' + id);
+  if (t) { t.classList.add('active'); t.scrollTop = 0; }
 }
 
+function startNavigator() { showScreen('q0'); }
 
+/* ══════════════════════════════════════
+   QUESTION HANDLERS
+══════════════════════════════════════ */
+function selectQ0(val) {
+  state.q0 = val;
+  highlightSelected('q0-answers', val);
+  setTimeout(() => {
+    if (val === 'guided') {
+      showScreen('triage');
+    } else if (val === 'open') {
+      showScreen('q5');
+    } else {
+      /* Locked paradigm — skip Q5, go straight to Q1 */
+      state.q5 = null;
+      _showQ1AsQuestion2();
+    }
+  }, 250);
+}
 
-function startNavigator() { showScreen('q1'); }
+function selectQ5(val) {
+  state.q5 = val;
+  highlightSelected('q5-answers', val);
+  setTimeout(() => {
+    if (val === 'confused') {
+      showScreen('triage');
+    } else {
+      _showQ1AsQuestion3();
+    }
+  }, 250);
+}
 
-
-
-/* ── CONVERSATIONAL LOOPS ── */
+/* Q1 progress dot numbering adjusts based on whether Q5 was shown */
+function _showQ1AsQuestion2() {
+  document.getElementById('q1-label').textContent = 'Question 2 of 4';
+  const dots = document.getElementById('q1-progress');
+  dots.innerHTML = '<div class="dot done"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div>';
+  showScreen('q1');
+}
+function _showQ1AsQuestion3() {
+  document.getElementById('q1-label').textContent = 'Question 3 of 5';
+  const dots = document.getElementById('q1-progress');
+  dots.innerHTML = '<div class="dot done"></div><div class="dot done"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div>';
+  showScreen('q1');
+}
 
 function selectQ1(val) {
-
   state.q1 = val;
-
   highlightSelected('q1-answers', val);
-
+  /* Show "Planning to conceive" option only for hormonal Q1 */
+  document.getElementById('q3-conceive').style.display = (val === 'hormonal') ? 'flex' : 'none';
   setTimeout(() => showScreen('q2'), 250);
-
 }
-
-
 
 function selectQ2(val) {
-
   state.q2 = val;
-
   highlightSelected('q2-answers', val);
-
   setTimeout(() => showScreen('q3'), 250);
-
 }
-
-
 
 function toggleQ3(val) {
-
   const btn = document.querySelector(`#q3-answers [data-val="${val}"]`);
-
   const noneBtn = document.getElementById('q3-none');
-
-
-
   if (val === 'none') {
-
     state.q3 = ['none'];
-
     document.querySelectorAll('#q3-answers .answer-btn').forEach(b => b.classList.remove('selected'));
-
     btn.classList.add('selected');
-
   } else {
-
     noneBtn.classList.remove('selected');
-
     state.q3 = state.q3.filter(v => v !== 'none');
-
     if (state.q3.includes(val)) {
-
       state.q3 = state.q3.filter(v => v !== val);
-
       btn.classList.remove('selected');
-
     } else {
-
       state.q3.push(val);
-
       btn.classList.add('selected');
-
     }
-
   }
-
   document.getElementById('q3-continue').classList.toggle('visible', state.q3.length > 0);
-
 }
-
-
 
 function goToQ4() { if (state.q3.length > 0) showScreen('q4'); }
 
-
-
 function selectQ4(val) {
-
   state.q4 = val;
-
   highlightSelected('q4-answers', val);
-
   setTimeout(() => {
-
     showScreen('matching');
-
     setTimeout(() => computeResult(), 2000);
-
   }, 250);
-
 }
-
-
 
 function highlightSelected(containerId, val) {
-
   document.querySelectorAll(`#${containerId} .answer-btn`).forEach(b => {
-
     b.classList.toggle('selected', b.dataset.val === val);
-
   });
-
 }
 
+/* ══════════════════════════════════════
+   CORE ROUTING ENGINE — computeProfile()
+   7-Stage v5 hierarchy.
+══════════════════════════════════════ */
+function computeProfile(q0, q1, q2, q3, q4, q5) {
+  const has = (v) => Array.isArray(q3) && q3.includes(v);
+  const conceiveFlag = has('conceive');
+  const envFlag     = has('env_exposure');
+  const hormOvlp   = ['periods','acne','skin_hair'].some(s => has(s));
 
+  /* STAGE 1 */
+  let paradigm = q0;
+  if (q0 === 'guided') return _buildResult('I1_fallback_triage', 'A', false, true, true);
 
-/* ── PROFILE ROUTING OBJECT MATRIX ── */
-
-const PROFILES = {
-
-  hormonal: {
-
-    eyebrow: 'Hormonal — Dynamic Care Track',
-
-    sub: 'Your profile reflects a hormonal-stress cluster. We have aligned clinical confirmation leads with underlying cortisol recovery paths.',
-
-    team: [
-
-      { role: 'Diagnostic Anchor', badge: 'badge-anchor', name: 'Gynaecologist / Endocrinologist', detail: 'Establishes clinical baseline tracking panels (LH/FSH, fasting insulin, androgen profiles).' },
-
-      { role: 'Active Treatment Lead', badge: 'badge-driver', name: 'Psychotherapist', detail: 'Targets cortisol stabilization loops directly linked to PCOD loop flare-ups.' },
-
-      { role: 'Accelerator', badge: 'badge-accel', name: 'Dietician', detail: 'Deploys target low-GI meal tracking configurations for insulin optimizations.' }
-
-    ],
-
-    multiphase: true,
-
-    phaseNotice: '<strong>Dynamic Review Protocol:</strong> At day 60, if nervous load stabilizes but physical indicators persist, your Gynaecologist assumes structural treatment leadership.',
-
-    planFloor: 'premium',
-
-    waCopy: 'Hello JeevanKey, I completed the Clinical Navigator. Result: Hormonal Cluster.'
-
-  },
-
-  mind: {
-
-    eyebrow: 'Nervous System Stabilization',
-
-    sub: 'Profile points heavily toward stress exhaustion and neural tracking loops. Focus is placed on systemic behavioral recovery mechanics.',
-
-    team: [
-
-      { role: 'Diagnostic Anchor', badge: 'badge-anchor', name: 'MBBS General Practitioner', detail: 'Rules out nutritional deficiencies, thyroid fluctuations, or biochemical mimics.' },
-
-      { role: 'Active Treatment Lead', badge: 'badge-driver', name: 'Psychotherapist', detail: 'Manages evidence-backed cognitive interventions for nervous system de-escalation.' }
-
-    ],
-
-    multiphase: false,
-
-    planFloor: 'essential',
-
-    waCopy: 'Hello JeevanKey, I completed the Clinical Navigator. Result: Stress and Mental Wellness.'
-
-  },
-
-  gut: {
-
-    eyebrow: 'Metabolic & Gut Restoration',
-
-    sub: 'Focused on functional gastrointestinal optimization pathways supervised under baseline medical rule-outs.',
-
-    team: [
-
-      { role: 'Diagnostic Anchor', badge: 'badge-anchor', name: 'MBBS Clinician', detail: 'Reviews blood biomarker baselines and systemic inflammatory markers.' },
-
-      { role: 'Active Treatment Lead', badge: 'badge-driver', name: 'Dietician', detail: 'Runs tailored element elimination matrices to isolate persistent food triggers.' }
-
-    ],
-
-    multiphase: false,
-
-    planFloor: 'essential',
-
-    waCopy: 'Hello JeevanKey, I completed the Clinical Navigator. Result: Gut & Metabolic Cluster.'
-
-  },
-
-  movement: {
-
-    eyebrow: 'Musculoskeletal Rehabilitation',
-
-    sub: 'Aligns mechanical posture correction pipelines while addressing the pain-stress amplification loop.',
-
-    team: [
-
-      { role: 'Diagnostic Anchor', badge: 'badge-anchor', name: 'MBBS Doctor', detail: 'Assesses structural nerve radiculopathy or decompression indicators.' },
-
-      { role: 'Active Treatment Lead', badge: 'badge-driver', name: 'Physiotherapist', detail: 'Deploys customized physical spinal alignment and tracking exercises.' }
-
-    ],
-
-    multiphase: false,
-
-    planFloor: 'premium',
-
-    waCopy: 'Hello JeevanKey, I completed the Clinical Navigator. Result: Musculoskeletal Rehab.'
-
-  },
-
-  chronic: {
-
-    eyebrow: 'Chronic Systematic Care Plan',
-
-    sub: 'Engineered for consistent biological management of systemic long-term tracking metrics.',
-
-    team: [
-
-      { role: 'Diagnostic Anchor & Lead', badge: 'badge-anchor', name: 'MD Specialist Consultation', detail: 'Central medical authority monitoring blood markers and adjusting prescriptions.' },
-
-      { role: 'Accelerator', badge: 'badge-accel', name: 'Dietician', detail: 'Configures glycemic or cardiovascular disease-focused restriction parameters.' }
-
-    ],
-
-    multiphase: false,
-
-    planFloor: 'elite',
-
-    waCopy: 'Hello JeevanKey, I completed the Clinical Navigator. Result: Chronic Condition Management.'
-
+  /* STAGE 2 */
+  let seniority_escalation = false;
+  if (q0 === 'open') {
+    if (q5 === 'confused') return _buildResult('I1_fallback_triage', 'A', false, true, true);
+    if (q5 === 'dissatisfied') seniority_escalation = true;
   }
 
-};
+  /* STAGE 3 — Cluster identification */
+  let cluster;
+  if (q4 === 'managing' && q1 !== 'hormonal') { cluster = 'F'; }
+  else if (q1 === 'hormonal' && conceiveFlag)  { cluster = 'H'; }
+  else if (q1 === 'chronic' || q4 === 'managing') { cluster = 'F'; }
+  else if (q1 === 'mind')    { cluster = 'A'; }
+  else if ((q1 === 'gut' || q1 === 'energy') && envFlag) { cluster = 'G'; }
+  else if (q1 === 'gut')     { cluster = 'B'; }
+  else if (q1 === 'pain')    { cluster = 'C'; }
+  else if (q1 === 'hormonal'){ cluster = 'D'; }
+  else if (q1 === 'energy')  { cluster = 'E'; }
+  else { return _fallbackResult(q4, seniority_escalation); }
 
+  /* Cluster H paradigm safety override — fires only for 'open', not for locked paradigms */
+  if (cluster === 'H' && paradigm === 'open') { paradigm = 'allopathic'; }
 
+  /* STAGE 4 — Complexity scoring */
+  const dur = { acute:0, months:1, long:2, recurring:3 }[q2] || 0;
+  const q3c = Array.isArray(q3) ? q3.filter(v => !['none','conceive','env_exposure'].includes(v)) : [];
+  let sig   = Math.min(q3c.length, 3);
+  if (cluster !== 'D' && cluster !== 'H' && hormOvlp) sig += 1;
+  const complexity = dur + sig;
+  let tier = complexity <= 1 ? 'essential' : complexity <= 4 ? 'premium' : 'elite';
 
-const PLANS = [
+  /* STAGE 5 — Q4 managing forces cluster F */
+  if (q4 === 'managing' && cluster !== 'F') cluster = 'F';
 
-  { id: 'trial', name: 'Trial', price: '₹499', period: 'one-time', experts: '1 Expert Consultation', featured: false },
+  /* STAGE 6 — Resolve 'open' paradigm */
+  if (paradigm === 'open') {
+    const clinAnchor = ['periods','acne','skin_hair'].some(s => has(s)) || conceiveFlag || q4 === 'managing' || complexity >= 4;
+    const lifeSigs   = ['meal_fatigue','sleep','motivation','weight'].filter(s => has(s)).length;
+    const lifeDom    = lifeSigs >= 2 && complexity <= 3 && !clinAnchor;
+    paradigm = clinAnchor ? 'allopathic' : (lifeDom ? 'alternative' : 'allopathic');
+  }
 
-  { id: 'essential', name: 'Essential', price: '₹2,499', period: '/month', experts: '2 Coordinated Experts', featured: false },
+  const pdm = (paradigm === 'alternative') ? 'ALT' : 'A';
 
-  { id: 'premium', name: 'Premium', price: '₹4,499', period: '/month', experts: '3 Specialized Experts', featured: true },
+  /* STAGE 7 — Select mapping */
+  const profileKey = _selectMapping(cluster, pdm, tier, q4, q1, q3);
+  if (!profileKey || !PROFILES[profileKey]) return _fallbackResult(q4, seniority_escalation);
 
-  { id: 'elite', name: 'Elite', price: '₹7,499', period: '/month', experts: '4+ Clinical Experts', featured: false }
+  let profile = PROFILES[profileKey];
+  const resolvedTier = profile.tier;
 
-];
+  /* Seniority escalation — non-mutating deep clone */
+  if (seniority_escalation) {
+    profile = _applySeniority(profile, cluster, pdm);
+  }
 
-
-
-function computeProfile() {
-
-  if (state.q1 === 'chronic' || state.q4 === 'managing') return 'chronic';
-
-  if (state.q1 === 'hormonal') return 'hormonal';
-
-  if (state.q1 === 'mind' && state.q3.some(v => ['periods','acne','skin_hair'].includes(v))) return 'hormonal';
-
-  if (state.q1 === 'pain') return 'movement';
-
-  if (state.q1 === 'gut') return 'gut';
-
-  return 'mind';
-
+  return { profileKey, profile, tier: resolvedTier, paradigm: pdm, seniority_escalation, isTriage: !!profile.isTriage, isGuided: false };
 }
 
+function _buildResult(key, pdm, sen, isTriage, isGuided) {
+  return { profileKey: key, profile: PROFILES[key], tier: PROFILES[key].tier, paradigm: pdm, seniority_escalation: sen, isTriage, isGuided };
+}
 
+function _selectMapping(cluster, pdm, tier, q4, q1, q3) {
+  const has = (v) => Array.isArray(q3) && q3.includes(v);
+  switch(cluster) {
+    case 'A':
+      if (pdm==='ALT') return tier==='essential' ? 'A6_mind_alt_essential' : 'A7_mind_alt_premium';
+      if (['periods','acne','skin_hair'].some(s=>has(s))) return 'A5_mind_hormonal_xcluster';
+      if (tier==='essential') return 'A1_mind_essential';
+      if (tier==='elite')     return 'A4_mind_elite';
+      return (q4==='sleep_issue'||has('sleep')) ? 'A3_mind_premium_sleep' : 'A2_mind_premium_diet';
+    case 'B':
+      if (pdm==='ALT') return tier==='essential' ? 'B5_gut_alt_essential' : 'B6_gut_alt_premium';
+      if (tier==='essential') return 'B1_gut_essential';
+      if (has('weight'))      return 'B3_gut_premium_weight';
+      if (q4==='stressed'||has('mood')||has('motivation')) return 'B4_gut_premium_stress';
+      return 'B2_gut_premium_chronic';
+    case 'C':
+      if (tier==='essential') return 'C1_pain_essential';
+      if (tier==='elite')     return 'C4_pain_elite';
+      if (has('weight')||q4==='sedentary') return 'C3_pain_premium_weight';
+      return 'C2_pain_premium_stress';
+    case 'D':
+      if (pdm==='ALT') return tier==='essential' ? 'D5_hormonal_alt_essential' : 'D6_hormonal_alt_premium';
+      if (tier==='essential') return 'D1_hormonal_essential';
+      if (tier==='elite')     return 'D4_hormonal_elite';
+      if (has('mood')||has('motivation')||has('sleep')) return 'D2_hormonal_premium_stress';
+      if (has('skin_hair')||has('acne')) return 'D3_hormonal_premium_skin';
+      return 'D2_hormonal_premium_stress';
+    case 'E':
+      if (pdm==='ALT') return tier==='essential' ? 'E5_energy_alt_essential' : 'E6_energy_alt_premium';
+      if (tier==='essential') return 'E1_energy_essential';
+      if (['periods','acne','skin_hair'].some(s=>has(s))) return 'E4_energy_premium_hormonal';
+      if (q4==='stressed'||has('mood')||has('sleep'))   return 'E2_energy_premium_stress';
+      if (has('meal_fatigue')||has('weight'))            return 'E3_energy_premium_gut';
+      return 'E2_energy_premium_stress';
+    case 'F':
+      if (pdm==='ALT') return 'F5_chronic_alt_premium';
+      if (tier==='essential') return 'F1_chronic_essential';
+      if (tier==='elite') return (has('mood')||has('motivation')||has('sleep')) ? 'F4_chronic_elite_psych' : 'F3_chronic_elite_complex';
+      return 'F2_chronic_premium';
+    case 'G':
+      if (pdm==='ALT') {
+        if (has('env_exposure')) return 'G6_immunity_pollution_ayurvedic';
+        return (has('sleep')||has('motivation')) ? 'G4_immunity_premium_ayurvedic' : 'G2_immunity_essential_ayurvedic';
+      }
+      if (has('env_exposure')) return 'G5_immunity_pollution_allopathic';
+      return (has('sleep')||has('motivation')) ? 'G3_immunity_premium_allopathic' : 'G1_immunity_essential_allopathic';
+    case 'H':
+      if (pdm==='ALT') {
+        if (tier==='essential') return 'H5_fertility_alt_essential';
+        if (tier==='premium')   return 'H6_fertility_alt_premium';
+        return (has('mood')||has('motivation')) ? 'H7_fertility_alt_elite_stress' : 'H8_fertility_alt_elite_full';
+      }
+      if (tier==='essential') return 'H1_fertility_essential';
+      if (tier==='premium')   return 'H2_fertility_premium';
+      return (has('mood')||has('motivation')) ? 'H3_fertility_elite_stress' : 'H4_fertility_elite_full';
+    default: return null;
+  }
+}
 
+function _applySeniority(profile, cluster, pdm) {
+  const p = JSON.parse(JSON.stringify(profile));
+  const a = p.team[0];
+  if (pdm === 'ALT') {
+    if (cluster === 'H') {
+      a.detail = 'Senior BAMS MD Specialist — Prasuti Tantra & Stri Roga, minimum 8 years reproductive medicine practice. ' + a.detail;
+    } else {
+      a.name   = 'Senior BAMS / Senior BHMS Doctor';
+      a.detail = 'Senior practitioner (8+ years clinical practice). ' + a.detail;
+    }
+  } else {
+    if (cluster === 'D' || cluster === 'H') {
+      a.name   = 'Gynaecologist / MD Specialist — Women\'s Health';
+      a.detail = 'Senior specialist (8+ years reproductive medicine). ' + a.detail;
+    } else if (cluster === 'F') {
+      a.name   = 'MD Specialist (Senior)';
+      a.detail = 'Senior MD Specialist (8+ years chronic/systemic medicine). ' + a.detail;
+    } else {
+      a.name   = a.name.replace('MBBS General Practitioner','MBBS — Senior GP / MD Generalist').replace('MBBS GP','MBBS Senior GP');
+      a.detail = 'Senior practitioner (5+ years specialist experience). ' + a.detail;
+    }
+  }
+  p.team.forEach(m => { if (m.isActiveLead) m.detail += ' [Senior / RCI-Registered practitioner preferred.]'; });
+  p.seniorityEscalated = true;
+  return p;
+}
+
+function _fallbackResult(q4, sen) {
+  const key = (q4 === 'managing') ? 'I2_fallback_managing' : 'I1_fallback_triage';
+  return { profileKey: key, profile: PROFILES[key], tier: PROFILES[key].tier, paradigm:'A', seniority_escalation: sen, isTriage: true, isGuided: false };
+}
+
+/* ══════════════════════════════════════
+   RESULT RENDERING
+══════════════════════════════════════ */
 function computeResult() {
+  const result = computeProfile(state.q0, state.q1, state.q2, state.q3, state.q4, state.q5);
+  state.result = result;
 
-  const pKey = computeProfile();
+  if (result.isGuided) { showScreen('triage'); return; }
 
-  const profile = PROFILES[pKey];
+  const { profile, tier, paradigm, seniority_escalation, isTriage } = result;
 
-
-
-  document.getElementById('result-eyebrow').textContent = profile.eyebrow;
+  /* Eyebrow */
+  const eyebrowEl = document.getElementById('result-eyebrow');
+  eyebrowEl.textContent = profile.eyebrow;
+  eyebrowEl.className = 'result-eyebrow' + (paradigm === 'ALT' ? ' alt-track' : '');
 
   document.getElementById('result-sub').textContent = profile.sub;
 
+  /* ALT track banner */
+  document.getElementById('alt-track-banner').classList.toggle('visible', paradigm === 'ALT');
 
+  /* Seniority notice */
+  document.getElementById('seniority-notice').classList.toggle('visible', seniority_escalation);
 
+  /* Triage notice */
+  document.getElementById('triage-notice').classList.toggle('visible', isTriage && !result.isGuided);
+
+  /* ── Team Grid — DELIVERABLE 2B ── */
   const grid = document.getElementById('team-grid');
-
   grid.innerHTML = '';
-
   profile.team.forEach((m, idx) => {
-
     const card = document.createElement('div');
-
     card.className = 'team-card';
-
+    /* Active Treatment Lead subtitle — DELIVERABLE 2C */
+    const activeLeadSubtitle = m.isActiveLead
+      ? `<div class="active-lead-subtitle">Your primary point of daily contact and the driver of your recovery plan.</div>`
+      : '';
     card.innerHTML = `
-
       <div class="team-card-header" onclick="this.parentElement.classList.toggle('open')">
-
         <span class="team-role-badge ${m.badge}">${m.role}</span>
-
-        <span class="team-expert-name">${m.name}</span>
-
+        <div class="team-expert-info">
+          <div class="team-expert-name">${m.name}</div>
+          ${activeLeadSubtitle}
+        </div>
         <span class="team-card-chevron">▼</span>
-
       </div>
-
-      <div class="team-card-body"><div class="team-card-body-inner">${m.detail}</div></div>
-
-    `;
-
+      <div class="team-card-body">
+        <div class="team-card-body-inner">${m.detail}</div>
+      </div>`;
     grid.appendChild(card);
-
     if (idx === 0) card.classList.add('open');
-
   });
 
-
-
-  const pNotice = document.getElementById('phase-notice');
-
-  if (profile.multiphase && profile.phaseNotice) {
-
-    pNotice.style.display = 'block';
-
-    pNotice.innerHTML = profile.phaseNotice;
-
-  } else {
-
-    pNotice.style.display = 'none';
-
-  }
-
-
-
+  /* ── Plan Grid ── */
   const planGrid = document.getElementById('plan-grid');
-
   planGrid.innerHTML = '';
-
   PLANS.forEach(p => {
-
     const card = document.createElement('div');
-
-    card.className = 'plan-card' + (p.featured ? ' featured' : '');
-
+    const isMatched = p.id === tier;
+    const isHigher  = PLANS.findIndex(x=>x.id===p.id) < PLANS.findIndex(x=>x.id===tier);
+    /* Trial is available but dimmed for premium/elite profiles */
+    const dimTrial  = p.id === 'trial' && (tier === 'premium' || tier === 'elite');
+    card.className  = 'plan-card' + (isMatched ? ' selected' : '') + (dimTrial ? ' dimmed' : '');
     card.dataset.planId = p.id;
-
+    const trialNote = p.id === 'trial' && (tier !== 'essential')
+      ? `<div class="plan-trial-note">Introductory consultation — not a coordinated pathway</div>` : '';
     card.innerHTML = `
-
-      ${p.featured ? '<div class="plan-popular">Popular</div>' : ''}
-
+      ${isMatched ? '<div class="plan-matched">Your Match</div>' : ''}
+      ${p.featured && !isMatched ? '<div class="plan-popular">Popular</div>' : ''}
       <div class="plan-name">${p.name}</div>
-
       <div class="plan-price">${p.price}<span style="font-size:10px;color:var(--ink-4)"> ${p.period}</span></div>
-
       <div class="plan-experts">${p.experts}</div>
-
-    `;
-
+      ${trialNote}`;
     card.onclick = () => selectPlan(p.id, profile.waCopy);
-
     planGrid.appendChild(card);
-
   });
 
-
-
-  selectPlan(profile.planFloor, profile.waCopy);
-
+  selectPlan(tier, profile.waCopy);
   showScreen('result');
-
 }
-
-
 
 function selectPlan(pId, waCopy) {
-
   state.selectedPlan = pId;
-
   document.querySelectorAll('.plan-card').forEach(c => {
-
     c.classList.toggle('selected', c.dataset.planId === pId);
-
   });
-
   const plan = PLANS.find(p => p.id === pId);
-
-  const consentText = '\n\nI accept the Terms of Service and consent to care coordination via WhatsApp.';
-
-  const fullText = waCopy + (plan ? ` Plan Interest: ${plan.name} Tier.` : '') + consentText;
-
-  state.activeWaUrl = 'https://wa.me/919259684363?text=' + encodeURIComponent(fullText);
-
+  const consent = '\n\nI accept the Terms of Service and consent to care coordination via WhatsApp.';
+  const full    = waCopy + (plan ? ` Plan Interest: ${plan.name} Tier.` : '') + consent;
+  state.activeWaUrl = 'https://wa.me/919259684363?text=' + encodeURIComponent(full);
   document.getElementById('whatsapp-text').textContent = plan ? `Start with ${plan.name} Pathway →` : 'Connect on WhatsApp →';
-
 }
-
-
 
 function openWhatsAppRedirect() {
-
-  if (state.activeWaUrl && state.activeWaUrl !== '#') {
-
-    window.open(state.activeWaUrl, '_blank');
-
-  }
-
+  if (state.activeWaUrl && state.activeWaUrl !== '#') window.open(state.activeWaUrl, '_blank');
 }
 
-
+function openTriageWhatsApp() {
+  const text = 'Hello JeevanKey, I completed the Clinical Navigator. I need a personal review — my profile covers multiple health areas. Please help me find the right care path.';
+  window.open('https://wa.me/919259684363?text=' + encodeURIComponent(text), '_blank');
+}
 
 function restart() {
-
-  state.q1 = null; state.q2 = null; state.q3 = []; state.q4 = null; state.selectedPlan = null;
-
-  document.querySelectorAll('#q3-answers .answer-btn').forEach(b => b.classList.remove('selected'));
-
+  state.q0=null; state.q1=null; state.q2=null; state.q3=[];
+  state.q4=null; state.q5=null; state.selectedPlan=null;
+  state.activeWaUrl='#'; state.result=null;
+  document.querySelectorAll('.answer-btn').forEach(b => b.classList.remove('selected'));
   document.getElementById('q3-continue').classList.remove('visible');
-
+  document.getElementById('q3-conceive').style.display = 'none';
   showScreen('welcome');
-
 }
 
-
-
 showScreen('welcome');
-
 </script>
-
 </body>
-
 </html>
-
