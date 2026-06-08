@@ -65,13 +65,12 @@ html, body {
   box-shadow: 0 10px 40px rgba(12, 68, 124, 0.06);
   padding: 40px 32px;
   position: relative;
-  height: auto;
-  max-height: 92vh;
+  height: auto;          /*  Allows the card container to stretch naturally */
+  min-height: 640px;     /*  Maintains clean aspect ratios for short early screens */
   display: flex;
   flex-direction: column;
-  overflow: hidden;
 }
-
+   
 /* ── Screen transitions ── */
 .screen {
   display: none;
