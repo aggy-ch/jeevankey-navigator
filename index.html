@@ -41,18 +41,21 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body {
-  height: 100%;
+  height: auto;          /* Changed from 100% to unlock page height */
   font-family: var(--sans);
   background: var(--off);
   color: var(--ink);
-  overflow: hidden;
+  overflow: visible;     /* Changed from hidden to allow natural document flow */
   -webkit-font-smoothing: antialiased;
 }
 
 #app {
-  position: fixed; inset: 0; z-index: 1;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
+  position: relative;    /* Changed from fixed to prevent viewport locking */
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; /* Changed from center to let content stack downward */
   padding: 20px;
 }
 
@@ -65,10 +68,11 @@ html, body {
   box-shadow: 0 10px 40px rgba(12, 68, 124, 0.06);
   padding: 40px 32px;
   position: relative;
-  height: auto;          /*  Allows the card container to stretch naturally */
-  min-height: 640px;     /*  Maintains clean aspect ratios for short early screens */
+  height: auto;          
+  /* REMOVED max-height: 92vh; completely to eliminate expansion limits */
   display: flex;
   flex-direction: column;
+  overflow: visible;     /* Changed from hidden so content changes alter the container size */
 }
    
 /* ── Screen transitions ── */
@@ -78,11 +82,9 @@ html, body {
   opacity: 0;
   transform: translateY(12px);
   transition: opacity .4s var(--ease-out-expo), transform .4s var(--ease-out-expo);
-  overflow-y: auto;
+  overflow: visible;     /* Changed from overflow-y: auto to destroy the internal scrollbar */
   width: 100%;
   flex: 1;
-  scrollbar-width: thin;
-  scrollbar-color: #d2dbe1 transparent;
 }
 .screen::-webkit-scrollbar { width: 4px; }
 .screen::-webkit-scrollbar-track { background: transparent; }
