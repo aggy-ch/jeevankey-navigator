@@ -1799,7 +1799,6 @@ function computeResult(){
     card.className='team-card';
     card.innerHTML=`
       <div class="team-card-header" onclick="this.parentElement.classList.toggle('open')">
-        // Update this specific badge code placeholder line inside the loop:
         <span class="team-role-badge ${m.badge}">${t(m.role.toLowerCase().replace(/ /g, '_'))}</span>
         <div class="team-expert-info">
           <div class="team-expert-name">${m.name}</div>
