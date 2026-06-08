@@ -775,15 +775,7 @@ const PROFILES = {
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   const t = document.getElementById('screen-' + id);
-  if (t) { 
-    t.classList.add('active'); 
-    t.scrollTop = 0; 
-    
-    // ── ADD THIS BLOCK: Tells the parent Carrd page the exact height after every step ──
-    setTimeout(() => {
-      window.parent.postMessage({ type: 'jk-height', height: document.body.scrollHeight }, '*');
-    }, 450);
-  }
+  if (t) { t.classList.add('active'); t.scrollTop = 0; }
 }
 function startNavigator() { showScreen('q0'); }
 
@@ -1163,7 +1155,25 @@ function restart() {
   document.getElementById('q3-conceive').style.display = 'none';
   showScreen('welcome');
 }
+// ── MASTER RESIZE MONITOR ──
+// Targets the physical white card boundaries directly, completely bypassing buggy body metrics
+const jkLayoutObserver = new ResizeObserver(entries => {
+  for (let entry of entries) {
+    // Calculates core container height + 100px padding safety margin for shadows & content cushions
+    const structuralHeight = Math.ceil(entry.contentRect.height) + 100;
+    
+    window.parent.postMessage({ 
+      type: 'jk-height', 
+      height: structuralHeight 
+    }, '*');
+  }
+});
 
+// Anchor observer to your active layout frame
+const liveCard = document.querySelector('.wrap');
+if (liveCard) {
+  jkLayoutObserver.observe(liveCard);
+}
 showScreen('welcome');
 </script>
 </body>
