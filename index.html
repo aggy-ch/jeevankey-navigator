@@ -775,9 +775,16 @@ const PROFILES = {
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   const t = document.getElementById('screen-' + id);
-  if (t) { t.classList.add('active'); t.scrollTop = 0; }
+  if (t) { 
+    t.classList.add('active'); 
+    t.scrollTop = 0; 
+    
+    // ── ADD THIS BLOCK: Tells the parent Carrd page the exact height after every step ──
+    setTimeout(() => {
+      window.parent.postMessage({ type: 'jk-height', height: document.body.scrollHeight }, '*');
+    }, 450);
+  }
 }
-
 function startNavigator() { showScreen('q0'); }
 
 /* ══════════════════════════════════════
