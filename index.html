@@ -4,496 +4,89 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>JeevanKey — Apni Care Team Dhundein</title>
-<style>
-/* ══════════════════════════════════════════════
-   JEEVANKEY NAVIGATOR v5 — INDIA EDITION
-   Full pan-Indian localization + dynamic step
-   tracking + multi-language dropdown.
-══════════════════════════════════════════════ */
-:root {
-  --navy:          #0C447C;
-  --navy-d:        #06233f;
-  --navy-l:        #12579b;
-  --green:         #3B6D11;
-  --green-d:       #24440a;
-  --green-l:       #539719;
-  --white:         #ffffff;
-  --off:           #8EDBF5;
-  --ink:           #111b24;
-  --ink-2:         #2c3a46;
-  --ink-3:         #526371;
-  --ink-4:         #8ea1b0;
-  --wa:            #25D366;
-  --wa-d:          #1aab53;
-  --teal:          #1b4d4d;
-  --saffron:       #b45309;
-  --saffron-bg:    #fffbeb;
-  --saffron-bd:    #fde68a;
-  --sans:          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-html, body {
-  height: auto;
-  font-family: var(--sans);
-  background: var(--off);
-  color: var(--ink);
-  overflow: visible;
-  -webkit-font-smoothing: antialiased;
-}
-
-#app {
-  position: relative; z-index: 1;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: flex-start;
-  padding: 10px 0;
-}
-
-.wrap {
-  width: 100%;
-  max-width: 600px;
-  background: var(--white);
-  border-radius: 16px;
-  box-shadow: 0 10px 40px rgba(12,68,124,0.06);
-  padding: 40px 32px;
-  position: relative;
-  height: auto;
-  display: flex;
-  flex-direction: column;
-  overflow: visible;
-}
-
-.screen {
-  display: none;
-  flex-direction: column;
-  opacity: 0;
-  transform: translateY(12px);
-  transition: opacity .4s var(--ease-out-expo), transform .4s var(--ease-out-expo);
-  overflow: visible;
-  width: 100%;
-  scrollbar-width: none;
-}
-.screen::-webkit-scrollbar { display: none; }
-.screen.active { display: flex; opacity: 1; transform: translateY(0); overflow: visible; }
-#screen-result.active, #screen-q3.active {
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  max-height: calc(100svh - 40px);
-  scrollbar-width: none;
-}
-#screen-result.active::-webkit-scrollbar,
-#screen-q3.active::-webkit-scrollbar { display: none; }
-
-/* ── Brand Bar ── */
-.nav {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 24px; flex-shrink: 0; width: 100%;
-  gap: 8px;
-}
-.logo {
-  font-size: 20px; font-weight: 700; letter-spacing: -.02em;
-  color: var(--navy); text-decoration: none; flex-shrink: 0;
-}
-.logo span { color: var(--green); }
-
-/* ── Language Dropdown ── */
-.lang-select {
-  appearance: none;
-  -webkit-appearance: none;
-  background: #f4f7f5 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238ea1b0' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 8px center;
-  border: 1.5px solid #d2dbe1;
-  border-radius: 8px;
-  padding: 6px 28px 6px 10px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--ink-2);
-  cursor: pointer;
-  font-family: var(--sans);
-  transition: border-color .2s;
-  min-width: 0;
-  max-width: 140px;
-}
-.lang-select:focus { outline: none; border-color: var(--navy); }
-.lang-select:hover { border-color: var(--green-l); }
-
-/* ── Step Counter ── */
-.step-counter {
-  font-size: 11px; font-weight: 600; letter-spacing: .05em;
-  text-transform: uppercase; color: var(--green);
-  margin-bottom: 8px; flex-shrink: 0;
-}
-
-/* ── Progress Bar ── */
-.progress-track {
-  height: 4px;
-  background: #edf2f5;
-  border-radius: 2px;
-  margin-bottom: 20px;
-  flex-shrink: 0;
-  overflow: hidden;
-}
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--navy), var(--green));
-  border-radius: 2px;
-  transition: width .5s var(--ease-out-expo);
-}
-
-/* ── Question Typography ── */
-.q-text {
-  font-size: 21px; font-weight: 800; line-height: 1.3;
-  color: var(--ink); margin-bottom: 6px;
-  letter-spacing: -.01em; flex-shrink: 0;
-}
-.q-text em {
-  font-style: normal;
-  background: linear-gradient(270deg, var(--green) 45%, var(--navy) 63%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-.q-subtext {
-  font-size: 13px; color: var(--ink-3); line-height: 1.5;
-  margin-bottom: 16px; flex-shrink: 0;
-}
-
-/* ── Answer Buttons ── */
-.answers { display: flex; flex-direction: column; gap: 8px; }
-.answers.multi-col {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 8px;
-}
-.answer-btn {
-  display: flex; align-items: flex-start; gap: 10px;
-  padding: 13px 14px;
-  background: var(--white);
-  border: 1.5px solid #d2dbe1;
-  border-radius: 8px;
-  cursor: pointer;
-  text-align: left;
-  font-family: var(--sans);
-  font-size: 13.5px; font-weight: 500;
-  color: var(--ink-2); line-height: 1.45;
-  transition: all .2s var(--ease-out-expo);
-  animation: fadeUp .4s var(--ease-out-expo) both;
-}
-.answer-btn:hover {
-  border-color: var(--green-l);
-  background: #fbfdfa;
-  color: var(--green-d);
-  transform: translateX(2px);
-}
-.answer-btn.selected {
-  border-color: var(--green);
-  background: #f4faf0;
-  color: var(--green-d);
-  font-weight: 600;
-}
-.btn-icon { font-size: 17px; flex-shrink: 0; margin-top: 1px; }
-.btn-main { flex: 1; }
-.btn-sub {
-  display: block;
-  font-size: 11.5px;
-  font-weight: 400;
-  color: var(--ink-4);
-  margin-top: 2px;
-  line-height: 1.4;
-}
-.answer-btn.selected .btn-sub { color: var(--green-d); opacity: 0.75; }
-
-.multi-hint {
-  font-size: 12px; color: var(--ink-4);
-  margin-bottom: 10px; font-style: italic; flex-shrink: 0;
-}
-
-/* Continue Button */
-.continue-btn {
-  margin-top: 14px;
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  padding: 14px 24px;
-  background: var(--navy); color: var(--white);
-  border: none; border-radius: 8px;
-  font-family: var(--sans); font-size: 14.5px; font-weight: 600;
-  cursor: pointer; transition: all .2s var(--ease-out-expo);
-  opacity: 0; pointer-events: none; width: 100%;
-  flex-shrink: 0;
-}
-.continue-btn.visible { opacity: 1; pointer-events: all; }
-.continue-btn:hover { background: var(--navy-l); }
-
-/* ── Matching Screen ── */
-#screen-matching { text-align: center; padding: 24px 0; justify-content: center; }
-.matching-pulse {
-  font-size: 40px; margin-bottom: 16px;
-  animation: bounce 1.5s infinite ease-in-out;
-}
-@keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
-.matching-title { font-size: 20px; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
-.matching-sub { font-size: 14px; color: var(--ink-3); }
-
-/* ── Result Screen ── */
-.result-header { text-align: center; margin-bottom: 18px; flex-shrink: 0; }
-.result-eyebrow {
-  font-size: 11px; font-weight: 600; letter-spacing: .05em;
-  text-transform: uppercase; color: var(--green); margin-bottom: 6px;
-}
-.result-eyebrow.alt-track { color: var(--saffron); }
-.result-headline { font-size: 22px; font-weight: 800; color: var(--navy); margin-bottom: 6px; }
-.result-sub { font-size: 13px; color: var(--ink-3); line-height: 1.55; }
-
-.alt-track-banner {
-  display: none;
-  background: var(--saffron-bg);
-  border: 1px solid var(--saffron-bd);
-  border-left: 3px solid var(--saffron);
-  border-radius: 4px;
-  padding: 8px 12px;
-  margin-bottom: 14px;
-  font-size: 12px;
-  color: var(--saffron);
-  font-weight: 600;
-}
-.alt-track-banner.visible { display: block; }
-
-/* ── Team Cards ── */
-.team-grid { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
-.team-card { border: 1.5px solid #edf2f5; border-radius: 8px; overflow: hidden; }
-.team-card-header {
-  display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px;
-  background: #f8fafc; cursor: pointer; transition: background .2s;
-}
-.team-card-header:hover { background: #edf2f5; }
-
-.team-role-badge {
-  font-size: 9px; font-weight: 700; letter-spacing: .05em;
-  text-transform: uppercase; padding: 3px 7px; border-radius: 4px;
-  white-space: nowrap; flex-shrink: 0; margin-top: 1px;
-}
-.badge-anchor      { background: var(--navy);  color: var(--white); }
-.badge-therapeutic { background: var(--teal);  color: var(--white); }
-.badge-driver      { background: var(--green); color: var(--white); }
-.badge-accel       { background: #e1e8ed; color: var(--ink-2); }
-.badge-compliance  { background: #edf2f5; color: var(--ink-3); }
-
-.team-expert-info { flex: 1; min-width: 0; }
-.team-expert-name { font-size: 14px; font-weight: 700; color: var(--ink); line-height: 1.3; }
-.team-card-chevron { color: var(--ink-4); font-size: 14px; transition: transform .3s; flex-shrink: 0; margin-top: 2px; }
-.team-card.open .team-card-chevron { transform: rotate(180deg); }
-.team-card-body { max-height: 0; overflow: hidden; transition: max-height .35s var(--ease-out-expo); }
-.team-card.open .team-card-body { max-height: 220px; }
-.team-card-body-inner { padding: 12px 14px; font-size: 13px; line-height: 1.55; color: var(--ink-3); border-top: 1px solid #edf2f5; }
-
-/* Notice Banners */
-.notice-banner {
-  display: none;
-  border-radius: 4px; padding: 11px 14px;
-  margin-bottom: 14px; font-size: 12.5px; line-height: 1.5;
-}
-.notice-banner.visible { display: block; }
-.notice-triage { background: #eff6ff; border: 1px solid #bfdbfe; border-left: 3px solid var(--navy); color: var(--navy-d); }
-.notice-seniority { background: #fdf4ff; border: 1px solid #e9d5ff; border-left: 3px solid #7c3aed; color: #4c1d95; }
-.notice-seniority strong { font-weight: 700; }
-
-/* ── Plan Grid ── */
-.plan-section { margin-bottom: 14px; flex-shrink: 0; }
-.plan-label {
-  font-size: 11px; font-weight: 600; text-transform: uppercase;
-  color: var(--ink-4); margin-bottom: 8px; letter-spacing: .05em;
-}
-.plan-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
-.plan-card {
-  border: 1.5px solid #d2dbe1; border-radius: 8px; padding: 10px 12px;
-  cursor: pointer; transition: all .2s var(--ease-out-expo); position: relative;
-}
-.plan-card:hover { border-color: var(--green-l); background: #fbfdfa; }
-.plan-card.selected { border-color: var(--green); background: #f4faf0; }
-.plan-card.dimmed { opacity: 0.48; pointer-events: none; }
-.plan-tag {
-  position: absolute; top: -7px; left: 8px;
-  font-size: 8px; font-weight: 700; padding: 1px 5px;
-  border-radius: 3px; text-transform: uppercase;
-}
-.plan-tag.match { background: var(--navy); color: var(--white); }
-.plan-tag.pop   { background: var(--green); color: var(--white); left:auto; right:8px; }
-.plan-name  { font-size: 14px; font-weight: 700; color: var(--ink); }
-.plan-price { font-size: 13px; font-weight: 700; color: var(--green); margin: 2px 0; }
-.plan-experts { font-size: 11px; color: var(--ink-4); }
-.plan-trial-note { font-size: 10px; color: var(--ink-4); margin-top: 3px; font-style: italic; line-height: 1.3; }
-
-/* ── CTA ── */
-.cta-section { flex-shrink: 0; }
-.whatsapp-btn {
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  padding: 14px 24px; background: var(--wa); color: var(--white);
-  border: none; border-radius: 8px; font-size: 15px; font-weight: 600;
-  cursor: pointer; text-decoration: none; transition: background .2s; width: 100%;
-  font-family: var(--sans);
-}
-.whatsapp-btn:hover { background: var(--wa-d); }
-.cta-note { font-size: 11.5px; color: var(--ink-4); text-align: center; margin-top: 8px; }
-
-.disclaimer {
-  font-size: 10.5px; color: var(--ink-4); line-height: 1.4;
-  margin-top: 14px; border-top: 1px solid #edf2f5; padding-top: 12px; flex-shrink: 0;
-}
-.restart-btn {
-  background: none; border: none; cursor: pointer;
-  font-size: 12px; color: var(--ink-4); text-decoration: underline;
-  margin-top: 10px; text-align: center; display: block; width: 100%;
-  font-family: var(--sans); flex-shrink: 0;
-}
-
-/* ── Welcome ── */
-#screen-welcome { text-align: center; justify-content: center; }
-.welcome-tag {
-  display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: .05em;
-  text-transform: uppercase; color: var(--green); background: #f4faf0;
-  padding: 4px 10px; border-radius: 4px; margin-bottom: 14px;
-}
-.welcome-headline {
-  font-size: 30px; font-weight: 800; line-height: 1.18;
-  color: var(--navy); margin-bottom: 10px; letter-spacing: -.02em;
-}
-.welcome-headline em { font-style: normal; color: var(--green); }
-.welcome-body { font-size: 14px; color: var(--ink-3); line-height: 1.65; margin-bottom: 22px; }
-.start-btn {
-  display: flex; align-items: center; justify-content: center; gap: 6px;
-  width: 100%; padding: 14px 24px; background: var(--navy); color: var(--white);
-  border: none; border-radius: 8px; font-size: 15px; font-weight: 600;
-  cursor: pointer; transition: background .2s; font-family: var(--sans);
-}
-.start-btn:hover { background: var(--navy-l); }
-.welcome-reassure { font-size: 11px; color: var(--ink-4); margin-top: 14px; }
-
-/* ── Triage ── */
-#screen-triage { text-align: center; justify-content: center; }
-.triage-icon { font-size: 40px; margin-bottom: 14px; }
-.triage-title { font-size: 19px; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
-.triage-body { font-size: 14px; color: var(--ink-3); line-height: 1.6; margin-bottom: 22px; }
-
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-@media (max-width: 480px) {
-  #app { padding: 0; }
-  .wrap { padding: 20px 16px 32px; height: auto; border-radius: 0; width: 100%; overflow: visible; }
-  .q-text { font-size: 18px; }
-  .welcome-headline { font-size: 24px; }
-  .answers.multi-col { grid-template-columns: 1fr 1fr; }
-  .plan-grid { grid-template-columns: 1fr 1fr; }
-  .lang-select { font-size: 11px; max-width: 120px; }
-}
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div id="app">
   <div class="wrap">
 
+    <!-- LOADING OVERLAY — shown until async data fetch completes -->
+    <div id="loading-overlay">
+      <div class="loading-pulse">🌿</div>
+      <p class="loading-text">Loading…</p>
+    </div>
+
     <!-- ══ WELCOME ══ -->
-    <div class="screen active" id="screen-welcome">
+    <div class="screen" id="screen-welcome">
       <div class="welcome-tag" data-i18n="welcome_tag">Health Navigator</div>
-      <h1 class="welcome-headline" data-i18n="welcome_headline">Jaanein bilkul sahi<br><em>kaun</em> help kar sakta hai.</h1>
-      <p class="welcome-body" data-i18n="welcome_body">Sirf 5 sawaal. 2 minute. Hum aapke health concern ke liye bilkul sahi experts ka combination dhundenge — koi guesswork nahi, koi generic advice nahi.</p>
-      <button class="start-btn" onclick="startNavigator()" data-i18n="welcome_btn">Shuru Karein →</button>
-      <p class="welcome-reassure" data-i18n="welcome_reassure">Diagnosis nahi · Expert-matched care path · 46 care routes</p>
+      <h1 class="welcome-headline" data-i18n="welcome_headline"></h1>
+      <p class="welcome-body" data-i18n="welcome_body"></p>
+      <button class="start-btn" onclick="startNavigator()" data-i18n="welcome_btn">Begin →</button>
+      <p class="welcome-reassure" data-i18n="welcome_reassure"></p>
     </div>
 
     <!-- ══ Q0 — PARADIGM GATE ══ -->
     <div class="screen" id="screen-q0">
       <nav class="nav">
         <a class="logo" href="#">Jeevan<span>Key</span></a>
-        <select class="lang-select" id="lang-select" onchange="setLang(this.value)">
-          <option value="en">English</option>
-          <option value="hi">हिंदी</option>
-          <option value="gu">ગુજરાતી</option>
-          <option value="mr">मराठी</option>
-          <option value="bn">বাংলা</option>
-          <option value="ta">தமிழ்</option>
-          <option value="te">తెలుగు</option>
-          <option value="kn">ಕನ್ನಡ</option>
+        <select class="lang-select" id="lang-select-q0" onchange="setLang(this.value)">
+          <option value="en">English</option><option value="hi">हिंदी</option>
+          <option value="gu">ગુજરાતી</option><option value="mr">मराठी</option>
+          <option value="bn">বাংলা</option><option value="ta">தமிழ்</option>
+          <option value="te">తెలుగు</option><option value="kn">ಕನ್ನಡ</option>
           <option value="ml">മലയാളം</option>
         </select>
       </nav>
-      <div class="step-counter" id="q0-counter">Step 1</div>
+      <div class="step-counter" id="q0-counter"></div>
       <div class="progress-track"><div class="progress-fill" id="q0-fill" style="width:10%"></div></div>
-      <h2 class="q-text" data-i18n="q0_text">Aap apni health ke liye kya approach prefer karte hain?</h2>
+      <h2 class="q-text" data-i18n="q0_text"></h2>
       <div class="answers" id="q0-answers">
         <button class="answer-btn" onclick="selectQ0('allopathic')" data-val="allopathic">
           <span class="btn-icon">🏥</span>
-          <span class="btn-main">
-            <span data-i18n="q0_a1_main">Allopathy / English Medicine</span>
-            <span class="btn-sub" data-i18n="q0_a1_sub">Doctor, tests, X-ray, blood reports, prescriptions — main regular English medicine chahta/chahti hoon</span>
-          </span>
+          <span class="btn-main"><span data-i18n="q0_a1_main"></span><span class="btn-sub" data-i18n="q0_a1_sub"></span></span>
         </button>
         <button class="answer-btn" onclick="selectQ0('alternative')" data-val="alternative">
           <span class="btn-icon">🌿</span>
-          <span class="btn-main">
-            <span data-i18n="q0_a2_main">Ayurvedic / Homeopathy / Natural Treatment</span>
-            <span class="btn-sub" data-i18n="q0_a2_sub">Holistic / root-cause treatment — English medicines ke bina, body ke saath kaam karna chahta/chahti hoon</span>
-          </span>
+          <span class="btn-main"><span data-i18n="q0_a2_main"></span><span class="btn-sub" data-i18n="q0_a2_sub"></span></span>
         </button>
         <button class="answer-btn" onclick="selectQ0('open')" data-val="open">
           <span class="btn-icon">⚖️</span>
-          <span class="btn-main">
-            <span data-i18n="q0_a3_main">Dono theek hain — Jo symptoms ke hisaab se best ho</span>
-            <span class="btn-sub" data-i18n="q0_a3_sub">Mere answers ke basis pe aap decide karein</span>
-          </span>
+          <span class="btn-main"><span data-i18n="q0_a3_main"></span><span class="btn-sub" data-i18n="q0_a3_sub"></span></span>
         </button>
         <button class="answer-btn" onclick="selectQ0('guided')" data-val="guided">
           <span class="btn-icon">🤔</span>
-          <span class="btn-main">
-            <span data-i18n="q0_a4_main">Pata nahi — Kuch theek nahi lag raha</span>
-            <span class="btn-sub" data-i18n="q0_a4_sub">Mujhe samajh nahi aa raha, please help karein</span>
-          </span>
+          <span class="btn-main"><span data-i18n="q0_a4_main"></span><span class="btn-sub" data-i18n="q0_a4_sub"></span></span>
         </button>
       </div>
     </div>
 
-    <!-- ══ Q5 — CONFIDENCE CHECK (open paradigm only) ══ -->
+    <!-- ══ Q5 — CONFIDENCE CHECK ══ -->
     <div class="screen" id="screen-q5">
       <nav class="nav">
         <a class="logo" href="#">Jeevan<span>Key</span></a>
-        <select class="lang-select" onchange="setLang(this.value)" id="lang-select-q5">
-          <option value="en">English</option>
-          <option value="hi">हिंदी</option>
-          <option value="gu">ગુજરાતી</option>
-          <option value="mr">मराठी</option>
-          <option value="bn">বাংলা</option>
-          <option value="ta">தமிழ்</option>
-          <option value="te">తెలుగు</option>
-          <option value="kn">ಕನ್ನಡ</option>
+        <select class="lang-select" onchange="setLang(this.value)">
+          <option value="en">English</option><option value="hi">हिंदी</option>
+          <option value="gu">ગુજરાતી</option><option value="mr">मराठी</option>
+          <option value="bn">বাংলা</option><option value="ta">தமிழ்</option>
+          <option value="te">తెలుగు</option><option value="kn">ಕನ್ನಡ</option>
           <option value="ml">മലയാളം</option>
         </select>
       </nav>
-      <div class="step-counter" id="q5-counter">Step 2</div>
+      <div class="step-counter" id="q5-counter"></div>
       <div class="progress-track"><div class="progress-fill" id="q5-fill" style="width:25%"></div></div>
-      <h2 class="q-text" data-i18n="q5_text">Apni health history ke baare mein batayein</h2>
+      <h2 class="q-text" data-i18n="q5_text"></h2>
       <div class="answers" id="q5-answers">
         <button class="answer-btn" onclick="selectQ5('clear')" data-val="clear">
           <span class="btn-icon">🎯</span>
-          <span class="btn-main">
-            <span data-i18n="q5_a1_main">Mujhe pata hai kya problem hai</span>
-            <span class="btn-sub" data-i18n="q5_a1_sub">Sahi experts se milana chahta/chahti hoon</span>
-          </span>
+          <span class="btn-main"><span data-i18n="q5_a1_main"></span><span class="btn-sub" data-i18n="q5_a1_sub"></span></span>
         </button>
         <button class="answer-btn" onclick="selectQ5('dissatisfied')" data-val="dissatisfied">
           <span class="btn-icon">🔄</span>
-          <span class="btn-main">
-            <span data-i18n="q5_a2_main">Kai doctors ko dikha chuka/chuki hoon — kuch kaam nahi kiya</span>
-            <span class="btn-sub" data-i18n="q5_a2_sub">Ek alag approach chahiye</span>
-          </span>
+          <span class="btn-main"><span data-i18n="q5_a2_main"></span><span class="btn-sub" data-i18n="q5_a2_sub"></span></span>
         </button>
         <button class="answer-btn" onclick="selectQ5('confused')" data-val="confused">
           <span class="btn-icon">🌫️</span>
-          <span class="btn-main">
-            <span data-i18n="q5_a3_main">Bilkul samajh nahi aa raha kya ho raha hai</span>
-            <span class="btn-sub" data-i18n="q5_a3_sub">Please mujhe guide karein</span>
-          </span>
+          <span class="btn-main"><span data-i18n="q5_a3_main"></span><span class="btn-sub" data-i18n="q5_a3_sub"></span></span>
         </button>
       </div>
     </div>
@@ -502,64 +95,42 @@ html, body {
     <div class="screen" id="screen-q1">
       <nav class="nav">
         <a class="logo" href="#">Jeevan<span>Key</span></a>
-        <select class="lang-select" onchange="setLang(this.value)" id="lang-select-q1">
-          <option value="en">English</option>
-          <option value="hi">हिंदी</option>
-          <option value="gu">ગુજરાતી</option>
-          <option value="mr">मराठी</option>
-          <option value="bn">বাংলা</option>
-          <option value="ta">தமிழ்</option>
-          <option value="te">తెలుగు</option>
-          <option value="kn">ಕನ್ನಡ</option>
+        <select class="lang-select" onchange="setLang(this.value)">
+          <option value="en">English</option><option value="hi">हिंदी</option>
+          <option value="gu">ગુજરાતી</option><option value="mr">मराठी</option>
+          <option value="bn">বাংলা</option><option value="ta">தமிழ்</option>
+          <option value="te">తెలుగు</option><option value="kn">ಕನ್ನಡ</option>
           <option value="ml">മലയാളം</option>
         </select>
       </nav>
-      <div class="step-counter" id="q1-counter">Step 2</div>
+      <div class="step-counter" id="q1-counter"></div>
       <div class="progress-track"><div class="progress-fill" id="q1-fill" style="width:30%"></div></div>
-      <h2 class="q-text" data-i18n="q1_text">Aapko <em>sabse zyada</em> kya pareshaan kar raha hai?</h2>
-      <p class="q-subtext" data-i18n="q1_subtext">Agar aapko kai problems hain — sirf main problem chunein. Baaki saari problems agle step mein select kar sakte hain!</p>
+      <h2 class="q-text" data-i18n="q1_text"></h2>
+      <p class="q-subtext" data-i18n="q1_subtext"></p>
       <div class="answers" id="q1-answers">
         <button class="answer-btn" onclick="selectQ1('mind')" data-val="mind">
           <span class="btn-icon">🧠</span>
-          <span class="btn-main">
-            <span data-i18n="q1_a1_main">Dimag nahi rukta — Stress, Burnout</span>
-            <span class="btn-sub" data-i18n="q1_a1_sub">Kaam ka stress, lagaataar thakan, overwhelmed feeling, anxiety, burnout</span>
-          </span>
+          <span class="btn-main"><span data-i18n="q1_a1_main"></span><span class="btn-sub" data-i18n="q1_a1_sub"></span></span>
         </button>
         <button class="answer-btn" onclick="selectQ1('gut')" data-val="gut">
           <span class="btn-icon">🌿</span>
-          <span class="btn-main">
-            <span data-i18n="q1_a2_main">Pet aur Pachan ki Taklif</span>
-            <span class="btn-sub" data-i18n="q1_a2_sub">Gas, Acidity, Bloating, IBS, Fatty Liver, Kabz, Diarrhea</span>
-          </span>
+          <span class="btn-main"><span data-i18n="q1_a2_main"></span><span class="btn-sub" data-i18n="q1_a2_sub"></span></span>
         </button>
         <button class="answer-btn" onclick="selectQ1('pain')" data-val="pain">
           <span class="btn-icon">🦴</span>
-          <span class="btn-main">
-            <span data-i18n="q1_a3_main">Sharir mein Dard — Kamar, Jodon, Posture</span>
-            <span class="btn-sub" data-i18n="q1_a3_sub">Back pain, knee pain, neck pain, joint pain, posture ki problem</span>
-          </span>
+          <span class="btn-main"><span data-i18n="q1_a3_main"></span><span class="btn-sub" data-i18n="q1_a3_sub"></span></span>
         </button>
         <button class="answer-btn" onclick="selectQ1('hormonal')" data-val="hormonal">
           <span class="btn-icon">🌙</span>
-          <span class="btn-main">
-            <span data-i18n="q1_a4_main">Hormonal Samasya</span>
-            <span class="btn-sub" data-i18n="q1_a4_sub">Periods ki gadbad, PCOD/PCOS, Acne / Pimples, skin-hair changes</span>
-          </span>
+          <span class="btn-main"><span data-i18n="q1_a4_main"></span><span class="btn-sub" data-i18n="q1_a4_sub"></span></span>
         </button>
         <button class="answer-btn" onclick="selectQ1('energy')" data-val="energy">
           <span class="btn-icon">⚡</span>
-          <span class="btn-main">
-            <span data-i18n="q1_a5_main">Hamesha Thaka-Thaka Lagta Hai</span>
-            <span class="btn-sub" data-i18n="q1_a5_sub">Energy nahi, motivation nahi, din bhar neend aana, kamzori</span>
-          </span>
+          <span class="btn-main"><span data-i18n="q1_a5_main"></span><span class="btn-sub" data-i18n="q1_a5_sub"></span></span>
         </button>
         <button class="answer-btn" onclick="selectQ1('chronic')" data-val="chronic">
           <span class="btn-icon">📋</span>
-          <span class="btn-main">
-            <span data-i18n="q1_a6_main">Lambe Samay ki Bimari</span>
-            <span class="btn-sub" data-i18n="q1_a6_sub">Sugar/Diabetes, Thyroid, BP, Asthma, Kidney/Urine ki problem, Heart condition</span>
-          </span>
+          <span class="btn-main"><span data-i18n="q1_a6_main"></span><span class="btn-sub" data-i18n="q1_a6_sub"></span></span>
         </button>
       </div>
     </div>
@@ -568,49 +139,33 @@ html, body {
     <div class="screen" id="screen-q2">
       <nav class="nav">
         <a class="logo" href="#">Jeevan<span>Key</span></a>
-        <select class="lang-select" onchange="setLang(this.value)" id="lang-select-q2">
-          <option value="en">English</option>
-          <option value="hi">हिंदी</option>
-          <option value="gu">ગુજરાતી</option>
-          <option value="mr">मराठी</option>
-          <option value="bn">বাংলা</option>
-          <option value="ta">தமிழ்</option>
-          <option value="te">తెలుగు</option>
-          <option value="kn">ಕನ್ನಡ</option>
-          <option value="ml">മലयāളം</option>
+        <select class="lang-select" onchange="setLang(this.value)">
+          <option value="en">English</option><option value="hi">हिंदी</option>
+          <option value="gu">ગુજરાતી</option><option value="mr">मराठी</option>
+          <option value="bn">বাংলা</option><option value="ta">தமிழ்</option>
+          <option value="te">తెలుగు</option><option value="kn">ಕನ್ನಡ</option>
+          <option value="ml">മലയാളം</option>
         </select>
       </nav>
-      <div class="step-counter" id="q2-counter">Step 3</div>
+      <div class="step-counter" id="q2-counter"></div>
       <div class="progress-track"><div class="progress-fill" id="q2-fill" style="width:50%"></div></div>
-      <h2 class="q-text" data-i18n="q2_text">Yeh taklif <em>kitne time</em> se hai?</h2>
+      <h2 class="q-text" data-i18n="q2_text"></h2>
       <div class="answers" id="q2-answers">
         <button class="answer-btn" onclick="selectQ2('acute')" data-val="acute">
           <span class="btn-icon">🌱</span>
-          <span class="btn-main">
-            <span data-i18n="q2_a1_main">1 mahine se kam</span>
-            <span class="btn-sub" data-i18n="q2_a1_sub">Abhi abhi shuru hua hai</span>
-          </span>
+          <span class="btn-main"><span data-i18n="q2_a1_main"></span><span class="btn-sub" data-i18n="q2_a1_sub"></span></span>
         </button>
         <button class="answer-btn" onclick="selectQ2('months')" data-val="months">
           <span class="btn-icon">📅</span>
-          <span class="btn-main">
-            <span data-i18n="q2_a2_main">Kuch mahine ho gaye</span>
-            <span class="btn-sub" data-i18n="q2_a2_sub">2-6 mahine pehle shuru hua</span>
-          </span>
+          <span class="btn-main"><span data-i18n="q2_a2_main"></span><span class="btn-sub" data-i18n="q2_a2_sub"></span></span>
         </button>
         <button class="answer-btn" onclick="selectQ2('long')" data-val="long">
           <span class="btn-icon">⏳</span>
-          <span class="btn-main">
-            <span data-i18n="q2_a3_main">6 mahine se zyada</span>
-            <span class="btn-sub" data-i18n="q2_a3_sub">Kafi samay se chal raha hai</span>
-          </span>
+          <span class="btn-main"><span data-i18n="q2_a3_main"></span><span class="btn-sub" data-i18n="q2_a3_sub"></span></span>
         </button>
         <button class="answer-btn" onclick="selectQ2('recurring')" data-val="recurring">
           <span class="btn-icon">🔄</span>
-          <span class="btn-main">
-            <span data-i18n="q2_a4_main">Kai saalon se aata-jaata rehta hai</span>
-            <span class="btn-sub" data-i18n="q2_a4_sub">Thodi der theek hota hai phir wapas aata hai</span>
-          </span>
+          <span class="btn-main"><span data-i18n="q2_a4_main"></span><span class="btn-sub" data-i18n="q2_a4_sub"></span></span>
         </button>
       </div>
     </div>
@@ -619,114 +174,64 @@ html, body {
     <div class="screen" id="screen-q3">
       <nav class="nav">
         <a class="logo" href="#">Jeevan<span>Key</span></a>
-        <select class="lang-select" onchange="setLang(this.value)" id="lang-select-q3">
-          <option value="en">English</option>
-          <option value="hi">हिंदी</option>
-          <option value="gu">ગુજરાતી</option>
-          <option value="mr">मराठी</option>
-          <option value="bn">বাংলা</option>
-          <option value="ta">தமிழ்</option>
-          <option value="te">తెలుగు</option>
-          <option value="kn">ಕನ್ನಡ</option>
+        <select class="lang-select" onchange="setLang(this.value)">
+          <option value="en">English</option><option value="hi">हिंदी</option>
+          <option value="gu">ગુજરાતી</option><option value="mr">मराठी</option>
+          <option value="bn">বাংলা</option><option value="ta">தமிழ்</option>
+          <option value="te">తెలుగు</option><option value="kn">ಕನ್ನಡ</option>
           <option value="ml">മലayāḷaṁ</option>
         </select>
       </nav>
-      <div class="step-counter" id="q3-counter">Step 4</div>
+      <div class="step-counter" id="q3-counter"></div>
       <div class="progress-track"><div class="progress-fill" id="q3-fill" style="width:70%"></div></div>
-      <h2 class="q-text" data-i18n="q3_text">Aur kya kya taklif ho rahi hai <em>saath mein</em>?</h2>
-      <p class="multi-hint" data-i18n="q3_subtext">Jo bhi lagu ho sab chunein — phir Continue karein</p>
+      <h2 class="q-text" data-i18n="q3_text"></h2>
+      <p class="multi-hint" data-i18n="q3_subtext"></p>
       <div class="answers multi-col" id="q3-answers">
-        <button class="answer-btn" onclick="toggleQ3('sleep')" data-val="sleep">
-          <span class="btn-icon">😴</span>
-          <span class="btn-main" data-i18n="q3_sleep">Neend ki problem</span>
-        </button>
-        <button class="answer-btn" onclick="toggleQ3('weight')" data-val="weight">
-          <span class="btn-icon">⚖️</span>
-          <span class="btn-main" data-i18n="q3_weight">Wajan badh/ghat raha hai</span>
-        </button>
-        <button class="answer-btn" onclick="toggleQ3('skin_hair')" data-val="skin_hair">
-          <span class="btn-icon">✨</span>
-          <span class="btn-main" data-i18n="q3_skin">Skin ya Baalon ki problem</span>
-        </button>
-        <button class="answer-btn" onclick="toggleQ3('mood')" data-val="mood">
-          <span class="btn-icon">🌊</span>
-          <span class="btn-main" data-i18n="q3_mood">Mood theek nahi rehta</span>
-        </button>
-        <button class="answer-btn" onclick="toggleQ3('motivation')" data-val="motivation">
-          <span class="btn-icon">🌫️</span>
-          <span class="btn-main" data-i18n="q3_motivation">Kuch karne ka mann nahi</span>
-        </button>
-        <button class="answer-btn" onclick="toggleQ3('meal_fatigue')" data-val="meal_fatigue">
-          <span class="btn-icon">🍽️</span>
-          <span class="btn-main" data-i18n="q3_meal">Khane mein problem / Appetite nahi</span>
-        </button>
-        <button class="answer-btn" onclick="toggleQ3('periods')" data-val="periods" id="q3-periods">
-          <span class="btn-icon">🌺</span>
-          <span class="btn-main" data-i18n="q3_periods">Periods ki gadbad</span>
-        </button>
-        <button class="answer-btn" onclick="toggleQ3('acne')" data-val="acne">
-          <span class="btn-icon">🔴</span>
-          <span class="btn-main" data-i18n="q3_acne">Pimple / Acne</span>
-        </button>
-        <button class="answer-btn" onclick="toggleQ3('conceive')" data-val="conceive" id="q3-conceive" style="display:none">
-          <span class="btn-icon">🌸</span>
-          <span class="btn-main" data-i18n="q3_conceive">Bachcha chahiye / Conceive karna hai</span>
-        </button>
-        <button class="answer-btn" onclick="toggleQ3('none')" data-val="none" id="q3-none">
-          <span class="btn-icon">✓</span>
-          <span class="btn-main" data-i18n="q3_none">Inme se koi nahi</span>
-        </button>
+        <button class="answer-btn" onclick="toggleQ3('sleep')" data-val="sleep"><span class="btn-icon">😴</span><span class="btn-main" data-i18n="q3_sleep"></span></button>
+        <button class="answer-btn" onclick="toggleQ3('weight')" data-val="weight"><span class="btn-icon">⚖️</span><span class="btn-main" data-i18n="q3_weight"></span></button>
+        <button class="answer-btn" onclick="toggleQ3('skin_hair')" data-val="skin_hair"><span class="btn-icon">✨</span><span class="btn-main" data-i18n="q3_skin"></span></button>
+        <button class="answer-btn" onclick="toggleQ3('mood')" data-val="mood"><span class="btn-icon">🌊</span><span class="btn-main" data-i18n="q3_mood"></span></button>
+        <button class="answer-btn" onclick="toggleQ3('motivation')" data-val="motivation"><span class="btn-icon">🌫️</span><span class="btn-main" data-i18n="q3_motivation"></span></button>
+        <button class="answer-btn" onclick="toggleQ3('meal_fatigue')" data-val="meal_fatigue"><span class="btn-icon">🍽️</span><span class="btn-main" data-i18n="q3_meal"></span></button>
+        <button class="answer-btn" onclick="toggleQ3('periods')" data-val="periods" id="q3-periods"><span class="btn-icon">🌺</span><span class="btn-main" data-i18n="q3_periods"></span></button>
+        <button class="answer-btn" onclick="toggleQ3('acne')" data-val="acne"><span class="btn-icon">🔴</span><span class="btn-main" data-i18n="q3_acne"></span></button>
+        <button class="answer-btn" onclick="toggleQ3('conceive')" data-val="conceive" id="q3-conceive" style="display:none"><span class="btn-icon">🌸</span><span class="btn-main" data-i18n="q3_conceive"></span></button>
+        <button class="answer-btn" onclick="toggleQ3('none')" data-val="none" id="q3-none"><span class="btn-icon">✓</span><span class="btn-main" data-i18n="q3_none"></span></button>
       </div>
-      <button class="continue-btn" id="q3-continue" onclick="goToQ4()" data-i18n="q3_continue">Aage Chalein →</button>
+      <button class="continue-btn" id="q3-continue" onclick="goToQ4()" data-i18n="q3_continue">Continue →</button>
     </div>
 
     <!-- ══ Q4 — LIFESTYLE ══ -->
     <div class="screen" id="screen-q4">
       <nav class="nav">
         <a class="logo" href="#">Jeevan<span>Key</span></a>
-        <select class="lang-select" onchange="setLang(this.value)" id="lang-select-q4">
-          <option value="en">English</option>
-          <option value="hi">हिंदी</option>
-          <option value="gu">ગુજરાતી</option>
-          <option value="mr">मराठी</option>
-          <option value="bn">বাংলা</option>
-          <option value="ta">தமிழ்</option>
-          <option value="te">తెలుగు</option>
-          <option value="kn">ಕನ್ನಡ</option>
+        <select class="lang-select" onchange="setLang(this.value)">
+          <option value="en">English</option><option value="hi">हिंदी</option>
+          <option value="gu">ગુજરાતી</option><option value="mr">मराठी</option>
+          <option value="bn">বাংলা</option><option value="ta">தமிழ்</option>
+          <option value="te">తెలుగు</option><option value="kn">ಕನ್ನಡ</option>
           <option value="ml">മലayāḷaṁ</option>
         </select>
       </nav>
-      <div class="step-counter" id="q4-counter">Step 5</div>
+      <div class="step-counter" id="q4-counter"></div>
       <div class="progress-track"><div class="progress-fill" id="q4-fill" style="width:88%"></div></div>
-      <h2 class="q-text" data-i18n="q4_text">Aaj kal ki <em>zindagi kaisi hai</em>?</h2>
+      <h2 class="q-text" data-i18n="q4_text"></h2>
       <div class="answers" id="q4-answers">
         <button class="answer-btn" onclick="selectQ4('sedentary')" data-val="sedentary">
           <span class="btn-icon">💻</span>
-          <span class="btn-main">
-            <span data-i18n="q4_a1_main">Sitting Job / Desk Job</span>
-            <span class="btn-sub" data-i18n="q4_a1_sub">Zyada baithne ka kaam — bahut kam physical movement hoti hai</span>
-          </span>
+          <span class="btn-main"><span data-i18n="q4_a1_main"></span><span class="btn-sub" data-i18n="q4_a1_sub"></span></span>
         </button>
         <button class="answer-btn" onclick="selectQ4('stressed')" data-val="stressed">
           <span class="btn-icon">🔥</span>
-          <span class="btn-main">
-            <span data-i18n="q4_a2_main">Bahut busy life — High mental stress</span>
-            <span class="btn-sub" data-i18n="q4_a2_sub">Active rehta/rehti hoon lekin stress pe chal raha hai sab</span>
-          </span>
+          <span class="btn-main"><span data-i18n="q4_a2_main"></span><span class="btn-sub" data-i18n="q4_a2_sub"></span></span>
         </button>
         <button class="answer-btn" onclick="selectQ4('sleep_issue')" data-val="sleep_issue">
           <span class="btn-icon">🌙</span>
-          <span class="btn-main">
-            <span data-i18n="q4_a3_main">Neend meri sabse badi samasya hai</span>
-            <span class="btn-sub" data-i18n="q4_a3_sub">Theek se sota/soti nahi, ya bahut neend aati hai</span>
-          </span>
+          <span class="btn-main"><span data-i18n="q4_a3_main"></span><span class="btn-sub" data-i18n="q4_a3_sub"></span></span>
         </button>
         <button class="answer-btn" onclick="selectQ4('managing')" data-val="managing">
           <span class="btn-icon">🏥</span>
-          <span class="btn-main">
-            <span data-i18n="q4_a4_main">Pehle se koi bimari chal rahi hai</span>
-            <span class="btn-sub" data-i18n="q4_a4_sub">Sugar, BP, Thyroid ya koi aur lambi bimari manage kar raha/rahi hoon</span>
-          </span>
+          <span class="btn-main"><span data-i18n="q4_a4_main"></span><span class="btn-sub" data-i18n="q4_a4_sub"></span></span>
         </button>
       </div>
     </div>
@@ -734,1150 +239,51 @@ html, body {
     <!-- ══ MATCHING ══ -->
     <div class="screen" id="screen-matching">
       <div class="matching-pulse">🔬</div>
-      <h2 class="matching-title" data-i18n="matching_title">Aapka profile padh rahe hain…</h2>
-      <p class="matching-sub" data-i18n="matching_sub">Aapke liye sahi care team dhundh rahe hain.</p>
+      <h2 class="matching-title" data-i18n="matching_title"></h2>
+      <p class="matching-sub" data-i18n="matching_sub"></p>
     </div>
 
     <!-- ══ TRIAGE ══ -->
     <div class="screen" id="screen-triage">
       <div class="triage-icon">🤝</div>
-      <h2 class="triage-title" data-i18n="triage_title">Aapke profile ko personal review chahiye</h2>
-      <p class="triage-body" data-i18n="triage_body">Aapke jawaabon mein kai health areas hain. Automated system ki jagah, humara Coordinator personally aapke profile ko review karke sahi care path confirm karega.</p>
+      <h2 class="triage-title" data-i18n="triage_title"></h2>
+      <p class="triage-body" data-i18n="triage_body"></p>
       <button class="whatsapp-btn" onclick="openTriageWhatsApp()">
-        <span class="btn-icon">💬</span><span data-i18n="triage_btn">Coordinator se baat karein →</span>
+        <span class="btn-icon">💬</span><span data-i18n="triage_btn">Talk to a Coordinator →</span>
       </button>
-      <p class="cta-note" data-i18n="triage_note">Coordinator working days mein 2 ghante mein reply karega.</p>
-      <button class="restart-btn" onclick="restart()" data-i18n="restart">← Dobara shuru karein</button>
+      <p class="cta-note" data-i18n="triage_note"></p>
+      <button class="restart-btn" onclick="restart()" data-i18n="restart">← Start over</button>
     </div>
 
     <!-- ══ RESULT ══ -->
     <div class="screen" id="screen-result">
       <div class="result-header">
-        <p class="result-eyebrow" id="result-eyebrow">Care Pathway</p>
-        <h2 class="result-headline" data-i18n="result_headline">Aapki team tayaar hai.</h2>
+        <p class="result-eyebrow" id="result-eyebrow"></p>
+        <h2 class="result-headline" data-i18n="result_headline"></h2>
         <p class="result-sub" id="result-sub"></p>
       </div>
-
-      <div class="alt-track-banner" id="alt-track-banner" data-i18n="alt_banner">
-        🌿 Ayurvedic / Praakritik Ilaaj — Sabhi practitioners CCIM ke antargat kaam karte hain.
-      </div>
-
+      <div class="alt-track-banner" id="alt-track-banner" data-i18n="alt_banner"></div>
       <div class="notice-banner notice-seniority" id="seniority-notice">
-        <strong data-i18n="seniority_title">Senior Practitioner Assignment:</strong> <span data-i18n="seniority_body">Aapke pehle ke treatments ke history ko dekhte hue, hum personally aapki team confirm karne se pehle case review karenge.</span>
+        <strong data-i18n="seniority_title"></strong> <span data-i18n="seniority_body"></span>
       </div>
-
-      <div class="notice-banner notice-triage" id="triage-notice" data-i18n="triage_notice">
-        Aapki team ki final confirmation aapke Coordinator dwara ki jaayegi.
-      </div>
-
+      <div class="notice-banner notice-triage" id="triage-notice" data-i18n="triage_notice"></div>
       <div class="team-grid" id="team-grid"></div>
-
       <div class="plan-section">
-        <p class="plan-label" data-i18n="plan_label">Apna plan chunein</p>
+        <p class="plan-label" data-i18n="plan_label"></p>
         <div class="plan-grid" id="plan-grid"></div>
       </div>
-
       <div class="cta-section">
         <button class="whatsapp-btn" id="whatsapp-btn" onclick="openWhatsAppRedirect()">
           <span class="btn-icon">💬</span><span id="whatsapp-text">WhatsApp pe Connect karein</span>
         </button>
-        <p class="cta-note" data-i18n="cta_note">Aapka Coordinator 2 ghante mein team allocation confirm karega.</p>
+        <p class="cta-note" data-i18n="cta_note"></p>
       </div>
-
-      <div class="disclaimer" data-i18n="disclaimer">
-        Yeh ek care pathway recommendation hai — medical diagnosis nahi. JeevanKey ek health management aur coordination service hai jo India ke Telemedicine Practice Guidelines 2020 ke antargat kaam karti hai.
-      </div>
-      <button class="restart-btn" onclick="restart()" data-i18n="restart">← Dobara shuru karein</button>
+      <div class="disclaimer" data-i18n="disclaimer"></div>
+      <button class="restart-btn" onclick="restart()" data-i18n="restart">← Start over</button>
     </div>
 
   </div>
 </div>
-
-<script>
-'use strict';
-
-/* ══════════════════════════════════════════════════════
-   MULTI-LANGUAGE DICTIONARY — 9 LANGUAGES
-   Keys map to data-i18n attributes in HTML and
-   dynamic JS strings.
-══════════════════════════════════════════════════════ */
-const DICT = {
-  en: {
-    welcome_tag:'Health Navigator',
-    welcome_headline:'Know exactly\n<em>who</em> can help.',
-    welcome_body:'Just 5 questions. 2 minutes. We match you with the precise combination of experts your health concern actually needs — no guesswork, no generic advice.',
-    welcome_btn:'Begin →',
-    welcome_reassure:'Not a diagnosis · Expert-matched pathway · 46 care routes',
-    q0_text:'How do you prefer to approach your health?',
-    q0_a1_main:'Allopathy / English Medicine',
-    q0_a1_sub:'Doctor, tests, blood reports, prescriptions — I want regular English medicine',
-    q0_a2_main:'Ayurvedic / Homeopathy / Natural Treatment',
-    q0_a2_sub:'Holistic / root-cause — without English medicines, work with the body',
-    q0_a3_main:'Both are fine — guide me based on my symptoms',
-    q0_a3_sub:'Decide based on my answers',
-    q0_a4_main:"Not sure — something doesn't feel right",
-    q0_a4_sub:'Please help me figure it out',
-    q5_text:'Tell us about your health history',
-    q5_a1_main:'I know what the problem is',
-    q5_a1_sub:'Match me with the right experts',
-    q5_a2_main:"I've tried multiple doctors — nothing has worked",
-    q5_a2_sub:'I need a different approach',
-    q5_a3_main:"I genuinely don't know what's wrong",
-    q5_a3_sub:'Please guide me through it',
-    q1_text:'What is bothering you <em>the most</em>?',
-    q1_subtext:"If you have multiple problems — just pick the main one here. You can select all other issues in the very next step!",
-    q1_a1_main:"Mind won't stop — Stress, Burnout",
-    q1_a1_sub:'Work stress, constant exhaustion, overwhelmed, anxiety, burnout',
-    q1_a2_main:'Stomach & Digestion Problems',
-    q1_a2_sub:'Gas, Acidity, Bloating, IBS, Fatty Liver, Constipation, Diarrhea',
-    q1_a3_main:'Body Pain — Back, Joints, Posture',
-    q1_a3_sub:'Back pain, knee pain, neck pain, joint pain, posture problems',
-    q1_a4_main:'Hormonal Issues',
-    q1_a4_sub:'Irregular periods, PCOD/PCOS, Acne / Pimples, skin-hair changes',
-    q1_a5_main:'Always Tired / No Energy',
-    q1_a5_sub:'No energy, no motivation, sleepy all day, weakness',
-    q1_a6_main:'Long-term Diseases',
-    q1_a6_sub:'Sugar/Diabetes, Thyroid, BP, Asthma, Kidney/Urine issues, Heart condition',
-    q2_text:'How long have you had this problem?',
-    q2_a1_main:'Less than 1 month',
-    q2_a1_sub:'Just started recently',
-    q2_a2_main:'A few months',
-    q2_a2_sub:'Started 2–6 months ago',
-    q2_a3_main:'More than 6 months',
-    q2_a3_sub:'Has been going on for a while',
-    q2_a4_main:'Comes and goes for years',
-    q2_a4_sub:'Gets better for a while then comes back',
-    q3_text:'What else is happening <em>alongside</em> it?',
-    q3_subtext:'Select all that apply — then continue',
-    q3_sleep:'Sleep problems', q3_weight:'Weight gaining/losing',
-    q3_skin:'Skin or Hair problems', q3_mood:'Mood is off',
-    q3_motivation:'No motivation / Low drive', q3_meal:'Eating problems / No appetite',
-    q3_periods:'Irregular periods', q3_acne:'Pimples / Acne',
-    q3_conceive:'Want to conceive / Have a baby', q3_none:'None of these',
-    q3_continue:'Continue →',
-    q4_text:'How is your <em>daily life</em> right now?',
-    q4_a1_main:'Sitting / Desk Job',
-    q4_a1_sub:'Mostly sitting — very little physical movement',
-    q4_a2_main:'Very busy life — High mental stress',
-    q4_a2_sub:'Active but running on stress',
-    q4_a3_main:'Sleep is my biggest problem',
-    q4_a3_sub:"Can't sleep properly, or sleeping too much",
-    q4_a4_main:'Already managing an existing illness',
-    q4_a4_sub:'Sugar, BP, Thyroid or other long-term disease',
-    matching_title:'Reading your profile…',
-    matching_sub:'Finding the right care team for you.',
-    triage_title:'Your profile needs a personal review',
-    triage_body:'Your responses cover several health areas. Our Coordinator will personally review your profile and confirm the right care path for you.',
-    triage_btn:'Talk to a Coordinator →',
-    triage_note:'Coordinator will respond within 2 hours on working days.',
-    result_headline:'Your team is ready.',
-    alt_banner:'🌿 Ayurvedic / Natural Track — All practitioners operate under CCIM statutory framework.',
-    seniority_title:'Senior Practitioner Assignment:',
-    seniority_body:'Given your history with previous treatments, we will personally review your case brief before confirming your team.',
-    triage_notice:'Your team\'s final confirmation will be done by your Coordinator.',
-    plan_label:'Choose your plan',
-    plan_match:'Your Match', plan_pop:'Popular',
-    plan_trial_note:'Introductory consultation — not a coordinated pathway',
-    cta_note:'Your Coordinator will confirm your team within 2 hours.',
-    disclaimer:'This is a care pathway recommendation — not a medical diagnosis. JeevanKey operates as a health management and coordination service under India\'s Telemedicine Practice Guidelines 2020.',
-    restart:'← Start over',
-    active_lead_sub:'Your main daily contact — leads your recovery plan.',
-    wa_consent:'\n\nI accept the Terms of Service and consent to care coordination via WhatsApp.',
-    step_prefix: 'Step',
-    diagnostic_anchor: 'Diagnostic Anchor',
-    therapeutic_anchor: 'Therapeutic Anchor',
-    active_treatment_lead: 'Active Treatment Lead',
-  },
-  hi: {
-    welcome_tag:'Health Navigator',
-    welcome_headline:'Jaanein bilkul sahi\n<em>kaun</em> help kar sakta hai.',
-    welcome_body:'Sirf 5 sawaal. 2 minute. Hum aapke liye bilkul sahi experts dhundenge — koi guesswork nahi.',
-    welcome_btn:'Shuru Karein →',
-    welcome_reassure:'Diagnosis nahi · Expert-matched care · 46 care routes',
-    q0_text:'Aap apni health ke liye kya approach prefer karte hain?',
-    q0_a1_main:'Allopathy / English Medicine (Doctor, Tests, Prescription)',
-    q0_a1_sub:'Regular English medicine chahiye — doctor, blood tests, dawai',
-    q0_a2_main:'Ayurvedic / Homeopathy / Praakritik Ilaaj',
-    q0_a2_sub:'Bina English dawai ke, root-cause se thik hona chahta/chahti hoon',
-    q0_a3_main:'Dono theek hain — symptoms ke hisaab se decide karein',
-    q0_a3_sub:'Mere jawaabon ke basis pe sahi track chunein',
-    q0_a4_main:'Pata nahi — kuch theek nahi lag raha',
-    q0_a4_sub:'Please mujhe samajhne mein help karein',
-    q5_text:'Apni health history ke baare mein batayein',
-    q5_a1_main:'Mujhe pata hai kya problem hai',
-    q5_a1_sub:'Sahi experts se connect karo',
-    q5_a2_main:'Kai doctors ko dikha chuka/chuki hoon — koi farak nahi pada',
-    q5_a2_sub:'Ek alag approach chahiye',
-    q5_a3_main:'Bilkul samajh nahi aa raha kya ho raha hai',
-    q5_a3_sub:'Please guide karein',
-    q1_text:'Aapko <em>sabse zyada</em> kya pareshaan kar raha hai?',
-    q1_subtext:'Agar kai problems hain — sirf main problem chunein. Baaki sab agle step mein chunein!',
-    q1_a1_main:'Dimag nahi rukta — Stress, Burnout',
-    q1_a1_sub:'Kaam ka stress, thakan, overwhelmed, anxiety, burnout',
-    q1_a2_main:'Pet aur Pachan ki Taklif',
-    q1_a2_sub:'Gas, Acidity, Bloating, IBS, Fatty Liver, Kabz, Diarrhea',
-    q1_a3_main:'Sharir mein Dard',
-    q1_a3_sub:'Kamar, ghutne, gardan, jodon mein dard, posture ki problem',
-    q1_a4_main:'Hormonal Samasya',
-    q1_a4_sub:'Periods ki gadbad, PCOD/PCOS, Pimples, skin-baalon mein badlav',
-    q1_a5_main:'Hamesha Thaka-Thaka Lagta Hai',
-    q1_a5_sub:'Energy nahi, motivation nahi, kamzori, din bhar neend',
-    q1_a6_main:'Lambe Samay ki Bimari',
-    q1_a6_sub:'Sugar/Diabetes, Thyroid, BP, Asthma, Kidney/Urine, Heart',
-    q2_text:'Yeh taklif <em>kitne time</em> se hai?',
-    q2_a1_main:'1 mahine se kam', q2_a1_sub:'Abhi abhi shuru hua',
-    q2_a2_main:'Kuch mahine ho gaye', q2_a2_sub:'2-6 mahine pehle shuru hua',
-    q2_a3_main:'6 mahine se zyada', q2_a3_sub:'Kafi samay se chal raha',
-    q2_a4_main:'Kai saalon se aata-jaata rehta hai', q2_a4_sub:'Thodi der theek phir wapas aata',
-    q3_text:'Aur kya kya taklif ho rahi hai <em>saath mein</em>?',
-    q3_subtext:'Jo bhi lagu ho sab chunein — phir aage chalein',
-    q3_sleep:'Neend ki problem', q3_weight:'Wajan badh/ghat raha',
-    q3_skin:'Skin ya Baalon ki problem', q3_mood:'Mood theek nahi rehta',
-    q3_motivation:'Kuch karne ka mann nahi', q3_meal:'Khane mein problem',
-    q3_periods:'Periods ki gadbad', q3_acne:'Pimple / Acne',
-    q3_conceive:'Bachcha chahiye / Conceive karna hai', q3_none:'Inme se koi nahi',
-    q3_continue:'Aage Chalein →',
-    q4_text:'Aaj kal ki <em>zindagi kaisi hai</em>?',
-    q4_a1_main:'Sitting Job / Desk Job', q4_a1_sub:'Zyada baithna, bahut kam movement',
-    q4_a2_main:'Bahut busy — High mental stress', q4_a2_sub:'Active hoon par stress pe chal raha sab',
-    q4_a3_main:'Neend meri sabse badi samasya hai', q4_a3_sub:'Theek se sota/soti nahi',
-    q4_a4_main:'Pehle se koi bimari chal rahi hai', q4_a4_sub:'Sugar, BP, Thyroid ya koi aur',
-    matching_title:'Aapka profile padh rahe hain…', matching_sub:'Sahi care team dhundh rahe hain.',
-    triage_title:'Aapke profile ko personal review chahiye',
-    triage_body:'Humara Coordinator personally aapke profile ko review karke sahi raasta batayega.',
-    triage_btn:'Coordinator se baat karein →', triage_note:'2 ghante mein reply milega.',
-    result_headline:'Aapki team tayaar hai.',
-    alt_banner:'🌿 Ayurvedic / Praakritik Track — Sab practitioners CCIM ke antargat hain.',
-    seniority_title:'Senior Practitioner:', seniority_body:'Aapka case personally review karke team confirm karenge.',
-    triage_notice:'Aapki team ko Coordinator final confirm karega.',
-    plan_label:'Apna plan chunein', plan_match:'Aapka Match', plan_pop:'Popular',
-    plan_trial_note:'Sirf ek consultation — coordinated pathway nahi',
-    cta_note:'Coordinator 2 ghante mein confirm karega.', restart:'← Dobara shuru karein',
-    disclaimer:'Yeh diagnosis nahi hai. JeevanKey ek health coordination service hai.',
-    active_lead_sub:'Aapka roz ka main contact — aapki recovery plan chalate hain.',
-    wa_consent:'\n\nMain Terms of Service se agree karta/karti hoon aur WhatsApp pe care coordination ki anumati deta/deti hoon.',
-    step_prefix: 'कदम',
-    diagnostic_anchor: 'मुख्य जांच डॉक्टर',
-    therapeutic_anchor: 'आयुर्वेदिक/होम्योपैथिक विशेषज्ञ',
-    active_treatment_lead: 'मुख्य उपचार संचालक',
-  },
-  gu: {
-    welcome_tag:'Health Navigator',
-    welcome_headline:'Jaano bilkul sahi\n<em>kaun</em> madad kari shake.',
-    welcome_body:'Fakt 5 prasho. 2 minute. Ame tamnay sahi experts sathe match karisu.',
-    welcome_btn:'Sharu Karo →', welcome_reassure:'Diagnosis nahi · Expert-matched care · 46 care routes',
-    q0_text:'Tame tamari health mate kevi rite approach karo cho?',
-    q0_a1_main:'Allopathy / English Medicine (Doctor, Tests, Prescription)',
-    q0_a1_sub:'Regular English dawai joiye — doctor, blood tests',
-    q0_a2_main:'Ayurvedic / Homeopathy / Prakrutik Ilaaj',
-    q0_a2_sub:'English dawai vagar, root-cause thi saaru thavu che',
-    q0_a3_main:'Banne chale — symptoms mujab decide karo',
-    q0_a3_sub:'Mara jawab na aadhar pe sahi track chuno',
-    q0_a4_main:'Khabar nathi — koi vastu saaru nathi lagtu',
-    q0_a4_sub:'Mane samajva maa madad karo',
-    q5_text:'Tamari health history vishye janavsho',
-    q5_a1_main:'Mane khabar che shu problem che', q5_a1_sub:'Sahi experts sathe milavo',
-    q5_a2_main:'Kai doctors ne maldyo/malyi chhu — koi fark padyo nahi', q5_a2_sub:'Alag approach joiye',
-    q5_a3_main:'Bilkul samajatu nathi shu thay che', q5_a3_sub:'Mane guide karo',
-    q1_text:'Tame <em>sauthi vadhu</em> su pareshaani anubhavo cho?',
-    q1_subtext:'Ek karta vadhu problems hoi — fakt main problem chuno. Baki tamam agle step maa chuni shakaay che!',
-    q1_a1_main:'Mann nathi rukhatu — Stress, Burnout', q1_a1_sub:'Kaam no stress, thakan, anxiety',
-    q1_a2_main:'Pet ane Pachan ni Taklif', q1_a2_sub:'Gas, Acidity, Bloating, IBS, Fatty Liver',
-    q1_a3_main:'Sharire Dard — Kamar, Ghutna, Jointo', q1_a3_sub:'Back, knee, neck, joint pain',
-    q1_a4_main:'Hormonal Samasya', q1_a4_sub:'Periods ni gadbad, PCOD/PCOS, Pimples',
-    q1_a5_main:'Hamesha Thakelo/Thakeli Laagu Chu', q1_a5_sub:'Energy nahi, motivation nahi',
-    q1_a6_main:'Lambe Samay ni Bimari', q1_a6_sub:'Sugar/Diabetes, Thyroid, BP, Asthma, Kidney',
-    q2_text:'Aa taklif <em>ketla samay</em> thi che?',
-    q2_a1_main:'1 mahino thi ochi', q2_a1_sub:'Haju haju sharu thayo', q2_a2_main:'Keta mahina thai gaya', q2_a2_sub:'2-6 mahina pahela',
-    q2_a3_main:'6 mahina thi vadhu', q2_a3_sub:'Khekhana thi che', q2_a4_main:'Varso thi aave-jaye che', q2_a4_sub:'Thodi var thik phir pachi aave',
-    q3_text:'Biju shu <em>saathe</em> thay che?', q3_subtext:'Jo laagu hoy te badhu chuno — phir aage vado',
-    q3_sleep:'Unch ni samasya', q3_weight:'Vajan vadhe/ghate che', q3_skin:'Skin ya Vaalna ni samasya',
-    q3_mood:'Mood saaro nathi', q3_motivation:'Koi motivation nathi', q3_meal:'Khavama samasya',
-    q3_periods:'Periods ni gadbad', q3_acne:'Pimple / Acne', q3_conceive:'Bachcho joiye / Conceive karvu che',
-    q3_none:'Aa ma thi koi nahi', q3_continue:'Aage Vado →',
-    q4_text:'Aaj kal nu <em>jivan kevu che</em>?',
-    q4_a1_main:'Sitting Job / Desk Job', q4_a1_sub:'Vadhu beshvu, ochi movement',
-    q4_a2_main:'Khub busy — High stress', q4_a2_sub:'Active chhu pan stress pe chalyu jay che',
-    q4_a3_main:'Unch mari moxi samasya che', q4_a3_sub:'Sari rite sota nathi',
-    q4_a4_main:'Pahela thi koi bimari che', q4_a4_sub:'Sugar, BP, Thyroid ya koi biji',
-    matching_title:'Tamaru profile vanchi rahya chiye…', matching_sub:'Sahi care team shodhi rahya chiye.',
-    triage_title:'Tamara profile ne personal review joiye',
-    triage_body:'Amaro Coordinator personally tamaro profile review kari sahi raasto batavse.',
-    triage_btn:'Coordinator sathe vaat karo →', triage_note:'2 kalaak maa reply malse.',
-    result_headline:'Tamari team tayaar che.',
-    alt_banner:'🌿 Ayurvedic Track — CCIM antargat.',
-    seniority_title:'Senior Practitioner:', seniority_body:'Tamaro case personally review kari team confirm karsu.',
-    triage_notice:'Tamari team Coordinator dwara final confirm thashe.',
-    plan_label:'Tamaro plan chuno', plan_match:'Tamnay Match', plan_pop:'Popular',
-    plan_trial_note:'Fakt ek consultation — coordinated pathway nahi',
-    cta_note:'Coordinator 2 kalaak maa confirm karso.',
-    disclaimer:'Aa diagnosis nathi. JeevanKey ek health coordination service che.',
-    restart:'← Pharthi sharu karo', active_lead_sub:'Tamaro roj no main contact.',
-    wa_consent:'\n\nHun Terms of Service sathe sahmat chhu ane WhatsApp pe care coordination ni anumati apu chhu.',
-    step_prefix: 'પગલું',
-    diagnostic_anchor: 'મુખ્ય ચેક-અપ ડૉક્ટર',
-    therapeutic_anchor: 'આયુર્વેદિક / હોમિયોપેથી એક્સપર્ટ',
-    active_treatment_lead: 'મુખ્ય સારવાર ગાઇડ',
-  },
-  mr: {
-    welcome_tag:'Health Navigator',
-    welcome_headline:'Nakki jaanun ghya\n<em>koni</em> madad karu shakto.',
-    welcome_body:'Fakt 5 prashna. 2 minute. Aapan aapali yogya care team shodhun kadhato.',
-    welcome_btn:'Suru Kara →', welcome_reassure:'Diagnosis nahi · Expert-matched care · 46 care routes',
-    q0_text:'Tumhala tumchya arogyasathi kaiti yog paahaychay?',
-    q0_a1_main:'Allopathy / English Medicine (Doctor, Tests, Prescription)',
-    q0_a1_sub:'Regular English dawa havi — doctor, blood tests',
-    q0_a2_main:'Ayurvedic / Homeopathy / Prakrutik Upchar',
-    q0_a2_sub:'English dawa shivay, mool kaaranane bare whayache ahe',
-    q0_a3_main:'Donhi chalel — symptoms anusar nirnay ghya',
-    q0_a3_sub:'Mazya utraravar aadhaarit yogy track nivdaa',
-    q0_a4_main:'Mahit nahi — kahi tari bik vaatey',
-    q0_a4_sub:'Krupaya mala samajuun ghyaa',
-    q5_text:'Tumchya arogyaachya itihasabaddal sangaa',
-    q5_a1_main:'Mala mahit aahe kaay problem aahe', q5_a1_sub:'Yogya experts shee joda',
-    q5_a2_main:'Kaahi doctors kade gelo/gele — kahi upyog jhala nahi', q5_a2_sub:'Vegla approach havi aahe',
-    q5_a3_main:'Khaarokhar samajat nahi kaay challay', q5_a3_sub:'Krupaya marga daakhvaa',
-    q1_text:'Tumhala <em>sabaat jaast</em> kaay traas hotoy?',
-    q1_subtext:'Jaast problems asatil tari — fakt mukhya ek nivdaa. Baaki saarya pudchya step mein nivdta yetaat!',
-    q1_a1_main:'Dokyaat vichar thaambanat — Stress, Burnout', q1_a1_sub:'Kamaacha stress, thakaava, anxiety, burnout',
-    q1_a2_main:'Pot aani Pachanaachi Samasya', q1_a2_sub:'Gas, Acidity, Bloating, IBS, Fatty Liver',
-    q1_a3_main:'Angadukhee — Kamar, Gudghe, Sande', q1_a3_sub:'Back, knee, neck, joint pain',
-    q1_a4_main:'Hormonal Samasya', q1_a4_sub:'Periods cha ghadabad, PCOD/PCOS, Pimples',
-    q1_a5_main:'Nehe Thakalelya Sarkhey Vaatey', q1_a5_sub:'Energy nahi, motivation nahi, alas',
-    q1_a6_main:'Juna Aajaar', q1_a6_sub:'Sugar/Diabetes, Thyroid, BP, Asthma, Kidney, Heart',
-    q2_text:'Ha traas <em>kiti divsaanpasun</em> aahe?',
-    q2_a1_main:'1 mahinyaapeksha kami', q2_a1_sub:'Aadhiach suru jhale', q2_a2_main:'Kahi mahine zhaale', q2_a2_sub:'2-6 mahinyeepoorvi suru',
-    q2_a3_main:'6 mahinyaapeksha jaast', q2_a3_sub:'Kaafi divsaanpasun', q2_a4_main:'Kaahi varshapasun yeto-jaato', q2_a4_sub:'Thodi vel baree hote maag yete',
-    q3_text:'Aajun kaay kaay traas hotoy <em>sobot</em>?', q3_subtext:'Jo laagu hoy te sarv nivdaa — nanttar pudhe chala',
-    q3_sleep:'Zhopechi samasya', q3_weight:'Wajan vaadhtay/kaamee hotay', q3_skin:'Charmyaacha ya Kesinchi samasya',
-    q3_mood:'Mood theek rahaat nahi', q3_motivation:'Kahi karaavaasaa vaataat nahi', q3_meal:'Khaanyaachi samasya',
-    q3_periods:'Periods cha ghadabadi', q3_acne:'Pimple / Acne', q3_conceive:'Baala hava aahe / Conceive karayachey ahe',
-    q3_none:'Yaapaikee kahi nahi', q3_continue:'Pudhe Chala →',
-    q4_text:'Sadhacha <em>dinakram kaasa</em> aahe?',
-    q4_a1_main:'Sitting Job / Desk Job', q4_a1_sub:'Zaast basa, kami movement',
-    q4_a2_main:'Khoop busy — High stress', q4_a2_sub:'Active aahe pan stress var chalatey saarey',
-    q4_a3_main:'Jhop mazi sabaat motha samasya aahe', q4_a3_sub:'Vyavasthit jhopt nahi',
-    q4_a4_main:'Agodarach kahi aajaar aahe', q4_a4_sub:'Sugar, BP, Thyroid kinva itr',
-    matching_title:'Tumchi profile vaachto aahot…', matching_sub:'Yogya care team shodhto aahot.',
-    triage_title:'Tumchya profile la personal review havi',
-    triage_body:'Aamacha Coordinator personally tumchi profile review karun yogya raasta saangel.',
-    triage_btn:'Coordinator shee bola →', triage_note:'Kaamachya divsaancha 2 taasaant reply miil.',
-    result_headline:'Tumchi team tayaar aahe.',
-    alt_banner:'🌿 Ayurvedic Track — CCIM antargat.',
-    seniority_title:'Varishtha Practitioner:', seniority_body:'Tumchi team personally review karun confirm karnat.',
-    triage_notice:'Tumchya team cha final confirmation Coordinator karnar.',
-    plan_label:'Tumcha plan nivdaa', plan_match:'Tumhaala Match', plan_pop:'Popular',
-    plan_trial_note:'Fakt ek consultation — coordinated pathway nahi',
-    cta_note:'Coordinator 2 taasaant confirm karil.',
-    disclaimer:'He diagnosis nahi. JeevanKey ek health coordination service aahe.',
-    restart:'← Pudha suru kara', active_lead_sub:'Tumcha dainik mukhya contact.',
-    wa_consent:'\n\nMee Terms of Service shee sahamat aahe ani WhatsApp vaar care coordination chi paravangee deto/dete.',
-    step_prefix: 'टप्पा',
-    diagnostic_anchor: 'मुख्य चेक-अप डॉक्टर',
-    therapeutic_anchor: 'आयुर्वेदिक / होमिओपॅथी एक्स्पर्ट',
-    active_treatment_lead: 'मुख्य उपचार गाईड',
-  },
-  bn: {
-    welcome_tag:'স্বাস্থ্য নেভিগেটর',
-    welcome_headline:'জেনে নিন ঠিক\n<em>কে</em> সাহায্য করতে পারে।',
-    welcome_body:'মাত্র ৫টি প্রশ্ন। ২ মিনিট। আমরা আপনার জন্য সঠিক বিশেষজ্ঞ খুঁজে বের করব।',
-    welcome_btn:'শুরু করুন →', welcome_reassure:'রোগ নির্ণয় নয় · বিশেষজ্ঞ-ম্যাচড পথ · ৪৬টি রুট',
-    q0_text:'আপনি কীভাবে স্বাস্থ্যসেবা নিতে চান?',
-    q0_a1_main:'অ্যালোপ্যাথি / ইংরেজি চিকিৎসা (ডাক্তার, পরীক্ষা, প্রেসক্রিপশন)',
-    q0_a1_sub:'নিয়মিত ইংরেজি ওষুধ চাই — ডাক্তার, রক্ত পরীক্ষা',
-    q0_a2_main:'আয়ুর্বেদিক / হোমিওপ্যাথি / প্রাকৃতিক চিকিৎসা',
-    q0_a2_sub:'ইংরেজি ওষুধ ছাড়া, শিকড় থেকে সুস্থ হতে চাই',
-    q0_a3_main:'দুটোই ঠিক আছে — লক্ষণ অনুযায়ী সিদ্ধান্ত নিন',
-    q0_a3_sub:'আমার উত্তর দেখে সঠিক পথ বেছে নিন',
-    q0_a4_main:'জানি না — কিছু ঠিক লাগছে না',
-    q0_a4_sub:'দয়া করে আমাকে বুঝতে সাহায্য করুন',
-    q5_text:'আপনার স্বাস্থ্যের ইতিহাস সম্পর্কে বলুন',
-    q5_a1_main:'আমি জানি সমস্যাটা কী', q5_a1_sub:'সঠিক বিশেষজ্ঞের সাথে মেলান',
-    q5_a2_main:'অনেক ডাক্তার দেখিয়েছি — কোনো লাভ হয়নি', q5_a2_sub:'ভিন্ন পদ্ধতি দরকার',
-    q5_a3_main:'একদম বুঝতে পারছি না কী হচ্ছে', q5_a3_sub:'দয়া করে গাইড করুন',
-    q1_text:'আপনাকে <em>সবচেয়ে বেশি</em> কী কষ্ট দিচ্ছে?',
-    q1_subtext:'একাধিক সমস্যা থাকলেও — এখানে শুধু প্রধান সমস্যাটি বেছে নিন। বাকিগুলো পরের ধাপে নির্বাচন করতে পারবেন!',
-    q1_a1_main:'মাথা থামছে না — স্ট্রেস, বার্নআউট', q1_a1_sub:'কাজের চাপ, ক্লান্তি, উদ্বেগ, বার্নআউট',
-    q1_a2_main:'পেট ও হজমের সমস্যা', q1_a2_sub:'গ্যাস, অ্যাসিডিটি, ব্লোটিং, IBS, ফ্যাটি লিভার',
-    q1_a3_main:'শরীরে ব্যথা — কোমর, হাঁটু, জয়েন্ট', q1_a3_sub:'পিঠ, হাঁটু, ঘাড়, জয়েন্টে ব্যথা',
-    q1_a4_main:'হরমোনের সমস্যা', q1_a4_sub:'অনিয়মিত পিরিয়ড, PCOD/PCOS, ব্রণ',
-    q1_a5_main:'সবসময় ক্লান্ত লাগে', q1_a5_sub:'শক্তি নেই, মনোবল নেই, দুর্বলতা',
-    q1_a6_main:'দীর্ঘস্থায়ী রোগ', q1_a6_sub:'ডায়াবেটিস, থাইরয়েড, উচ্চ রক্তচাপ, হাঁপানি, কিডনি',
-    q2_text:'এই সমস্যা <em>কতদিন ধরে</em> আছে?',
-    q2_a1_main:'১ মাসের কম', q2_a1_sub:'সম্প্রতি শুরু হয়েছে', q2_a2_main:'কয়েক মাস', q2_a2_sub:'২-৬ মাস আগে শুরু',
-    q2_a3_main:'৬ মাসের বেশি', q2_a3_sub:'অনেকদিন ধরে চলছে', q2_a4_main:'বহু বছর ধরে আসে-যায়', q2_a4_sub:'কিছুদিন ভালো থাকে, আবার আসে',
-    q3_text:'আর কী কী সমস্যা <em>সাথে</em> হচ্ছে?', q3_subtext:'যা প্রযোজ্য সব বেছে নিন — তারপর এগিয়ে যান',
-    q3_sleep:'ঘুমের সমস্যা', q3_weight:'ওজন বাড়ছে/কমছে', q3_skin:'ত্বক বা চুলের সমস্যা',
-    q3_mood:'মেজাজ ঠিক থাকে না', q3_motivation:'কিছু করতে ইচ্ছে করে না', q3_meal:'খাওয়ার সমস্যা',
-    q3_periods:'পিরিয়ডের গন্ডগোল', q3_acne:'ব্রণ / পিম্পল', q3_conceive:'সন্তান চাই / গর্ভধারণ করতে চাই',
-    q3_none:'এর মধ্যে কিছু নেই', q3_continue:'এগিয়ে যান →',
-    q4_text:'এখন আপনার <em>দৈনন্দিন জীবন কেমন</em>?',
-    q4_a1_main:'বসার চাকরি / ডেস্ক জব', q4_a1_sub:'বেশিরভাগ সময় বসে থাকি, কম নড়াচড়া',
-    q4_a2_main:'খুব ব্যস্ত — মানসিক চাপে আছি', q4_a2_sub:'সক্রিয় কিন্তু স্ট্রেসে চলছে সব',
-    q4_a3_main:'ঘুম আমার সবচেয়ে বড় সমস্যা', q4_a3_sub:'ঠিকমতো ঘুমাতে পারি না',
-    q4_a4_main:'আগে থেকে কোনো রোগ আছে', q4_a4_sub:'ডায়াবেটিস, রক্তচাপ, থাইরয়েড বা অন্য কিছু',
-    matching_title:'আপনার প্রোফাইল পড়া হচ্ছে…', matching_sub:'সঠিক কেয়ার টিম খোঁজা হচ্ছে।',
-    triage_title:'আপনার প্রোফাইলে ব্যক্তিগত পর্যালোচনা দরকার',
-    triage_body:'আমাদের কোঅর্ডিনেটর ব্যক্তিগতভাবে আপনার প্রোফাইল পর্যালোচনা করে সঠিক পথ বলবে।',
-    triage_btn:'কোঅর্ডিনেটরের সাথে কথা বলুন →', triage_note:'কার্যদিবসে ২ ঘণ্টার মধ্যে উত্তর।',
-    result_headline:'আপনার টিম প্রস্তুত।',
-    alt_banner:'🌿 আয়ুর্বেদিক ট্র্যাক — CCIM অনুমোদিত।',
-    seniority_title:'সিনিয়র প্র্যাকটিশনার:', seniority_body:'আপনার পূর্ববর্তী চিকিৎসার ইতিহাস দেখে টিম নিশ্চিত করা হবে।',
-    triage_notice:'আপনার টিম কোঅর্ডিনেটর দ্বারা চূড়ান্ত নিশ্চিত করা হবে।',
-    plan_label:'আপনার প্ল্যান বেছে নিন', plan_match:'আপনার ম্যাচ', plan_pop:'জনপ্রিয়',
-    plan_trial_note:'শুধু একটি পরামর্শ — সমন্বিত পরিকল্পনা নয়',
-    cta_note:'কোঅর্ডিনেটর ২ ঘণ্টার মধ্যে নিশ্চিত করবে।',
-    disclaimer:'এটি রোগ নির্ণয় নয়। JeevanKey একটি স্বাস্থ্য সমন্বয় সেবা।',
-    restart:'← আবার শুরু করুন', active_lead_sub:'আপনার দৈনিক প্রধান যোগাযোগ।',
-    wa_consent:'\n\nআমি Terms of Service-এ সম্মত এবং WhatsApp-এ কেয়ার কোঅর্ডিনেশনের অনুমতি দিচ্ছি।',
-    step_prefix: 'ধাপ',
-    diagnostic_anchor: 'প্রধান চেক-আপ ডাক্তার',
-    therapeutic_anchor: 'আয়ুর্বেদিক / হোমিওপ্যাথি এক্সপার্ট',
-    active_treatment_lead: 'প্রধান চিকিৎসা গাইড',
-  },
-  ta: {
-    welcome_tag:'உடல்நல வழிகாட்டி',
-    welcome_headline:'சரியாக அறிந்துகொள்ளுங்கள்\n<em>யார்</em> உதவலாம்.',
-    welcome_body:'வெறும் 5 கேள்விகள். 2 நிமிடங்கள். உங்களுக்கு சரியான நிபுணர்களை பொருத்துகிறோம்.',
-    welcome_btn:'தொடங்குங்கள் →', welcome_reassure:'நோய் கண்டறிதல் அல்ல · நிபுணர் பொருத்தப்பட்ட பாதை · 46 வழிகள்',
-    q0_text:'உங்கள் ஆரோக்கியத்திற்காக எந்த அணுகுமுறையை விரும்புகிறீர்கள்?',
-    q0_a1_main:'அலோபதி / ஆங்கில மருத்துவம் (மருத்துவர், சோதனைகள், மருந்து)',
-    q0_a1_sub:'ஆங்கில மருந்து வேண்டும் — மருத்துவர், இரத்த சோதனை',
-    q0_a2_main:'ஆயுர்வேதம் / ஹோமியோபதி / இயற்கை சிகிச்சை',
-    q0_a2_sub:'ஆங்கில மருந்து இல்லாமல், வேரிலிருந்து குணமாக வேண்டும்',
-    q0_a3_main:'இரண்டும் சரி — அறிகுறிகளை வைத்து முடிவு செய்யுங்கள்',
-    q0_a3_sub:'என் பதில்களின் அடிப்படையில் சரியான பாதையை தேர்ந்தெடுங்கள்',
-    q0_a4_main:'தெரியவில்லை — ஏதோ சரியில்லை',
-    q0_a4_sub:'தயவுசெய்து என்னை புரிந்துகொள்ள உதவுங்கள்',
-    q5_text:'உங்கள் மருத்துவ வரலாற்றைப் பற்றி சொல்லுங்கள்',
-    q5_a1_main:'என்ன பிரச்சனை என்று தெரியும்', q5_a1_sub:'சரியான நிபுணர்களுடன் இணைக்கவும்',
-    q5_a2_main:'பல மருத்துவர்களிடம் சென்றேன் — பலனில்லை', q5_a2_sub:'வேறு அணுகுமுறை வேண்டும்',
-    q5_a3_main:'என்ன நடக்கிறது என்று புரியவில்லை', q5_a3_sub:'தயவுசெய்து வழிகாட்டுங்கள்',
-    q1_text:'உங்களுக்கு <em>மிகவும் அதிகமாக</em> என்ன தொந்தரவு செய்கிறது?',
-    q1_subtext:'பல பிரச்சனைகள் இருந்தாலும் — இங்கே முக்கியமான ஒன்றை மட்டும் தேர்ந்தெடுங்கள். மற்றவை அடுத்த கட்டத்தில் தேர்ந்தெடுக்கலாம்!',
-    q1_a1_main:'மனம் நிற்கவில்லை — மன அழுத்தம், Burnout', q1_a1_sub:'வேலை அழுத்தம், சோர்வு, கவலை, burnout',
-    q1_a2_main:'வயிறு மற்றும் செரிமான பிரச்சனை', q1_a2_sub:'வாயு, அமிலம், வீக்கம், IBS, Fatty Liver',
-    q1_a3_main:'உடல் வலி — முதுகு, மூட்டு', q1_a3_sub:'முதுகு, மூட்டு, கழுத்து வலி',
-    q1_a4_main:'ஹார்மோன் பிரச்சனை', q1_a4_sub:'Periods பிரச்சனை, PCOD/PCOS, முகப்பரு',
-    q1_a5_main:'எப்போதும் சோர்வாக உணர்கிறேன்', q1_a5_sub:'சக்தி இல்லை, ஊக்கம் இல்லை, பலவீனம்',
-    q1_a6_main:'நீண்டகால நோய்கள்', q1_a6_sub:'சர்க்கரை நோய், தைராய்டு, BP, ஆஸ்துமா, சிறுநீரக பிரச்சனை',
-    q2_text:'இந்த பிரச்சனை <em>எத்தனை நாளாக</em> இருக்கிறது?',
-    q2_a1_main:'1 மாதத்திற்கும் குறைவாக', q2_a1_sub:'சமீபத்தில் ஆரம்பித்தது', q2_a2_main:'சில மாதங்கள்', q2_a2_sub:'2-6 மாதங்களுக்கு முன்பு',
-    q2_a3_main:'6 மாதங்களுக்கும் அதிகம்', q2_a3_sub:'நீண்ட காலமாக உள்ளது', q2_a4_main:'பல ஆண்டுகளாக வருகிறது போகிறது', q2_a4_sub:'சில நாள் சரியாகும் திரும்பவும் வரும்',
-    q3_text:'வேறு என்னென்ன பிரச்சனைகள் <em>சேர்ந்து</em> உள்ளன?', q3_subtext:'பொருந்துவதை எல்லாம் தேர்ந்தெடுங்கள் — பின்னர் தொடரவும்',
-    q3_sleep:'தூக்க பிரச்சனை', q3_weight:'எடை அதிகரிக்கிறது/குறைகிறது', q3_skin:'சருமம் அல்லது முடி பிரச்சனை',
-    q3_mood:'மனநிலை சரியில்லை', q3_motivation:'எதுவும் செய்ய மனமில்லை', q3_meal:'சாப்பிட பிரச்சனை',
-    q3_periods:'மாதவிடாய் பிரச்சனை', q3_acne:'முகப்பரு', q3_conceive:'குழந்தை வேண்டும் / கர்ப்பம் தரிக்க வேண்டும்',
-    q3_none:'இவற்றில் எதுவுமில்லை', q3_continue:'தொடரவும் →',
-    q4_text:'இப்போது <em>தினசரி வாழ்க்கை</em> எப்படி உள்ளது?',
-    q4_a1_main:'அமர்ந்து செய்யும் வேலை / Desk Job', q4_a1_sub:'பெரும்பாலும் அமர்ந்திருக்கிறேன், குறைந்த அசைவு',
-    q4_a2_main:'மிகவும் பிஸியான வாழ்க்கை — அதிக மன அழுத்தம்', q4_a2_sub:'சுறுசுறுப்பாக இருக்கிறேன் ஆனால் மன அழுத்தத்தில் இயங்குகிறேன்',
-    q4_a3_main:'தூக்கம் என் மிகப்பெரிய பிரச்சனை', q4_a3_sub:'சரியாக தூங்க முடியவில்லை',
-    q4_a4_main:'ஏற்கனவே நோய் இருக்கிறது', q4_a4_sub:'சர்க்கரை, BP, தைராய்டு அல்லது வேறு நோய்',
-    matching_title:'உங்கள் சுயவிவரம் படிக்கிறோம்…', matching_sub:'சரியான care team தேடுகிறோம்.',
-    triage_title:'உங்கள் சுயவிவரத்திற்கு தனிப்பட்ட மதிப்பாய்வு தேவை',
-    triage_body:'எங்கள் Coordinator தனிப்பட்ட முறையில் உங்கள் சுயவிவரத்தை மதிப்பாய்வு செய்து சரியான பாதையை உறுதிப்படுத்துவார்.',
-    triage_btn:'Coordinator உடன் பேசுங்கள் →', triage_note:'பணி நாட்களில் 2 மணி நேரத்தில் பதில்.',
-    result_headline:'உங்கள் team தயார்.',
-    alt_banner:'🌿 ஆயுர்வேத Track — CCIM கீழ்.',
-    seniority_title:'மூத்த நிபுணர்:', seniority_body:'உங்கள் சிகிச்சை வரலாற்றை பார்த்து team உறுதிப்படுத்தப்படும்.',
-    triage_notice:'உங்கள் team Coordinator மூலம் உறுதிப்படுத்தப்படும்.',
-    plan_label:'உங்கள் திட்டத்தை தேர்ந்தெடுங்கள்', plan_match:'உங்கள் Match', plan_pop:'பிரபலம்',
-    plan_trial_note:'ஒரு ஆலோசனை மட்டும் — ஒருங்கிணைந்த பாதை அல்ல',
-    cta_note:'Coordinator 2 மணி நேரத்தில் உறுதிப்படுத்துவார்.',
-    disclaimer:'இது நோய் கண்டறிதல் அல்ல. JeevanKey ஒரு சுகாதார ஒருங்கிணைப்பு சேவை.',
-    restart:'← மீண்டும் தொடங்கவும்', active_lead_sub:'உங்கள் தினசரி முக்கிய தொடர்பு.',
-    wa_consent:'\n\nநான் Terms of Service-க்கு ஒப்புக்கொள்கிறேன் மற்றும் WhatsApp மூலம் care coordination-க்கு அனுமதி வழங்குகிறேன்.',
-    step_prefix: 'படி',
-    diagnostic_anchor: 'முதன்மை செக்-அப் மருத்துவர்',
-    therapeutic_anchor: 'ஆயுர்வேத / ஹோமியோபதி எக்ஸ்பர்ட்',
-    active_treatment_lead: 'முதன்மை சிகிச்சை வழிகாட்டி',
-  },
-  te: {
-    welcome_tag:'ఆరోగ్య నావిగేటర్',
-    welcome_headline:'సరిగ్గా తెలుసుకోండి\n<em>ఎవరు</em> సహాయపడగలరు.',
-    welcome_body:'కేవలం 5 ప్రశ్నలు. 2 నిమిషాలు. మీకు సరైన నిపుణులను సరిపోల్చుతాము.',
-    welcome_btn:'ప్రారంభించండి →', welcome_reassure:'వ్యాధి నిర్ధారణ కాదు · నిపుణుల మార్గం · 46 మార్గాలు',
-    q0_text:'మీరు ఆరోగ్యం కోసం ఏ విధానాన్ని ఇష్టపడతారు?',
-    q0_a1_main:'అల్లోపతి / ఇంగ్లీష్ మెడిసిన్ (డాక్టర్, పరీక్షలు, ప్రిస్క్రిప్షన్)',
-    q0_a1_sub:'సాధారణ ఇంగ్లీష్ మందులు కావాలి — డాక్టర్, రక్త పరీక్షలు',
-    q0_a2_main:'ఆయుర్వేదం / హోమియోపతి / సహజ చికిత్స',
-    q0_a2_sub:'ఇంగ్లీష్ మందులు లేకుండా, మూల కారణం నుండి నయమవ్వాలి',
-    q0_a3_main:'రెండూ సరే — లక్షణాల ఆధారంగా నిర్ణయించండి',
-    q0_a3_sub:'నా జవాబుల ఆధారంగా సరైన మార్గం ఎంచుకోండి',
-    q0_a4_main:'తెలియదు — ఏదో సరిగా లేదు',
-    q0_a4_sub:'దయచేసి నాకు అర్థం చేసుకోవడంలో సహాయపడండి',
-    q5_text:'మీ ఆరోగ్య చరిత్ర గురించి చెప్పండి',
-    q5_a1_main:'సమస్య ఏమిటో నాకు తెలుసు', q5_a1_sub:'సరైన నిపుణులతో కనెక్ట్ చేయండి',
-    q5_a2_main:'చాలామంది డాక్టర్లను చూపించాను — ఏమీ ఫలితం లేదు', q5_a2_sub:'వేరే విధానం కావాలి',
-    q5_a3_main:'ఏం జరుగుతుందో అర్థం కావడం లేదు', q5_a3_sub:'దయచేసి మార్గదర్శనం చేయండి',
-    q1_text:'మీకు <em>అత్యంత ఎక్కువగా</em> ఏది ఇబ్బంది పెడుతోంది?',
-    q1_subtext:'చాలా సమస్యలు ఉన్నా — ఇక్కడ ప్రధానమైన ఒక్కదాన్ని ఎంచుకోండి. మిగిలినవి తదుపరి దశలో ఎంచుకోవచ్చు!',
-    q1_a1_main:'మనసు ఆగడం లేదు — ఒత్తిడి, Burnout', q1_a1_sub:'పని ఒత్తిడి, అలసట, ఆందోళన, burnout',
-    q1_a2_main:'కడుపు మరియు జీర్ణ సమస్యలు', q1_a2_sub:'గ్యాస్, అసిడిటీ, బ్లోటింగ్, IBS, Fatty Liver',
-    q1_a3_main:'శరీర నొప్పి — వెన్ను, మోకాళ్ళు, కీళ్ళు', q1_a3_sub:'వెన్ను, మోకాలు, మెడ, కీళ్ళ నొప్పి',
-    q1_a4_main:'హార్మోన్ సమస్యలు', q1_a4_sub:'అక్రమ పీరియడ్స్, PCOD/PCOS, పిమ్పుల్స్',
-    q1_a5_main:'ఎప్పుడూ అలసటగా ఉంటుంది', q1_a5_sub:'శక్తి లేదు, ప్రేరణ లేదు, బలహీనత',
-    q1_a6_main:'దీర్ఘకాలిక వ్యాధులు', q1_a6_sub:'డయాబెటీస్, థైరాయిడ్, BP, ఆస్తమా, కిడ్నీ సమస్యలు',
-    q2_text:'ఈ సమస్య <em>ఎంత కాలం నుండి</em> ఉంది?',
-    q2_a1_main:'1 నెల కంటే తక్కువ', q2_a1_sub:'ఇటీవలే మొదలైంది', q2_a2_main:'కొన్ని నెలలు', q2_a2_sub:'2-6 నెలల క్రితం మొదలైంది',
-    q2_a3_main:'6 నెలలకంటే ఎక్కువ', q2_a3_sub:'చాలా కాలం నుండి ఉంది', q2_a4_main:'చాలా సంవత్సరాలుగా వస్తూ పోతూ', q2_a4_sub:'కొంత కాలం మెరుగవుతుంది తిరిగొస్తుంది',
-    q3_text:'మరేమైనా <em>పాటుగా</em> జరుగుతోందా?', q3_subtext:'వర్తించే వన్నీ ఎంచుకోండి — తర్వాత కొనసాగండి',
-    q3_sleep:'నిద్ర సమస్యలు', q3_weight:'బరువు పెరుగుతోంది/తగ్గుతోంది', q3_skin:'చర్మం లేదా జుట్టు సమస్యలు',
-    q3_mood:'మూడ్ సరిగా ఉండదు', q3_motivation:'ఏమీ చేయాలని అనిపించదు', q3_meal:'తినడంలో సమస్య',
-    q3_periods:'అక్రమ పీరియడ్స్', q3_acne:'పిమ్పుల్స్ / మొటిమలు', q3_conceive:'పిల్లలు కావాలి / గర్భం దాల్చాలి',
-    q3_none:'వీటిలో ఏదీ లేదు', q3_continue:'కొనసాగండి →',
-    q4_text:'ఇప్పుడు <em>దినచర్య ఎలా</em> ఉంది?',
-    q4_a1_main:'కూర్చుని చేసే పని / Desk Job', q4_a1_sub:'ఎక్కువగా కూర్చుంటాను, చాలా తక్కువ కదలిక',
-    q4_a2_main:'చాలా బిజీ జీవితం — అధిక మానసిక ఒత్తిడి', q4_a2_sub:'చురుకుగా ఉన్నాను కానీ ఒత్తిడిలో నడుస్తోంది',
-    q4_a3_main:'నిద్ర నా అతి పెద్ద సమస్య', q4_a3_sub:'సరిగ్గా నిద్రపోలేను',
-    q4_a4_main:'ఇప్పటికే ఒక వ్యాధి నిర్వహిస్తున్నాను', q4_a4_sub:'షుగర్, BP, థైరాయిడ్ లేదా మరొకటి',
-    matching_title:'మీ ప్రొఫైల్ చదువుతున్నాము…', matching_sub:'సరైన care team కోసం వెతుకుతున్నాము.',
-    triage_title:'మీ ప్రొఫైల్‌కు వ్యక్తిగత సమీక్ష అవసరం',
-    triage_body:'మా Coordinator వ్యక్తిగతంగా మీ ప్రొఫైల్‌ను సమీక్షించి సరైన మార్గాన్ని నిర్ధారిస్తారు.',
-    triage_btn:'Coordinator తో మాట్లాడండి →', triage_note:'పని దినాలలో 2 గంటలలో ప్రత్యుత్తరం.',
-    result_headline:'మీ team సిద్ధం.',
-    alt_banner:'🌿 ఆయుర్వేదిక్ Track — CCIM కింద.',
-    seniority_title:'సీనియర్ ప్రాక్టిషనర్:', seniority_body:'మీ మునుపటి చికిత్సలను పరిశీలించి team నిర్ధారిస్తాము.',
-    triage_notice:'మీ team Coordinator ద్వారా నిర్ధారించబడుతుంది.',
-    plan_label:'మీ ప్లాన్ ఎంచుకోండి', plan_match:'మీకు Match', plan_pop:'ప్రసిద్ధం',
-    plan_trial_note:'ఒక్క సంప్రదింపు మాత్రమే — సమన్వయ మార్గం కాదు',
-    cta_note:'Coordinator 2 గంటలలో నిర్ధారిస్తారు.',
-    disclaimer:'ఇది వ్యాధి నిర్ధారణ కాదు. JeevanKey ఒక ఆరోగ్య సమన్వయ సేవ.',
-    restart:'← మళ్ళీ ప్రారంభించండి', active_lead_sub:'మీ రోజువారీ ప్రధాన సంప్రదింపు.',
-    wa_consent:'\n\nనేను Terms of Service కి అంగీకరిస్తున్నాను మరియు WhatsApp ద్వారా care coordination కి అనుమతి ఇస్తున్నాను.',
-    step_prefix: 'దశ',
-    diagnostic_anchor: 'ప్రధాన చెకప్ డాక్టర్',
-    therapeutic_anchor: 'ఆయుర్వేదిక్ / హోమియోపతి ఎక్స్‌పర్ట్',
-    active_treatment_lead: 'ప్రధాన చికిత్స గైడ్',
-  },
-  kn: {
-    welcome_tag:'ಆರೋಗ್ಯ ನ್ಯಾವಿಗೇಟರ್',
-    welcome_headline:'ಸರಿಯಾಗಿ ತಿಳಿಯಿರಿ\n<em>ಯಾರು</em> ಸಹಾಯ ಮಾಡಬಲ್ಲರು.',
-    welcome_body:'ಕೇವಲ 5 ಪ್ರಶ್ನೆಗಳು. 2 ನಿಮಿಷಗಳು. ನಿಮಗೆ ಸರಿಯಾದ ತಜ್ಞರನ್ನು ಹೊಂದಿಸುತ್ತೇವೆ.',
-    welcome_btn:'ಪ್ರಾರಂಭಿಸಿ →', welcome_reassure:'ರೋಗ ನಿರ್ಣಯ ಅಲ್ಲ · ತಜ್ಞರ ಮಾರ್ಗ · 46 ಮಾರ್ಗಗಳು',
-    q0_text:'ನಿಮ್ಮ ಆರೋಗ್ಯಕ್ಕಾಗಿ ಯಾವ ವಿಧಾನವನ್ನು ಬಯಸುತ್ತೀರಿ?',
-    q0_a1_main:'ಅಲ್ಲೋಪತಿ / ಇಂಗ್ಲಿಷ್ ಔಷಧ (ಡಾಕ್ಟರ್, ಪರೀಕ್ಷೆಗಳು, ಪ್ರಿಸ್ಕ್ರಿಪ್ಷನ್)',
-    q0_a1_sub:'ನಿಯಮಿತ ಇಂಗ್ಲಿಷ್ ಔಷಧ ಬೇಕು — ಡಾಕ್ಟರ್, ರಕ್ತ ಪರೀಕ್ಷೆಗಳು',
-    q0_a2_main:'ಆಯುರ್ವೇದ / ಹೋಮಿಯೋಪತಿ / ನೈಸರ್ಗಿಕ ಚಿಕಿತ್ಸೆ',
-    q0_a2_sub:'ಇಂಗ್ಲಿಷ್ ಔಷಧ ಇಲ್ಲದೆ, ಮೂಲ ಕಾರಣದಿಂದ ಗುಣಮುಖನಾಗಬೇಕು',
-    q0_a3_main:'ಎರಡೂ ಸರಿ — ಲಕ್ಷಣಗಳ ಆಧಾರದಲ್ಲಿ ನಿರ್ಧರಿಸಿ',
-    q0_a3_sub:'ನನ್ನ ಉತ್ತರಗಳ ಆಧಾರದಲ್ಲಿ ಸರಿಯಾದ ಮಾರ್ಗ ಆರಿಸಿ',
-    q0_a4_main:'ಗೊತ್ತಿಲ್ಲ — ಏನೋ ಸರಿ ಇಲ್ಲ', q0_a4_sub:'ದಯವಿಟ್ಟು ನನಗೆ ಅರ್ಥಮಾಡಿಕೊಳ್ಳಲು ಸಹಾಯ ಮಾಡಿ',
-    q5_text:'ನಿಮ್ಮ ಆರೋಗ್ಯ ಇತಿಹಾಸದ ಬಗ್ಗೆ ಹೇಳಿ',
-    q5_a1_main:'ಸಮಸ್ಯೆ ಏನೆಂದು ಗೊತ್ತಿದೆ', q5_a1_sub:'ಸರಿಯಾದ ತಜ್ಞರೊಂದಿಗೆ ಸಂಪರ್ಕಿಸಿ',
-    q5_a2_main:'ಅನೇಕ ಡಾಕ್ಟರ್‌ಗಳಿಗೆ ತೋರಿಸಿದ್ದೇನೆ — ಯಾವ ಪ್ರಯೋಜನವೂ ಇಲ್ಲ', q5_a2_sub:'ಬೇರೆ ವಿಧಾನ ಬೇಕು',
-    q5_a3_main:'ಏನು ನಡೆಯುತ್ತಿದೆ ಎಂದು ಅರ್ಥವಾಗುತ್ತಿಲ್ಲ', q5_a3_sub:'ದಯವಿಟ್ಟು ಮಾರ್ಗದರ್ಶನ ಮಾಡಿ',
-    q1_text:'ನಿಮ್ಮನ್ನು <em>ಅತ್ಯಂತ ಹೆಚ್ಚು</em> ಏನು ಕಾಡುತ್ತಿದೆ?',
-    q1_subtext:'ಅನೇಕ ಸಮಸ್ಯೆಗಳಿದ್ದರೂ — ಇಲ್ಲಿ ಮುಖ್ಯವಾದ ಒಂದನ್ನು ಆರಿಸಿ. ಉಳಿದವನ್ನು ಮುಂದಿನ ಹಂತದಲ್ಲಿ ಆರಿಸಬಹುದು!',
-    q1_a1_main:'ಮನಸ್ಸು ನಿಲ್ಲುತ್ತಿಲ್ಲ — ಒತ್ತಡ, Burnout', q1_a1_sub:'ಕೆಲಸದ ಒತ್ತಡ, ಆಯಾಸ, ಆತಂಕ',
-    q1_a2_main:'ಹೊಟ್ಟೆ ಮತ್ತು ಜೀರ್ಣಕ್ರಿಯೆ ಸಮಸ್ಯೆ', q1_a2_sub:'ಗ್ಯಾಸ್, ಆಮ್ಲೀಯತೆ, ಉಬ್ಬರ, IBS, Fatty Liver',
-    q1_a3_main:'ದೇಹ ನೋವು — ಬೆನ್ನು, ಮೊಣಕಾಲು, ಕೀಲು', q1_a3_sub:'ಬೆನ್ನು, ಮೊಣಕಾಲು, ಕತ್ತು, ಕೀಲು ನೋವು',
-    q1_a4_main:'ಹಾರ್ಮೋನ್ ಸಮಸ್ಯೆ', q1_a4_sub:'ಅನಿಯಮಿತ ಮಾಸಿಕ, PCOD/PCOS, ಮೊಡವೆ',
-    q1_a5_main:'ಯಾವಾಗಲೂ ಆಯಾಸ ಅನುಭವ', q1_a5_sub:'ಶಕ್ತಿ ಇಲ್ಲ, ಪ್ರೇರಣೆ ಇಲ್ಲ, ದೌರ್ಬಲ್ಯ',
-    q1_a6_main:'ದೀರ್ಘಕಾಲೀನ ಕಾಯಿಲೆಗಳು', q1_a6_sub:'ಮಧುಮೇಹ, ಥೈರಾಯ್ಡ್, BP, ಆಸ್ತಮಾ, ಮೂತ್ರಪಿಂಡ ಸಮಸ್ಯೆ',
-    q2_text:'ಈ ಸಮಸ್ಯೆ <em>ಎಷ್ಟು ಸಮಯದಿಂದ</em> ಇದೆ?',
-    q2_a1_main:'1 ತಿಂಗಳಿಗಿಂತ ಕಡಿಮೆ', q2_a1_sub:'ಇತ್ತೀಚೆಗೆ ಪ್ರಾರಂಭವಾಗಿದೆ', q2_a2_main:'ಕೆಲವು ತಿಂಗಳುಗಳು', q2_a2_sub:'2-6 ತಿಂಗಳ ಮೊದಲು',
-    q2_a3_main:'6 ತಿಂಗಳಿಗಿಂತ ಹೆಚ್ಚು', q2_a3_sub:'ಬಹಳ ಸಮಯದಿಂದ ಇದೆ', q2_a4_main:'ವರ್ಷಗಳಿಂದ ಬಂದು ಹೋಗುತ್ತಿದೆ', q2_a4_sub:'ಸ್ವಲ್ಪ ಸಮಯ ಉತ್ತಮ ಮತ್ತೆ ಬರುತ್ತದೆ',
-    q3_text:'ಇನ್ನೇನಾದರೂ <em>ಜೊತೆಗೆ</em> ಆಗುತ್ತಿದೆಯಾ?', q3_subtext:'ಅನ್ವಯವಾಗುವ ಎಲ್ಲವನ್ನೂ ಆರಿಸಿ — ನಂತರ ಮುಂದುವರಿಯಿರಿ',
-    q3_sleep:'ನಿದ್ರೆ ಸಮಸ್ಯೆ', q3_weight:'ತೂಕ ಹೆಚ್ಚಾಗುತ್ತಿದೆ/ಕಡಿಮೆಯಾಗುತ್ತಿದೆ', q3_skin:'ಚರ್ಮ ಅಥವಾ ಕೂದಲಿನ ಸಮಸ್ಯೆ',
-    q3_mood:'ಮೂಡ್ ಸರಿ ಇಲ್ಲ', q3_motivation:'ಏನೂ ಮಾಡಲು ಮನಸ್ಸಿಲ್ಲ', q3_meal:'ತಿನ್ನಲು ಸಮಸ್ಯೆ',
-    q3_periods:'ಅನಿಯಮಿತ ಮಾಸಿಕ', q3_acne:'ಮೊಡವೆ', q3_conceive:'ಮಗು ಬೇಕು / ಗರ್ಭ ಧರಿಸಬೇಕು',
-    q3_none:'ಇವುಗಳಲ್ಲಿ ಯಾವುದೂ ಇಲ್ಲ', q3_continue:'ಮುಂದುವರಿಯಿರಿ →',
-    q4_text:'ಈಗ <em>ದೈನಂದಿನ ಜೀವನ ಹೇಗಿದೆ</em>?',
-    q4_a1_main:'ಕೂರುವ ಕೆಲಸ / Desk Job', q4_a1_sub:'ಹೆಚ್ಚಾಗಿ ಕೂರುತ್ತೇನೆ, ತೀರಾ ಕಡಿಮೆ ಚಲನೆ',
-    q4_a2_main:'ತುಂಬಾ ಬ್ಯುಸಿ — ಅಧಿಕ ಮಾನಸಿಕ ಒತ್ತಡ', q4_a2_sub:'ಚಟುವಟಿಕೆಯಾಗಿದ್ದೇನೆ ಆದರೆ ಒತ್ತಡದಲ್ಲಿ ನಡೆಯುತ್ತಿದೆ',
-    q4_a3_main:'ನಿದ್ರೆ ನನ್ನ ಅತಿ ದೊಡ್ಡ ಸಮಸ್ಯೆ', q4_a3_sub:'ಸರಿಯಾಗಿ ನಿದ್ದೆ ಮಾಡಲು ಆಗುತ್ತಿಲ್ಲ',
-    q4_a4_main:'ಈಗಾಗಲೇ ಒಂದು ಕಾಯಿಲೆ ನಿರ್ವಹಿಸುತ್ತಿದ್ದೇನೆ', q4_a4_sub:'ಮಧುಮೇಹ, BP, ಥೈರಾಯ್ಡ್ ಅಥವಾ ಬೇರೆ',
-    matching_title:'ನಿಮ್ಮ ಪ್ರೊಫೈಲ್ ಓದುತ್ತಿದ್ದೇವೆ…', matching_sub:'ಸರಿಯಾದ care team ಹುಡುಕುತ್ತಿದ್ದೇವೆ.',
-    triage_title:'ನಿಮ್ಮ ಪ್ರೊಫೈಲ್‌ಗೆ ವ್ಯಕ್ತಿಗತ ಪರಿಶೀಲನೆ ಅಗತ್ಯ',
-    triage_body:'ನಮ್ಮ Coordinator ವೈಯಕ್ತಿಕವಾಗಿ ನಿಮ್ಮ ಪ್ರೊಫೈಲ್ ಪರಿಶೀಲಿಸಿ ಸರಿಯಾದ ಮಾರ್ಗ ಖಚಿತಪಡಿಸುತ್ತಾರೆ.',
-    triage_btn:'Coordinator ಜೊತೆ ಮಾತಾಡಿ →', triage_note:'ಕೆಲಸದ ದಿನಗಳಲ್ಲಿ 2 ಗಂಟೆಯಲ್ಲಿ ಉತ್ತರ.',
-    result_headline:'ನಿಮ್ಮ team ಸಿದ್ಧ.',
-    alt_banner:'🌿 ಆಯುರ್ವೇದಿಕ್ Track — CCIM ಅಡಿಯಲ್ಲಿ.',
-    seniority_title:'ಹಿರಿಯ ಅಭ್ಯಾಸಕ:', seniority_body:'ನಿಮ್ಮ ಹಿಂದಿನ ಚಿಕಿತ್ಸೆಗಳನ್ನು ನೋಡಿ team ಖಚಿತಪಡಿಸಲಾಗುತ್ತದೆ.',
-    triage_notice:'ನಿಮ್ಮ team Coordinator ಮೂಲಕ ಖಚಿತಪಡಿಸಲ್ಪಡುತ್ತದೆ.',
-    plan_label:'ನಿಮ್ಮ ಯೋಜನೆ ಆರಿಸಿ', plan_match:'ನಿಮಗೆ Match', plan_pop:'ಜನಪ್ರಿಯ',
-    plan_trial_note:'ಒಂದು ಸಲಹೆ ಮಾತ್ರ — ಸಮನ್ವಯ ಮಾರ್ಗ ಅಲ್ಲ',
-    cta_note:'Coordinator 2 ಗಂಟೆಯಲ್ಲಿ ಖಚಿತಪಡಿಸುತ್ತಾರೆ.',
-    disclaimer:'ಇದು ರೋಗ ನಿರ್ಣಯ ಅಲ್ಲ. JeevanKey ಒಂದು ಆರೋಗ್ಯ ಸಮನ್ವಯ ಸೇವೆ.',
-    restart:'← ಮತ್ತೆ ಪ್ರಾರಂಭಿಸಿ', active_lead_sub:'ನಿಮ್ಮ ದೈನಂದಿನ ಮುಖ್ಯ ಸಂಪರ್ಕ.',
-    wa_consent:'\n\nನಾನು Terms of Service ಗೆ ಒಪ್ಪಿಗೆ ನೀಡುತ್ತೇನೆ ಮತ್ತು WhatsApp ಮೂಲಕ care coordination ಗೆ ಅನುಮತಿ ನೀಡುತ್ತೇನೆ.',
-    step_prefix: 'ಹಂತ',
-    diagnostic_anchor: 'ಮುಖ್ಯ ಚೆಕ್-ಅಪ್ ವೈದ್ಯರು',
-    therapeutic_anchor: 'ಆಯುರ್ವೇದಿಕ್ / ಹೋಮಿಯೋಪತಿ ಎಕ್ಸ್‌ಪರ್ಟ್',
-    active_treatment_lead: 'ಮುಖ್ಯ ಚಿಕಿತ್ಸಾ ಗೈಡ್',
-  },
-  ml: {
-    welcome_tag:'ആരോഗ്യ നാവിഗേറ്റർ',
-    welcome_headline:'കൃത്യമായി അറിയൂ\n<em>ആർ</em> സഹായിക്കും.',
-    welcome_body:'വെറും 5 ചോദ്യങ്ങൾ. 2 മിനിറ്റ്. ശരിയായ വിദഗ്ധരെ നിങ്ങൾക്ക് കണ്ടെത്തിത്തരാം.',
-    welcome_btn:'ആരംഭിക്കൂ →', welcome_reassure:'രോഗനിർണ്ണയം അല്ല · വിദഗ്ധ-ഒത്തിണക്കിയ പാത · 46 വഴികൾ',
-    q0_text:'ആരോഗ്യ പ്രശ്നത്തിന് ഏത് ചികിത്സ രീതി ആഗ്രഹിക്കുന്നു?',
-    q0_a1_main:'അലോപ്പതി / ഇംഗ്ലീഷ് മരുന്ന് (ഡോക്ടർ, ടെസ്റ്റ്, പ്രിസ്ക്രിപ്ഷൻ)',
-    q0_a1_sub:'ഇംഗ്ലീഷ് മരുന്ന് വേണം — ഡോക്ടർ, രക്ത പരിശോധന',
-    q0_a2_main:'ആയൂർവേദം / ഹോമിയോപ്പതി / പ്രകൃതി ചികിത്സ',
-    q0_a2_sub:'ഇംഗ്ലീഷ് മരുന്ന് ഇല്ലാതെ, മൂല കാരണം ഭേദമാക്കണം',
-    q0_a3_main:'രണ്ടും ശരി — ലക്ഷണങ്ങൾ അനുസരിച്ച് തീരുമാനിക്കൂ',
-    q0_a3_sub:'എന്റെ ഉത്തരങ്ങൾ നോക്കി ശരിയായ വഴി തിരഞ്ഞെടുക്കൂ',
-    q0_a4_main:'അറിയില്ല — എന്തോ ശരിയല്ല', q0_a4_sub:'ദയവായി മനസ്സിലാക്കാൻ സഹായിക്കൂ',
-    q5_text:'ആരോഗ്യ ചരിത്രത്തെ കുറിച്ച് പറയൂ',
-    q5_a1_main:'എന്ത് പ്രശ്നമെന്ന് അറിയാം', q5_a1_sub:'ശരിയായ വിദഗ്ധരുമായി ബന്ധിപ്പിക്കൂ',
-    q5_a2_main:'ഒരുപാട് ഡോക്ടർമാരെ കണ്ടു — ഫലം ഇല്ല', q5_a2_sub:'മറ്റൊരു സമീപനം വേണം',
-    q5_a3_main:'എന്ത് സംഭവിക്കുന്നുവെന്ന് മനസ്സിലാകുന്നില്ല', q5_a3_sub:'ദയവായി വഴികാട്ടൂ',
-    q1_text:'നിങ്ങളെ <em>ഏറ്റവും കൂടുതൽ</em> ബുദ്ധിമുട്ടിക്കുന്നത് എന്ത്?',
-    q1_subtext:'ഒന്നിലധികം പ്രശ്നങ്ങൾ ഉണ്ടെങ്കിലും — ഇവിടെ പ്രധാനപ്പെട്ടത് ഒന്ന് തിരഞ്ഞെടുക്കൂ. ബാക്കിയുള്ളവ അടുത്ത ഘട്ടത്തിൽ തിരഞ്ഞെടുക്കാം!',
-    q1_a1_main:'മനസ്സ് നിൽക്കുന്നില്ല — സ്ട്രെസ്സ്, Burnout', q1_a1_sub:'ജോലി സ്ട്രെസ്സ്, ക്ഷീണം, ഉത്കണ്ഠ',
-    q1_a2_main:'വയറ്, ദഹന പ്രശ്നങ്ങൾ', q1_a2_sub:'ഗ്യാസ്, ആസിഡ്, ബ്ലോടിങ്, IBS, ഫാറ്റി ലിവർ',
-    q1_a3_main:'ശരീര വേദന — കഴുത്ത്, മുട്ട്, ജോയിന്റ്', q1_a3_sub:'പുറം, മുട്ട്, കഴുത്ത്, ജോയിന്റ് വേദന',
-    q1_a4_main:'ഹോർമോൺ പ്രശ്നങ്ങൾ', q1_a4_sub:'ആർത്തവ ക്രമക്കേട്, PCOD/PCOS, കുരു',
-    q1_a5_main:'എപ്പോഴും ക്ഷീണം തോന്നുന്നു', q1_a5_sub:'ഊർജ്ജം ഇല്ല, പ്രചോദനം ഇല്ല, ദൗർബ്ബല്യം',
-    q1_a6_main:'ദീർഘകാല രോഗങ്ങൾ', q1_a6_sub:'ഡയബറ്റീസ്, തൈറോയ്ഡ്, BP, ആസ്ത്മ, കിഡ്നി',
-    q2_text:'ഈ പ്രശ്നം <em>എത്ര കാലമായി</em> ഉണ്ട്?',
-    q2_a1_main:'1 മാസത്തിൽ കുറവ്', q2_a1_sub:'അടുത്തിടെ ആരംഭിച്ചു', q2_a2_main:'കുറച്ച് മാസങ്ങൾ', q2_a2_sub:'2-6 മാസം മുൻപ് ആരംഭിച്ചു',
-    q2_a3_main:'6 മാസത്തിൽ കൂടുതൽ', q2_a3_sub:'ഏറെ കാലമായി ഉണ്ട്', q2_a4_main:'വർഷങ്ങളായി വരുന്നു-പോകുന്നു', q2_a4_sub:'ഒരുകാലം ഭേദമാകും, തിരിച്ചുവരും',
-    q3_text:'മറ്റ് എന്തെങ്കിലും <em>ഒപ്പം</em> ഉണ്ടോ?', q3_subtext:'ബാധകമായവ എല്ലാം തിരഞ്ഞെടുക്കൂ — പിന്നെ തുടരൂ',
-    q3_sleep:'ഉറക്ക പ്രശ്നം', q3_weight:'ഭാരം കൂടുന്നു/കുറയുന്നു', q3_skin:'ചർമ്മം അല്ലെങ്കിൽ മുടി പ്രശ്നം',
-    q3_mood:'മൂഡ് ശരിയല്ല', q3_motivation:'ഒന്നും ചെയ്യാൻ തോന്നുന്നില്ല', q3_meal:'ഭക്ഷണ പ്രശ്നം',
-    q3_periods:'ആർത്തവ ക്രമക്കേട്', q3_acne:'കുരു / Acne', q3_conceive:'കുഞ്ഞ് വേണം / ഗർഭം ധരിക്കണം',
-    q3_none:'ഇതൊന്നുമില്ല', q3_continue:'തുടരൂ →',
-    q4_text:'ഇപ്പോൾ <em>ദൈനംദിന ജീവിതം</em> എങ്ങനെ?',
-    q4_a1_main:'ഇരിക്കുന്ന ജോലി / Desk Job', q4_a1_sub:'കൂടുതൽ ഇരിക്കുന്നു, ചലനം വളരെ കുറവ്',
-    q4_a2_main:'വളരെ തിരക്കുള്ള ജീവിതം — അധിക സ്ട്രെസ്സ്', q4_a2_sub:'ഉൽസാഹമുണ്ട് പക്ഷേ സ്ട്രെസ്സിൽ നടക്കുന്നു',
-    q4_a3_main:'ഉറക്കമാണ് ഏറ്റവും വലിയ പ്രശ്നം', q4_a3_sub:'ശരിക്ക് ഉറങ്ങാൻ കഴിയുന്നില്ല',
-    q4_a4_main:'ഇതിനകം ഒരു രോഗം കൈകാര്യം ചെയ്യുന്നു', q4_a4_sub:'ഡയബറ്റീസ്, BP, തൈറോയ്ഡ് അല്ലെങ്കിൽ മറ്റ്',
-    matching_title:'പ്രൊഫൈൽ വായിക്കുന്നു…', matching_sub:'ശരിയായ care team കണ്ടെത്തുന്നു.',
-    triage_title:'പ്രൊഫൈലിന് വ്യക്തിഗത അവലോകനം ആവശ്യം',
-    triage_body:'ഞങ്ങളുടെ Coordinator വ്യക്തിപരമായി പ്രൊഫൈൽ അവലോകനം ചെയ്ത് ശരിയായ വഴി ഉറപ്പിക്കും.',
-    triage_btn:'Coordinator-ഉമായി സംസാരിക്കൂ →', triage_note:'ജോലി ദിവസങ്ങളിൽ 2 മണിക്കൂറിൽ മറുപടി.',
-    result_headline:'നിങ്ങളുടെ team തയ്യാർ.',
-    alt_banner:'🌿 ആയൂർവേദ Track — CCIM കീഴിൽ.',
-    seniority_title:'സീനിയർ പ്രാക്ടീഷ്ണർ:', seniority_body:'മുൻ ചികിത്സ ചരിത്രം നോക്കി team ഉറപ്പിക്കും.',
-    triage_notice:'Team Coordinator ഉറപ്പിക്കും.',
-    plan_label:'പ്ലാൻ തിരഞ്ഞെടുക്കൂ', plan_match:'Match', plan_pop:'ജനപ്രിയം',
-    plan_trial_note:'ഒരു കൺസൾട്ടേഷൻ മാത്രം',
-    cta_note:'Coordinator 2 മണിക്കൂറിൽ ഉറപ്പിക്കും.',
-    disclaimer:'ഇത് രോഗനിർണ്ണയം അല്ല. JeevanKey ഒരു ആരോഗ്യ ഏകോപന സേവനമാണ്.',
-    restart:'← വീണ്ടും ആരംഭിക്കൂ', active_lead_sub:'ദൈനംദിന പ്രധാന ബന്ധം.',
-    wa_consent:'\n\nഞാൻ Terms of Service സമ്മതിക്കുന്നു, WhatsApp-ൽ care coordination-ന് അനുമതി നൽകുന്നു.',
-    step_prefix: 'ഘട്ടം',
-    diagnostic_anchor: 'പ്രധാന ചെക്ക്-അപ്പ് ഡോക്ടർ',
-    therapeutic_anchor: 'ആയുർവേദ / ഹോമിയോപ്പതി എക്സ്പെർട്ട്',
-    active_treatment_lead: 'പ്രധാന ചികിത്സാ ഗൈഡ്',
-  },
-};
-
-/* ══════════════════════════════════════
-   PLANS
-══════════════════════════════════════ */
-const PLANS = [
-  { id:'trial',     name:'Trial',     price:'₹499',   period:'one-time', experts:'1 Expert Consultation',  featured:false },
-  { id:'essential', name:'Essential', price:'₹2,499', period:'/month',   experts:'2 Coordinated Experts',  featured:false },
-  { id:'premium',   name:'Premium',   price:'₹4,499', period:'/month',   experts:'3 Specialized Experts',  featured:true  },
-  { id:'elite',     name:'Elite',     price:'₹7,499', period:'/month',   experts:'4+ Clinical Experts',    featured:false }
-];
-
-/* ══════════════════════════════════════
-   STATE
-══════════════════════════════════════ */
-const state = {
-  q0:null, q1:null, q2:null, q3:[], q4:null, q5:null,
-  selectedPlan:null, activeWaUrl:'#', result:null,
-  lang:'hi',        /* default language */
-  history:[]        /* dynamic step tracking stack */
-};
-
-/* ══════════════════════════════════════
-   LOCALIZATION ENGINE
-══════════════════════════════════════ */
-function t(key) {
-  const lang = state.lang;
-  return (DICT[lang] && DICT[lang][key]) || DICT['hi'][key] || DICT['en'][key] || key;
-}
-
-function setLang(lang) {
-  state.lang = lang;
-  /* Sync all dropdowns */
-  document.querySelectorAll('.lang-select').forEach(s => s.value = lang);
-  applyTranslations();
-}
-
-function applyTranslations() {
-  /* Translate all data-i18n elements */
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.getAttribute('data-i18n');
-    const val = t(key);
-    if (val) el.innerHTML = val;
-  });
-  /* Re-render active step counter if on a question screen */
-  updateStepDisplay();
-}
-
-/* ══════════════════════════════════════
-   DYNAMIC STEP TRACKING ENGINE
-   Replaces all hardcoded "Question X of Y"
-   labels. Uses state.history stack.
-══════════════════════════════════════ */
-const SCREEN_STEPS = {
-  'q0': 1,
-  'q5': 2,
-  'q1': null,   /* dynamic */
-  'q2': null,
-  'q3': null,
-  'q4': null,
-};
-
-function getStepInfo(screenId) {
-  /* Build step number from history stack length + 1 */
-  const pos = state.history.length + 1;
-  /* Total steps: depends on whether Q5 was shown */
-  const total = state.history.includes('q5') ? 5 : 4;
-  return { current: pos, total };
-}
-
-function setProgressBar(screenId, pct) {
-  const fill = document.getElementById(screenId.replace('screen-','') + '-fill');
-  if (fill) fill.style.width = pct + '%';
-}
-
-function updateStepDisplay() {
-  const active = document.querySelector('.screen.active');
-  if (!active) return;
-  const id = active.id.replace('screen-','');
-  const counterEl = document.getElementById(id + '-counter');
-  if (!counterEl) return;
-  
-  const pos = state.history.length;
-  // FIXED: Pulls dynamic step labels directly from language dictionaries
-  const label = t('step_prefix') + ' ' + pos;
-  counterEl.textContent = label;
-}
-
-/* ══════════════════════════════════════
-   BROADCAST HEIGHT
-══════════════════════════════════════ */
-function _broadcastHeight() {
-  const h = document.documentElement.scrollHeight;
-  window.parent.postMessage({ type:'jk-height', height:h }, '*');
-}
-
-/* ══════════════════════════════════════
-   NAVIGATION — with history stack
-══════════════════════════════════════ */
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  const t = document.getElementById('screen-' + id);
-  if (t) { t.classList.add('active'); t.scrollTop = 0; }
-  /* Update step counter */
-  const counterEl = document.getElementById(id + '-counter');
-  if (counterEl) {
-    const pos = state.history.length;
-    counterEl.textContent = 'Step ' + pos;
-  }
-  setTimeout(_broadcastHeight, 450);
-}
-
-function pushHistory(screenId) {
-  if (!state.history.includes(screenId)) {
-    state.history.push(screenId);
-  }
-}
-
-function startNavigator() {
-  state.history = [];
-  pushHistory('q0');
-  showScreen('q0');
-}
-
-/* ══════════════════════════════════════
-   QUESTION HANDLERS
-══════════════════════════════════════ */
-function selectQ0(val) {
-  state.q0 = val;
-  highlightSelected('q0-answers', val);
-  setTimeout(() => {
-    if (val === 'guided') {
-      showScreen('triage');
-    } else if (val === 'open') {
-      pushHistory('q5');
-      showScreen('q5');
-    } else {
-      state.q5 = null;
-      pushHistory('q1');
-      showScreen('q1');
-    }
-  }, 250);
-}
-
-function selectQ5(val) {
-  state.q5 = val;
-  highlightSelected('q5-answers', val);
-  setTimeout(() => {
-    if (val === 'confused') {
-      showScreen('triage');
-    } else {
-      pushHistory('q1');
-      showScreen('q1');
-    }
-  }, 250);
-}
-
-function selectQ1(val) {
-  state.q1 = val;
-  highlightSelected('q1-answers', val);
-  document.getElementById('q3-conceive').style.display = (val === 'hormonal') ? 'flex' : 'none';
-  pushHistory('q2');
-  setTimeout(() => showScreen('q2'), 250);
-}
-
-function selectQ2(val) {
-  state.q2 = val;
-  highlightSelected('q2-answers', val);
-  pushHistory('q3');
-  setTimeout(() => showScreen('q3'), 250);
-}
-
-function toggleQ3(val) {
-  const btn = document.querySelector('#q3-answers [data-val="' + val + '"]');
-  const noneBtn = document.getElementById('q3-none');
-  if (val === 'none') {
-    state.q3 = ['none'];
-    document.querySelectorAll('#q3-answers .answer-btn').forEach(b => b.classList.remove('selected'));
-    btn.classList.add('selected');
-  } else {
-    noneBtn.classList.remove('selected');
-    state.q3 = state.q3.filter(v => v !== 'none');
-    if (state.q3.includes(val)) {
-      state.q3 = state.q3.filter(v => v !== val);
-      btn.classList.remove('selected');
-    } else {
-      state.q3.push(val);
-      btn.classList.add('selected');
-    }
-  }
-  document.getElementById('q3-continue').classList.toggle('visible', state.q3.length > 0);
-}
-
-function goToQ4() {
-  if (state.q3.length > 0) {
-    pushHistory('q4');
-    showScreen('q4');
-  }
-}
-
-function selectQ4(val) {
-  state.q4 = val;
-  highlightSelected('q4-answers', val);
-  setTimeout(() => {
-    showScreen('matching');
-    setTimeout(() => computeResult(), 2000);
-  }, 250);
-}
-
-function highlightSelected(containerId, val) {
-  document.querySelectorAll('#' + containerId + ' .answer-btn').forEach(b => {
-    b.classList.toggle('selected', b.dataset.val === val);
-  });
-}
-
-/* ══════════════════════════════════════
-   46 PROFILES — ALL INTACT
-   Sub/detail text simplified to plain Indian English.
-══════════════════════════════════════ */
-const PROFILES = {
-  A1_mind_essential:{cluster:'A',paradigm:'A',tier:'essential',eyebrow:'Mind & Stress — Basic Care',sub:'Your problem is mostly mental stress and tension. The doctor will rule out any physical cause, and a counsellor will help your mind settle and recover.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS Doctor',detail:'Rules out thyroid issues, vitamin deficiencies, or any physical problem that can look like stress or anxiety.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Counsellor / Psychotherapist',detail:'Your main daily contact — leads your recovery. Uses proven techniques to calm your nervous system and rebuild mental strength.',isActiveLead:true}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Mind & Stress — Basic Care.'},
-  A2_mind_premium_diet:{cluster:'A',paradigm:'A',tier:'premium',eyebrow:'Mind & Stress — With Low Energy',sub:'Stress is draining your body too — your eating and energy patterns are suffering. Three experts work together on your mind, nutrition, and recovery.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS Doctor',detail:'Checks blood reports for nutritional gaps and physical contributors to stress and fatigue.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Counsellor / Psychotherapist',detail:'Your main daily contact — leads your recovery. Targets stress loops and helps rebuild mental and emotional resilience.',isActiveLead:true},{role:'Core Accelerator',badge:'badge-accel',name:'Dietician / Nutritionist',detail:'Fixes eating patterns and nutritional gaps that are making your stress and tiredness worse.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Mind & Stress — With Low Energy.'},
-  A3_mind_premium_sleep:{cluster:'A',paradigm:'A',tier:'premium',eyebrow:'Mind & Stress — Sleep Disruption',sub:'Your stress and poor sleep are feeding each other. The team breaks this cycle from multiple sides.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS Doctor',detail:'Rules out thyroid, cortisol, or sleep apnea causing the insomnia.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Counsellor / Psychotherapist',detail:'Your main daily contact — leads your recovery. Uses sleep therapy and nervous system calming techniques.',isActiveLead:true},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Coach',detail:'Teaches daily breathing and relaxation practices to help your body sleep naturally.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Mind & Stress — Sleep Disruption.'},
-  A4_mind_elite:{cluster:'A',paradigm:'A',tier:'elite',eyebrow:'Mind & Stress — Complete Burnout',sub:'You are in deep burnout — your mind, energy, sleep, and motivation have all collapsed together. A full four-expert team rebuilds you from every angle.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS Doctor',detail:'Checks for thyroid issues, vitamin deficiencies, and physical damage from prolonged burnout.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Counsellor / Psychotherapist',detail:'Your main daily contact — leads your recovery. Rebuilds your nervous system step by step with structured therapy.',isActiveLead:true},{role:'Core Accelerator',badge:'badge-accel',name:'Dietician / Nutritionist',detail:'Rebuilds energy through proper nutrition, anti-inflammatory foods, and meal timing.',isActiveLead:false},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Coach',detail:'Daily breathing, gentle movement, and relaxation practices to keep your recovery on track.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Mind & Stress — Complete Burnout.'},
-  A5_mind_hormonal_xcluster:{cluster:'A',paradigm:'A',tier:'premium',eyebrow:'Mind & Stress — Hormonal Connection',sub:'Your stress and hormonal signals are linked — periods, skin, or acne issues are making your mental health worse. The team addresses both together.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'Gynaecologist / MBBS Doctor',detail:'Checks hormone levels (thyroid, PCOS-related) that may be driving your stress and mood problems.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Counsellor / Psychotherapist',detail:'Your main daily contact — leads your recovery. Works on the stress-hormone loop causing mood issues.',isActiveLead:true},{role:'Core Accelerator',badge:'badge-accel',name:'Dietician / Nutritionist',detail:'Controls insulin and hormone levels through diet to reduce both stress and hormonal symptoms.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Mind & Stress — Hormonal Connection.'},
-  A6_mind_alt_essential:{cluster:'A',paradigm:'ALT',tier:'essential',eyebrow:'Mind & Stress — Ayurvedic Track',sub:'According to Ayurveda, your Vata-Pitta imbalance is creating mental load and exhaustion. The team works on constitution, nervous system nourishment, and counselling.',team:[{role:'Therapeutic Anchor',badge:'badge-therapeutic',name:'Ayurvedic Doctor (BAMS/BHMS)',detail:'Assesses your body constitution, identifies imbalances, and prescribes Ayurvedic nervine herbs and protocols from the AYUSH formulary.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Counsellor / Psychotherapist',detail:'Your main daily contact — leads your recovery. Integrates counselling with the Ayurvedic treatment plan.',isActiveLead:true}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Mind & Stress — Ayurvedic.'},
-  A7_mind_alt_premium:{cluster:'A',paradigm:'ALT',tier:'premium',eyebrow:'Mind & Stress — Ayurvedic Deep Recovery',sub:'Your chronic mental exhaustion from a constitutional level needs Ayurvedic protocol, counselling, and breathwork together.',team:[{role:'Therapeutic Anchor',badge:'badge-therapeutic',name:'Ayurvedic Doctor (BAMS/BHMS)',detail:'Prescribes Ayurvedic recovery protocol — ashwagandha, brahmi, sleep-supporting herbs — from the AYUSH formulary.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Counsellor / Psychotherapist',detail:'Your main daily contact — leads your recovery. Combines counselling with the Ayurvedic healing process.',isActiveLead:true},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Coach',detail:'Daily pranayama, yoga nidra, and Ayurvedic lifestyle practices for sustained mental recovery.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Mind & Stress — Ayurvedic Deep Recovery.'},
-  B1_gut_essential:{cluster:'B',paradigm:'A',tier:'essential',eyebrow:'Stomach & Digestion — Basic Care',sub:'Your gut needs a doctor\'s check first, then a dietician to fix what is triggering your symptoms.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS Doctor',detail:'Checks blood reports and rules out infections, liver issues, or inflammatory gut conditions.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician / Nutritionist',detail:'Your main daily contact — leads your recovery. Identifies food triggers and creates a step-by-step gut healing plan.',isActiveLead:true}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Stomach & Digestion — Basic Care.'},
-  B2_gut_premium_chronic:{cluster:'B',paradigm:'A',tier:'premium',eyebrow:'Stomach & Digestion — Chronic Problem',sub:'Your ongoing gut problem needs medical monitoring, proper diet correction, and daily lifestyle support to prevent it from coming back.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS Doctor',detail:'Monitors ongoing gut markers and checks for IBS, acidity, or inflammatory conditions needing treatment.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician / Nutritionist',detail:'Your main daily contact — leads your recovery. Guides phased gut restoration through food and meal timing.',isActiveLead:true},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Coach',detail:'Gentle yoga and breathing practices that improve gut movement, reduce bloating, and lower stress on digestion.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Stomach & Digestion — Chronic Problem.'},
-  B3_gut_premium_weight:{cluster:'B',paradigm:'A',tier:'premium',eyebrow:'Stomach & Digestion — Weight Connection',sub:'Your gut problem and weight gain are related — fixing your metabolism and diet fixes both.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS Doctor',detail:'Checks metabolic panel, insulin resistance, and thyroid to find the weight-gut connection.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician / Nutritionist',detail:'Your main daily contact — leads your recovery. Targets both gut healing and weight management through the right diet.',isActiveLead:true},{role:'Core Accelerator',badge:'badge-accel',name:'Yoga & Fitness Coach',detail:'Low-intensity movement to support gut motility, metabolism, and healthy weight loss.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Stomach & Digestion — Weight Connection.'},
-  B4_gut_premium_stress:{cluster:'B',paradigm:'A',tier:'premium',eyebrow:'Stomach & Digestion — Stress Connection',sub:'Your stress is damaging your gut. The gut-brain connection is the root cause — the team treats both together.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS Doctor',detail:'Confirms gut diagnosis and checks for stress-related inflammation and gut-brain axis disruption.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician / Nutritionist',detail:'Your main daily contact — leads your recovery. Calms gut symptoms through proper diet while addressing stress triggers.',isActiveLead:true},{role:'Core Accelerator',badge:'badge-accel',name:'Counsellor / Psychotherapist',detail:'Targets the mental stress loops that are directly harming your gut and digestion.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Stomach & Digestion — Stress Connection.'},
-  B5_gut_alt_essential:{cluster:'B',paradigm:'ALT',tier:'essential',eyebrow:'Stomach & Digestion — Ayurvedic Track',sub:'According to Ayurveda, your digestive fire (Agni) is weak. The team restores healthy digestion through Ayurvedic treatment and proper food.',team:[{role:'Therapeutic Anchor',badge:'badge-therapeutic',name:'Ayurvedic Doctor (BAMS/BHMS)',detail:'Assesses your digestive Agni, identifies Ama (toxin) build-up, and prescribes Ayurvedic digestive support.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician / Nutritionist',detail:'Your main daily contact — leads your recovery. Creates an Ayurveda-aligned food plan to heal and strengthen digestion.',isActiveLead:true}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Stomach & Digestion — Ayurvedic.'},
-  B6_gut_alt_premium:{cluster:'B',paradigm:'ALT',tier:'premium',eyebrow:'Stomach & Digestion — Ayurvedic Deep Healing',sub:'Your chronic gut and weight problems need sustained Ayurvedic treatment, proper nutrition, and daily lifestyle habits.',team:[{role:'Therapeutic Anchor',badge:'badge-therapeutic',name:'Ayurvedic Doctor (BAMS/BHMS)',detail:'Manages Ayurvedic gut restoration protocol and constitutional Agni rebuilding.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician / Nutritionist',detail:'Your main daily contact — leads your recovery. Provides Ayurvedic food guidance for gut and weight management.',isActiveLead:true},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Coach',detail:'Daily digestive yoga, breathing practices, and Ayurvedic lifestyle habits for lasting gut health.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Stomach & Digestion — Ayurvedic Deep Healing.'},
-  C1_pain_essential:{cluster:'C',paradigm:'A',tier:'essential',eyebrow:'Body Pain — Basic Rehabilitation',sub:'Your body pain needs a doctor to check what is causing it, then a physio to start proper recovery exercises.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS Doctor',detail:'Checks for nerve compression, joint inflammation, or structural damage that needs medical attention.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Physiotherapist',detail:'Your main daily contact — leads your recovery. Designs a step-by-step exercise and rehabilitation plan to reduce pain and improve movement.',isActiveLead:true}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Body Pain — Basic Rehabilitation.'},
-  C2_pain_premium_stress:{cluster:'C',paradigm:'A',tier:'premium',eyebrow:'Body Pain — Stress Making It Worse',sub:'Your mental stress is increasing your body pain. Both need to be treated together for real relief.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS Doctor',detail:'Rules out inflammatory conditions and checks if stress is amplifying the pain signals in your nervous system.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Physiotherapist',detail:'Your main daily contact — leads your recovery. Physical rehabilitation coordinated with mental stress management.',isActiveLead:true},{role:'Core Accelerator',badge:'badge-accel',name:'Counsellor / Psychotherapist',detail:'Addresses the mental side of chronic pain — fear of movement, anxiety, and stress that keeps pain going.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Body Pain — Stress Making It Worse.'},
-  C3_pain_premium_weight:{cluster:'C',paradigm:'A',tier:'premium',eyebrow:'Body Pain — Weight & Lifestyle',sub:'Extra weight is adding load on your joints and spine. Reducing that load while rebuilding movement is the key.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS Doctor',detail:'Assesses joint load, inflammation markers, and structural damage from excess weight.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Physiotherapist',detail:'Your main daily contact — leads your recovery. Low-impact rehabilitation that reduces pain while protecting joints.',isActiveLead:true},{role:'Core Accelerator',badge:'badge-accel',name:'Dietician / Nutritionist',detail:'Anti-inflammatory diet plan to reduce joint load and support tissue repair.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Body Pain — Weight & Lifestyle.'},
-  C4_pain_elite:{cluster:'C',paradigm:'A',tier:'elite',eyebrow:'Body Pain — Full Recovery Programme',sub:'Your long-standing pain with mood, sleep and motivation problems needs a complete four-expert team working on every side of your recovery.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS Doctor',detail:'Medical oversight, monitors inflammation markers, and escalates if pain becomes structural.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Physiotherapist',detail:'Your main daily contact — leads your recovery. Full physical rehabilitation across pain, mobility, and strength phases.',isActiveLead:true},{role:'Core Accelerator',badge:'badge-accel',name:'Counsellor / Psychotherapist',detail:'Addresses chronic pain psychology — the fear, avoidance, and sleep-pain loop that keeps it going.',isActiveLead:false},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Coach',detail:'Daily pain-regulation practices and breathing to calm the nervous system.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Body Pain — Full Recovery Programme.'},
-  D1_hormonal_essential:{cluster:'D',paradigm:'A',tier:'essential',eyebrow:'Hormonal Issues — Basic Care',sub:'Your hormonal problem needs a clinical baseline check first, then the right diet to correct imbalances naturally.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'Gynaecologist / MBBS Doctor',detail:'Checks hormone levels (LH, FSH, thyroid, androgen), confirms diagnosis, and manages prescriptions as needed under Telemedicine Guidelines.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician / Nutritionist',detail:'Your main daily contact — leads your recovery. Fixes insulin resistance and hormonal imbalances through a proper low-GI diet plan.',isActiveLead:true}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Hormonal Issues — Basic Care.'},
-  D2_hormonal_premium_stress:{cluster:'D',paradigm:'A',tier:'premium',eyebrow:'Hormonal Issues — Stress Causing It',sub:'Stress is directly disrupting your hormone cycle. The doctor, counsellor, and dietician work together to break this loop.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'Gynaecologist / Endocrinologist',detail:'Manages full hormonal panel, cycle regulation prescriptions, and ongoing hormone monitoring.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Counsellor / Psychotherapist',detail:'Your main daily contact — leads your recovery. Targets the stress-hormone disruption loop that is causing cycle and mood problems.',isActiveLead:true},{role:'Core Accelerator',badge:'badge-accel',name:'Dietician / Nutritionist',detail:'Manages insulin and cortisol through low-GI diet and nutritional hormone support.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Hormonal Issues — Stress Causing It.'},
-  D3_hormonal_premium_skin:{cluster:'D',paradigm:'A',tier:'premium',eyebrow:'Hormonal Issues — Skin & Hair',sub:'Your hormonal imbalance is showing through your skin and hair. The team treats the root hormonal cause alongside nutrition and emotional support.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS Doctor / Gynaecologist',detail:'Checks androgen levels, DHEA, and hormonal markers causing skin and hair changes.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician / Nutritionist',detail:'Your main daily contact — leads your recovery. Anti-androgen nutrition plan with key micronutrients for skin and hair recovery.',isActiveLead:true},{role:'Core Accelerator',badge:'badge-accel',name:'Counsellor / Psychotherapist',detail:'Addresses the emotional stress of visible hormonal symptoms, body image, and cortisol amplification.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Hormonal Issues — Skin & Hair.'},
-  D4_hormonal_elite:{cluster:'D',paradigm:'A',tier:'elite',eyebrow:'Hormonal Issues — Full PCOD Recovery',sub:'Your PCOD/PCOS is affecting your cycle, skin, mood, and weight all at once. A four-expert team tackles all dimensions together.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'Gynaecologist / MD Specialist',detail:'Manages full hormone panel, metformin dosing, cycle regulation prescriptions — all under India\'s Telemedicine Guidelines.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician / Nutritionist',detail:'Your main daily contact — leads your recovery. Manages insulin resistance, low-GI diet, and hormonal nutritional strategy.',isActiveLead:true},{role:'Core Accelerator',badge:'badge-accel',name:'Counsellor / Psychotherapist',detail:'Addresses cortisol-driven PCOD flares and the stress loop sustaining hormonal disruption.',isActiveLead:false},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Coach',detail:'Pelvic-opening yoga, cycle-supportive practices, and breathwork for cortisol regulation.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Hormonal Issues — Full PCOD Recovery.'},
-  D5_hormonal_alt_essential:{cluster:'D',paradigm:'ALT',tier:'essential',eyebrow:'Hormonal Issues — Ayurvedic Track',sub:'Your hormonal imbalance has a constitutional basis. The Ayurvedic approach corrects it from the root through herbs and proper diet.',team:[{role:'Therapeutic Anchor',badge:'badge-therapeutic',name:'Ayurvedic Doctor (BAMS/BHMS)',detail:'Assesses your hormonal constitution, identifies dosha imbalances, and prescribes hormonal balancing Ayurvedic protocol.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician / Nutritionist',detail:'Your main daily contact — leads your recovery. Ayurveda-aligned nutritional plan to support hormonal restoration.',isActiveLead:true}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Hormonal Issues — Ayurvedic.'},
-  D6_hormonal_alt_premium:{cluster:'D',paradigm:'ALT',tier:'premium',eyebrow:'Hormonal Issues — Ayurvedic Deep Rebalancing',sub:'Your chronic hormonal pattern needs sustained Ayurvedic treatment, proper nutrition, and daily practice to correct the cycle.',team:[{role:'Therapeutic Anchor',badge:'badge-therapeutic',name:'Ayurvedic Doctor (BAMS/BHMS)',detail:'Manages Ayurvedic hormonal restoration — rasayana protocol, shodhana guidance, and constitutional cycle support.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician / Nutritionist',detail:'Your main daily contact — leads your recovery. Ayurvedic food guidance for hormonal, skin, and hair recovery.',isActiveLead:true},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Coach',detail:'Cycle-supportive yoga, pranayama, and daily Ayurvedic routine for hormonal rhythm.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Hormonal Issues — Ayurvedic Deep Rebalancing.'},
-  E1_energy_essential:{cluster:'E',paradigm:'A',tier:'essential',eyebrow:'Fatigue & Low Energy — Basic Care',sub:'Your fatigue needs a doctor to check for physical causes first, then a dietician to restore your energy through proper nutrition.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS Doctor',detail:'Rules out anaemia, thyroid problems, Vitamin B12, D3 deficiency, and other physical causes of tiredness.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician / Nutritionist',detail:'Your main daily contact — leads your recovery. Designs an energy-boosting nutrition plan targeting the specific deficiencies found.',isActiveLead:true}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Fatigue & Low Energy — Basic Care.'},
-  E2_energy_premium_stress:{cluster:'E',paradigm:'A',tier:'premium',eyebrow:'Fatigue & Low Energy — Stress Draining You',sub:'Stress is the main reason your energy is gone. Diet alone won\'t fix it — the mental drain needs direct treatment.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS Doctor',detail:'Reviews cortisol and fatigue markers to confirm stress as the primary energy drain mechanism.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician / Nutritionist',detail:'Your main daily contact — leads your recovery. Adrenal-support nutrition and energy-stabilising meal plan.',isActiveLead:true},{role:'Core Accelerator',badge:'badge-accel',name:'Counsellor / Psychotherapist',detail:'Directly addresses the mental stress load that is draining your energy and disrupting sleep.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Fatigue & Low Energy — Stress Draining You.'},
-  E3_energy_premium_gut:{cluster:'E',paradigm:'A',tier:'premium',eyebrow:'Fatigue & Low Energy — Gut Not Absorbing',sub:'Your body is not converting food into energy properly because of gut absorption problems. Nutrition and gut health are fixed together.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS Doctor',detail:'Rules out malabsorption, micronutrient depletion, and gut conditions causing energy deficit.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician / Nutritionist',detail:'Your main daily contact — leads your recovery. Corrects the energy-absorption gap through gut-first nutritional rebuilding.',isActiveLead:true},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Coach',detail:'Gentle movement and breathing to improve digestion, nutrient absorption, and daily energy.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Fatigue & Low Energy — Gut Not Absorbing.'},
-  E4_energy_premium_hormonal:{cluster:'E',paradigm:'A',tier:'premium',eyebrow:'Fatigue & Low Energy — Hormonal Cause',sub:'Your tiredness has a hormonal signature — periods, acne or skin changes are connected to your low energy. The team treats the hormonal root cause.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS Doctor / Gynaecologist',detail:'Checks hormonal panel to confirm the endocrine cause of chronic fatigue.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician / Nutritionist',detail:'Your main daily contact — leads your recovery. Hormonal-supportive nutrition to restore energy levels.',isActiveLead:true},{role:'Core Accelerator',badge:'badge-accel',name:'Yoga & Breathwork Coach',detail:'Cycle-sensitive movement and breathwork to support hormonal energy restoration.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Fatigue & Low Energy — Hormonal Cause.'},
-  E5_energy_alt_essential:{cluster:'E',paradigm:'ALT',tier:'essential',eyebrow:'Fatigue & Low Energy — Ayurvedic Track',sub:'In Ayurveda, your vital energy (Ojas) is depleted and Vata is aggravated. The team rebuilds your energy from a constitutional level.',team:[{role:'Therapeutic Anchor',badge:'badge-therapeutic',name:'Ayurvedic Doctor (BAMS/BHMS)',detail:'Assesses Ojas depletion and Vata imbalance, prescribes Ayurvedic adaptogenic and rasayana protocol.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician / Nutritionist',detail:'Your main daily contact — leads your recovery. Ayurvedic energy-building nutrition and proper meal timing.',isActiveLead:true}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Fatigue & Low Energy — Ayurvedic.'},
-  E6_energy_alt_premium:{cluster:'E',paradigm:'ALT',tier:'premium',eyebrow:'Fatigue & Low Energy — Ayurvedic Deep Restoration',sub:'Your chronic energy depletion with gut and motivation problems needs full Ayurvedic system restoration, proper nutrition, and daily practice.',team:[{role:'Therapeutic Anchor',badge:'badge-therapeutic',name:'Ayurvedic Doctor (BAMS/BHMS)',detail:'Manages Ojas-rasayana protocol, digestive fire rebuilding, and constitutional vitality restoration.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician / Nutritionist',detail:'Your main daily contact — leads your recovery. Energy-restorative Ayurvedic nutrition and meal rhythm.',isActiveLead:true},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Coach',detail:'Daily pranayama, restorative yoga, and Ayurvedic daily routine for sustained energy.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Fatigue & Low Energy — Ayurvedic Deep Restoration.'},
-  F1_chronic_essential:{cluster:'F',paradigm:'A',tier:'essential',eyebrow:'Long-term Disease — Foundation Management',sub:'Your condition is in early management. The doctor and dietician establish the right medical monitoring and dietary structure.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS Doctor',detail:'Sets up monitoring protocol, reviews baseline reports, and manages prescriptions for the condition.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician / Nutritionist',detail:'Your main daily contact — leads your recovery. Condition-specific diet — for diabetes, blood pressure, thyroid, or metabolic conditions.',isActiveLead:true}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Long-term Disease — Foundation Management.'},
-  F2_chronic_premium:{cluster:'F',paradigm:'A',tier:'premium',eyebrow:'Long-term Disease — Active Management',sub:'Your condition needs active management with medical oversight, proper diet, and daily lifestyle support.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS Doctor',detail:'Manages ongoing prescriptions, monitors condition markers, and coordinates when escalation is needed.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician / Nutritionist',detail:'Your main daily contact — leads your recovery. Condition-optimised diet plan with progressive monitoring checkpoints.',isActiveLead:true},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Coach',detail:'Daily movement, breathing, and stress management appropriate for the condition.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Long-term Disease — Active Management.'},
-  F3_chronic_elite_complex:{cluster:'F',paradigm:'A',tier:'elite',eyebrow:'Long-term Disease — Complex Management',sub:'Your long-standing condition with multiple signals needs specialist leadership and a full supporting team.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MD Specialist',detail:'Central medical authority — adjusts prescriptions, monitors systemic markers, and manages complication risk.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'MBBS Doctor',detail:'Your main daily contact — manages clinical continuity and coordinates day-to-day care under the Specialist\'s direction.',isActiveLead:true},{role:'Core Accelerator',badge:'badge-accel',name:'Dietician / Nutritionist',detail:'Condition-specific diet — diabetes-friendly, heart-healthy, or anti-inflammatory as needed.',isActiveLead:false},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Coach',detail:'Safe daily movement and breathing practices suitable to the condition severity.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Long-term Disease — Complex Management.'},
-  F4_chronic_elite_psych:{cluster:'F',paradigm:'A',tier:'elite',eyebrow:'Long-term Disease — Mental Burden Too',sub:'Your chronic condition is also affecting your mood, motivation, and sleep. The team treats your body and mind together.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS Doctor / MD Specialist',detail:'Manages clinical oversight, medication, and condition monitoring.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Counsellor / Psychotherapist',detail:'Your main daily contact — leads your recovery. Addresses the emotional weight of chronic illness alongside the medical team.',isActiveLead:true},{role:'Core Accelerator',badge:'badge-accel',name:'Dietician / Nutritionist',detail:'Diet management for the condition with focus on mood-nutrition connection.',isActiveLead:false},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Coach',detail:'Daily coping practices and gentle movement for physical and mental load.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Long-term Disease — Mental Burden Too.'},
-  F5_chronic_alt_premium:{cluster:'F',paradigm:'ALT',tier:'premium',eyebrow:'Long-term Disease — Ayurvedic Management',sub:'Your chronic systemic condition is managed through Ayurvedic constitutional treatment, proper nutrition, and daily practice.',team:[{role:'Therapeutic Anchor',badge:'badge-therapeutic',name:'Ayurvedic Doctor (BAMS/BHMS)',detail:'Manages Ayurvedic chronic condition protocol — constitutional treatment and systemic rebalancing.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician / Nutritionist',detail:'Your main daily contact — leads your recovery. Ayurvedic-integrated dietary management for the chronic condition.',isActiveLead:true},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Coach',detail:'Daily Ayurvedic lifestyle practices, yoga, and breathwork for systemic recovery.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Long-term Disease — Ayurvedic Management.'},
-  G1_immunity_essential_allopathic:{cluster:'G',paradigm:'A',tier:'essential',eyebrow:'Immunity & Prevention — Basic Check',sub:'You want to build your immunity proactively. The doctor checks for deficiencies and the dietician builds your nutrition.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS Doctor',detail:'Reviews CBC, Vitamin D, B12, and immunity baseline — confirms no active deficiency or infection.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician / Nutritionist',detail:'Your main daily contact — leads your recovery. Immunity-boosting nutrition plan targeting identified deficiencies.',isActiveLead:true}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Immunity & Prevention — Basic Check.'},
-  G2_immunity_essential_ayurvedic:{cluster:'G',paradigm:'ALT',tier:'essential',eyebrow:'Immunity & Prevention — Ayurvedic Track',sub:'In Ayurveda, your Ojas (vital immunity) is depleted. Rasayana protocol and proper food rebuild your natural defences.',team:[{role:'Therapeutic Anchor',badge:'badge-therapeutic',name:'Ayurvedic Doctor (BAMS/BHMS)',detail:'Prescribes Rasayana immunity protocol — ashwagandha, guduchi, amalaki — from the AYUSH formulary.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician / Nutritionist',detail:'Your main daily contact — leads your recovery. Ayurvedic immunity-building nutrition and digestive fire strengthening.',isActiveLead:true}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Immunity & Prevention — Ayurvedic.'},
-  G3_immunity_premium_allopathic:{cluster:'G',paradigm:'A',tier:'premium',eyebrow:'Immunity & Prevention — Active Building',sub:'Your immunity is depleted with sleep and energy signals. A three-expert team rebuilds your clinical, nutritional, and lifestyle immunity together.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS Doctor',detail:'Reviews extended immunity panel and identifies the primary depletion causing your symptoms.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician / Nutritionist',detail:'Your main daily contact — leads your recovery. Phased immunity-restoration nutrition programme.',isActiveLead:true},{role:'Compliance Anchor',badge:'badge-compliance',name:'Wellness Coach',detail:'Tracks sleep, stress, and daily lifestyle compliance — the key factors for sustained immunity.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Immunity & Prevention — Active Building.'},
-  G4_immunity_premium_ayurvedic:{cluster:'G',paradigm:'ALT',tier:'premium',eyebrow:'Immunity & Prevention — Ayurvedic Deep Build',sub:'Your Ojas depletion with sleep and motivation problems needs sustained Ayurvedic rebuilding and daily compliance.',team:[{role:'Therapeutic Anchor',badge:'badge-therapeutic',name:'Ayurvedic Doctor (BAMS/BHMS)',detail:'Manages comprehensive Rasayana protocol and Ojas-rebuilding Ayurvedic intervention.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician / Nutritionist',detail:'Your main daily contact — leads your recovery. Immunity-building Ayurvedic nutrition and seasonal food plan.',isActiveLead:true},{role:'Compliance Anchor',badge:'badge-compliance',name:'Wellness Coach',detail:'Tracks daily Ayurvedic routine adherence, sleep rhythm, and lifestyle compliance.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Immunity & Prevention — Ayurvedic Deep Build.'},
-  G5_immunity_pollution_allopathic:{cluster:'G',paradigm:'A',tier:'premium',eyebrow:'Immunity & Prevention — Pollution Exposure',sub:'Pollution is harming your lungs and immunity. The team focuses on antioxidants, anti-inflammatory food, and breathing exercises.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS Doctor',detail:'Checks respiratory markers and inflammation caused by pollution exposure.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician / Nutritionist',detail:'Your main daily contact — leads your recovery. Antioxidant-rich, anti-inflammatory diet for pollution protection.',isActiveLead:true},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Coach',detail:'Pranayama and breathing exercises to strengthen lungs and counter pollution damage.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Immunity — Pollution Exposure.'},
-  G6_immunity_pollution_ayurvedic:{cluster:'G',paradigm:'ALT',tier:'premium',eyebrow:'Immunity & Prevention — Pollution (Ayurvedic)',sub:'Ayurvedic Rasayana protocol builds your constitutional resilience against pollution — tulsi, turmeric, and pranayama.',team:[{role:'Therapeutic Anchor',badge:'badge-therapeutic',name:'Ayurvedic Doctor (BAMS/BHMS)',detail:'Prescribes Ayurvedic anti-pollution protocol — tulsi, turmeric Rasayana, and lung-strengthening herbs from AYUSH formulary.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician / Nutritionist',detail:'Your main daily contact — leads your recovery. Antioxidant-rich Ayurvedic diet for pollution resilience.',isActiveLead:true},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Coach',detail:'Pranayama and respiratory yoga to build Ayurvedic lung strength.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Immunity — Pollution Ayurvedic.'},
-  H1_fertility_essential:{cluster:'H',paradigm:'A',tier:'essential',eyebrow:'Fertility — Clinical Foundation',sub:'You want to conceive. The team first establishes your hormonal baseline and then builds the right nutritional support for conception readiness.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'Gynaecologist',detail:'Checks LH, FSH, AMH, and cycle mapping — sets up the full pre-conception clinical picture and prescriptions.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician / Nutritionist',detail:'Your main daily contact — leads your recovery. Folate-rich, fertility-supporting nutrition plan for conception readiness.',isActiveLead:true}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Fertility — Clinical Foundation.'},
-  H2_fertility_premium:{cluster:'H',paradigm:'A',tier:'premium',eyebrow:'Fertility — Metabolic Optimisation',sub:'Your weight and cycle are affecting fertility together. The team addresses all three — hormones, nutrition, and movement.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'Gynaecologist',detail:'Manages hormonal panel, insulin sensitivity, and cycle regulation for fertility.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician / Nutritionist',detail:'Your main daily contact — leads your recovery. Fertility-optimised nutrition for weight, insulin resistance, and cycle regularity.',isActiveLead:true},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Coach',detail:'Pelvic yoga, stress-reducing breathwork, and fertility-supportive movement.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Fertility — Metabolic Optimisation.'},
-  H3_fertility_elite_stress:{cluster:'H',paradigm:'A',tier:'elite',eyebrow:'Fertility — Stress Disrupting Cycle',sub:'Stress is directly disrupting your reproductive cycle. A four-expert team addresses the clinical, mental, nutritional, and movement dimensions together.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'Gynaecologist / MD',detail:'Manages full reproductive panel, cortisol-cycle relationship, and fertility preparation prescriptions.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Counsellor / Psychotherapist',detail:'Your main daily contact — leads your recovery. Addresses the stress-reproductive cycle disruption through structured therapy.',isActiveLead:true},{role:'Core Accelerator',badge:'badge-accel',name:'Dietician / Nutritionist',detail:'Fertility-supportive nutrition targeting insulin sensitivity, folate, and hormonal balance.',isActiveLead:false},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Coach',detail:'Pelvic yoga and cortisol-reducing breathwork for cycle support.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Fertility — Stress Disrupting Cycle.'},
-  H4_fertility_elite_full:{cluster:'H',paradigm:'A',tier:'elite',eyebrow:'Fertility — Comprehensive Pre-conception',sub:'You have multiple fertility signals — cycle, acne, mood, and weight. The full four-expert team prepares you for conception comprehensively.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'Gynaecologist / MD Specialist',detail:'Full hormonal management — LH/FSH, AMH, androgen panel, fertility prescriptions under Telemedicine Guidelines.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician / Nutritionist',detail:'Your main daily contact — leads your recovery. Comprehensive fertility nutrition — insulin resistance, anti-androgen diet, pre-conception supplements.',isActiveLead:true},{role:'Core Accelerator',badge:'badge-accel',name:'Counsellor / Psychotherapist',detail:'Addresses fertility anxiety, cortisol reduction, and the emotional side of trying to conceive.',isActiveLead:false},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Coach',detail:'Pelvic yoga, breathwork, and daily cycle-supportive practices.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Fertility — Comprehensive Pre-conception.'},
-  H5_fertility_alt_essential:{cluster:'H',paradigm:'ALT',tier:'essential',eyebrow:'Fertility — Ayurvedic Conception Prep',sub:'Your natural conception preparation is managed through Prasuti Tantra — the Ayurvedic science of reproductive health. The team strengthens your Shukra (reproductive vitality) and Artava (cycle health).',team:[{role:'Therapeutic Anchor',badge:'badge-therapeutic',name:'Ayurvedic Fertility Specialist (BAMS MD — Prasuti Tantra)',detail:'Specialist in Ayurvedic reproductive medicine. Evaluates cycle health, reproductive vitality, and prescribes fertility Rasayana within CCIM-defined scope.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician / Nutritionist',detail:'Your main daily contact — leads your recovery. Ayurvedic fertility nutrition — Shukra-nourishing foods, pre-conception micronutrients.',isActiveLead:true}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Fertility — Ayurvedic Conception Prep.'},
-  H6_fertility_alt_premium:{cluster:'H',paradigm:'ALT',tier:'premium',eyebrow:'Fertility — Ayurvedic Metabolic + Cycle',sub:'Your Ayurvedic fertility profile with weight and cycle problems needs Prasuti Tantra expertise, nutritional support, and daily Ayurvedic practice.',team:[{role:'Therapeutic Anchor',badge:'badge-therapeutic',name:'Ayurvedic Fertility Specialist (BAMS MD — Prasuti Tantra)',detail:'Manages Ayurvedic fertility protocol for cycle regulation, weight, and constitutional Rasayana.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician / Nutritionist',detail:'Your main daily contact — leads your recovery. Ayurvedic fertility nutrition for weight and cycle management.',isActiveLead:true},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Coach',detail:'Pelvic yoga, pranayama for reproductive support, and Ayurvedic daily routine for cycle regularity.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Fertility — Ayurvedic Metabolic + Cycle.'},
-  H7_fertility_alt_elite_stress:{cluster:'H',paradigm:'ALT',tier:'elite',eyebrow:'Fertility — Ayurvedic Stress & Cycle Recovery',sub:'Stress is disrupting your Ayurvedic fertility profile. A full four-expert team — Prasuti Tantra specialist, counsellor, dietician, and yoga coach — works together.',team:[{role:'Therapeutic Anchor',badge:'badge-therapeutic',name:'Ayurvedic Fertility Specialist (BAMS MD — Prasuti Tantra)',detail:'Manages stress-cycle disruption through Ayurvedic nervine and Medhya Rasayana protocol alongside reproductive treatment.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Counsellor / Psychotherapist',detail:'Your main daily contact — leads your recovery. Addresses mental stress impact on your reproductive cycle.',isActiveLead:true},{role:'Core Accelerator',badge:'badge-accel',name:'Dietician / Nutritionist',detail:'Ayurvedic fertility nutrition — Shukra-nourishing, stress-countering food plan.',isActiveLead:false},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Coach',detail:'Pelvic yoga, Nadi Shodhana pranayama, and Ayurvedic lifestyle for cycle support.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Fertility — Ayurvedic Stress & Cycle.'},
-  H8_fertility_alt_elite_full:{cluster:'H',paradigm:'ALT',tier:'elite',eyebrow:'Fertility — Full Ayurvedic Pre-conception',sub:'Your multi-signal Ayurvedic fertility profile needs the complete four-expert team — Prasuti Tantra specialist leading with full psychological, nutritional, and practice support.',team:[{role:'Therapeutic Anchor',badge:'badge-therapeutic',name:'Ayurvedic Fertility Specialist (BAMS MD — Prasuti Tantra)',detail:'Full Ayurvedic pre-conception programme — cycle cleansing, Shukra Rasayana, and conception preparation protocols within CCIM scope.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician / Nutritionist',detail:'Your main daily contact — leads your recovery. Comprehensive Ayurvedic fertility nutrition across Shukra, Ojas, and hormonal balance.',isActiveLead:true},{role:'Core Accelerator',badge:'badge-accel',name:'Counsellor / Psychotherapist',detail:'Addresses pre-conception anxiety, stress, and the emotional journey of trying to conceive.',isActiveLead:false},{role:'Compliance Anchor',badge:'badge-compliance',name:'Yoga & Breathwork Coach',detail:'Full Ayurvedic fertility practice — pelvic yoga, pranayama, daily routine, and seasonal cycle alignment.',isActiveLead:false}],waCopy:'Hello JeevanKey, I completed the Navigator. Result: Fertility — Full Ayurvedic Pre-conception.'},
-  I1_fallback_triage:{cluster:'I',paradigm:'A',tier:'essential',eyebrow:'Personal Review Needed',sub:'Your profile covers many health areas. We will personally review your case with you before putting together your care team.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS Doctor',detail:'Will do a thorough check to make sure no serious condition is missed before your long-term care team is confirmed.',isActiveLead:false}],isTriage:true,waCopy:'Hello JeevanKey, I completed the Navigator. I need a personal review.'},
-  I2_fallback_managing:{cluster:'I',paradigm:'A',tier:'premium',eyebrow:'Long-term Disease — Coordinator Review',sub:'You are managing an ongoing condition. Your Coordinator will confirm your specialist team after reviewing your case.',team:[{role:'Diagnostic Anchor',badge:'badge-anchor',name:'MBBS Doctor / MD Specialist',detail:'Reviews your existing treatment history and sets up the medical framework for your care team.',isActiveLead:false},{role:'Active Treatment Lead',badge:'badge-driver',name:'Dietician / Nutritionist',detail:'Your main daily contact — leads your recovery. Condition-specific diet management while your team is finalised.',isActiveLead:true}],isTriage:true,waCopy:'Hello JeevanKey, I completed the Navigator. Result: Long-term Disease — Coordinator Review.'}
-};
-
-/* ══════════════════════════════════════
-   ROUTING ENGINE — 7 Stage v5
-══════════════════════════════════════ */
-function computeProfile(q0,q1,q2,q3,q4,q5) {
-  const has=(v)=>Array.isArray(q3)&&q3.includes(v);
-  const conceiveFlag=has('conceive');
-  const envFlag=has('env_exposure');
-  const hormOvlp=['periods','acne','skin_hair'].some(s=>has(s));
-
-  let paradigm=q0;
-  if(q0==='guided') return _buildResult('I1_fallback_triage','A',false,true,true);
-
-  let seniority_escalation=false;
-  if(q0==='open'){
-    if(q5==='confused') return _buildResult('I1_fallback_triage','A',false,true,true);
-    if(q5==='dissatisfied') seniority_escalation=true;
-  }
-
-  let cluster;
-  if(q4==='managing'&&q1!=='hormonal'){cluster='F';}
-  else if(q1==='hormonal'&&conceiveFlag){cluster='H';}
-  else if(q1==='chronic'||q4==='managing'){cluster='F';}
-  else if(q1==='mind'){cluster='A';}
-  else if((q1==='gut'||q1==='energy')&&envFlag){cluster='G';}
-  else if(q1==='gut'){cluster='B';}
-  else if(q1==='pain'){cluster='C';}
-  else if(q1==='hormonal'){cluster='D';}
-  else if(q1==='energy'){cluster='E';}
-  else{return _fallbackResult(q4,seniority_escalation);}
-
-  if(cluster==='H'&&paradigm==='open'){paradigm='allopathic';}
-
-  const dur={acute:0,months:1,long:2,recurring:3}[q2]||0;
-  const q3c=Array.isArray(q3)?q3.filter(v=>!['none','conceive','env_exposure'].includes(v)):[];
-  let sig=Math.min(q3c.length,3);
-  if(cluster!=='D'&&cluster!=='H'&&hormOvlp) sig+=1;
-  const complexity=dur+sig;
-  let tier=complexity<=1?'essential':complexity<=4?'premium':'elite';
-
-  if(q4==='managing'&&cluster!=='F') cluster='F';
-
-  if(paradigm==='open'){
-    const clinAnchor=['periods','acne','skin_hair'].some(s=>has(s))||conceiveFlag||q4==='managing'||complexity>=4;
-    const lifeSigs=['meal_fatigue','sleep','motivation','weight'].filter(s=>has(s)).length;
-    const lifeDom=lifeSigs>=2&&complexity<=3&&!clinAnchor;
-    paradigm=clinAnchor?'allopathic':(lifeDom?'alternative':'allopathic');
-  }
-
-  const pdm=(paradigm==='alternative')?'ALT':'A';
-  const profileKey=_selectMapping(cluster,pdm,tier,q4,q1,q3);
-  if(!profileKey||!PROFILES[profileKey]) return _fallbackResult(q4,seniority_escalation);
-
-  let profile=PROFILES[profileKey];
-  const resolvedTier=profile.tier;
-  if(seniority_escalation) profile=_applySeniority(profile,cluster,pdm);
-
-  return{profileKey,profile,tier:resolvedTier,paradigm:pdm,seniority_escalation,isTriage:!!profile.isTriage,isGuided:false};
-}
-
-function _buildResult(key,pdm,sen,isTriage,isGuided){
-  return{profileKey:key,profile:PROFILES[key],tier:PROFILES[key].tier,paradigm:pdm,seniority_escalation:sen,isTriage,isGuided};
-}
-
-function _selectMapping(cluster,pdm,tier,q4,q1,q3){
-  const has=(v)=>Array.isArray(q3)&&q3.includes(v);
-  switch(cluster){
-    case 'A':
-      if(pdm==='ALT') return tier==='essential'?'A6_mind_alt_essential':'A7_mind_alt_premium';
-      if(['periods','acne','skin_hair'].some(s=>has(s))) return 'A5_mind_hormonal_xcluster';
-      if(tier==='essential') return 'A1_mind_essential';
-      if(tier==='elite') return 'A4_mind_elite';
-      return (q4==='sleep_issue'||has('sleep'))?'A3_mind_premium_sleep':'A2_mind_premium_diet';
-    case 'B':
-      if(pdm==='ALT') return tier==='essential'?'B5_gut_alt_essential':'B6_gut_alt_premium';
-      if(tier==='essential') return 'B1_gut_essential';
-      if(has('weight')) return 'B3_gut_premium_weight';
-      if(q4==='stressed'||has('mood')||has('motivation')) return 'B4_gut_premium_stress';
-      return 'B2_gut_premium_chronic';
-    case 'C':
-      if(tier==='essential') return 'C1_pain_essential';
-      if(tier==='elite') return 'C4_pain_elite';
-      if(has('weight')||q4==='sedentary') return 'C3_pain_premium_weight';
-      return 'C2_pain_premium_stress';
-    case 'D':
-      if(pdm==='ALT') return tier==='essential'?'D5_hormonal_alt_essential':'D6_hormonal_alt_premium';
-      if(tier==='essential') return 'D1_hormonal_essential';
-      if(tier==='elite') return 'D4_hormonal_elite';
-      if(has('mood')||has('motivation')||has('sleep')) return 'D2_hormonal_premium_stress';
-      if(has('skin_hair')||has('acne')) return 'D3_hormonal_premium_skin';
-      return 'D2_hormonal_premium_stress';
-    case 'E':
-      if(pdm==='ALT') return tier==='essential'?'E5_energy_alt_essential':'E6_energy_alt_premium';
-      if(tier==='essential') return 'E1_energy_essential';
-      if(['periods','acne','skin_hair'].some(s=>has(s))) return 'E4_energy_premium_hormonal';
-      if(q4==='stressed'||has('mood')||has('sleep')) return 'E2_energy_premium_stress';
-      if(has('meal_fatigue')||has('weight')) return 'E3_energy_premium_gut';
-      return 'E2_energy_premium_stress';
-    case 'F':
-      if(pdm==='ALT') return 'F5_chronic_alt_premium';
-      if(tier==='essential') return 'F1_chronic_essential';
-      if(tier==='elite') return (has('mood')||has('motivation')||has('sleep'))?'F4_chronic_elite_psych':'F3_chronic_elite_complex';
-      return 'F2_chronic_premium';
-    case 'G':
-      if(pdm==='ALT'){
-        if(has('env_exposure')) return 'G6_immunity_pollution_ayurvedic';
-        return (has('sleep')||has('motivation'))?'G4_immunity_premium_ayurvedic':'G2_immunity_essential_ayurvedic';
-      }
-      if(has('env_exposure')) return 'G5_immunity_pollution_allopathic';
-      return (has('sleep')||has('motivation'))?'G3_immunity_premium_allopathic':'G1_immunity_essential_allopathic';
-    case 'H':
-      if(pdm==='ALT'){
-        if(tier==='essential') return 'H5_fertility_alt_essential';
-        if(tier==='premium') return 'H6_fertility_alt_premium';
-        return (has('mood')||has('motivation'))?'H7_fertility_alt_elite_stress':'H8_fertility_alt_elite_full';
-      }
-      if(tier==='essential') return 'H1_fertility_essential';
-      if(tier==='premium') return 'H2_fertility_premium';
-      return (has('mood')||has('motivation'))?'H3_fertility_elite_stress':'H4_fertility_elite_full';
-    default: return null;
-  }
-}
-
-function _applySeniority(profile,cluster,pdm){
-  const p=JSON.parse(JSON.stringify(profile));
-  const a=p.team[0];
-  if(pdm==='ALT'){
-    if(cluster==='H'){a.detail='Senior specialist (8+ years reproductive medicine). '+a.detail;}
-    else{a.name='Senior Ayurvedic Doctor (8+ years experience)';a.detail='Senior practitioner. '+a.detail;}
-  } else {
-    if(cluster==='D'||cluster==='H'){a.name='Gynaecologist / MD Specialist — Senior';a.detail='Senior specialist (8+ years). '+a.detail;}
-    else if(cluster==='F'){a.name='Senior MD Specialist';a.detail='Senior specialist (8+ years systemic medicine). '+a.detail;}
-    else{a.name=a.name.replace('MBBS Doctor','Senior MBBS Doctor');a.detail='Senior practitioner (5+ years specialist experience). '+a.detail;}
-  }
-  p.team.forEach(m=>{if(m.isActiveLead) m.detail+=' [Senior / Registered practitioner preferred.]';});
-  p.seniorityEscalated=true;
-  return p;
-}
-
-function _fallbackResult(q4,sen){
-  const key=(q4==='managing')?'I2_fallback_managing':'I1_fallback_triage';
-  return{profileKey:key,profile:PROFILES[key],tier:PROFILES[key].tier,paradigm:'A',seniority_escalation:sen,isTriage:true,isGuided:false};
-}
-
-/* ══════════════════════════════════════
-   RESULT RENDERING
-══════════════════════════════════════ */
-function computeResult(){
-  const result=computeProfile(state.q0,state.q1,state.q2,state.q3,state.q4,state.q5);
-  state.result=result;
-
-  if(result.isGuided){showScreen('triage');return;}
-
-  const{profile,tier,paradigm,seniority_escalation,isTriage}=result;
-
-  const eyebrowEl=document.getElementById('result-eyebrow');
-  eyebrowEl.textContent=profile.eyebrow;
-  eyebrowEl.className='result-eyebrow'+(paradigm==='ALT'?' alt-track':'');
-  document.getElementById('result-sub').textContent=profile.sub;
-
-  document.getElementById('alt-track-banner').classList.toggle('visible',paradigm==='ALT');
-  document.getElementById('seniority-notice').classList.toggle('visible',seniority_escalation);
-  document.getElementById('triage-notice').classList.toggle('visible',isTriage&&!result.isGuided);
-
-  const grid=document.getElementById('team-grid');
-  grid.innerHTML='';
-  profile.team.forEach((m,idx)=>{
-    const card=document.createElement('div');
-    card.className='team-card';
-    card.innerHTML=`
-      <div class="team-card-header" onclick="this.parentElement.classList.toggle('open')">
-        <span class="team-role-badge ${m.badge}">${t(m.role.toLowerCase().replace(/ /g, '_'))}</span>
-        <div class="team-expert-info">
-          <div class="team-expert-name">${m.name}</div>
-        </div>
-        <span class="team-card-chevron">▼</span>
-      </div>
-      <div class="team-card-body">
-        <div class="team-card-body-inner">${m.detail}</div>
-      </div>`;
-    grid.appendChild(card);
-    if(idx===0) card.classList.add('open');
-  });
-
-  const planGrid=document.getElementById('plan-grid');
-  planGrid.innerHTML='';
-  PLANS.forEach(p=>{
-    const card=document.createElement('div');
-    const isMatched=p.id===tier;
-    const dimTrial=p.id==='trial'&&(tier==='premium'||tier==='elite');
-    card.className='plan-card'+(isMatched?' selected':'')+(dimTrial?' dimmed':'');
-    card.dataset.planId=p.id;
-    const trialNote=p.id==='trial'&&tier!=='essential'?`<div class="plan-trial-note">${t('plan_trial_note')}</div>`:'';
-    card.innerHTML=`
-      ${isMatched?`<div class="plan-tag match">${t('plan_match')}</div>`:''}
-      ${p.featured&&!isMatched?`<div class="plan-tag pop">${t('plan_pop')}</div>`:''}
-      <div class="plan-name">${p.name}</div>
-      <div class="plan-price">${p.price}<span style="font-size:10px;color:var(--ink-4)"> ${p.period}</span></div>
-      <div class="plan-experts">${p.experts}</div>
-      ${trialNote}`;
-    card.onclick=()=>selectPlan(p.id,profile.waCopy);
-    planGrid.appendChild(card);
-  });
-
-  selectPlan(tier,profile.waCopy);
-  showScreen('result');
-  setTimeout(_broadcastHeight, 600);
-}
-
-function selectPlan(pId,waCopy){
-  state.selectedPlan=pId;
-  document.querySelectorAll('.plan-card').forEach(c=>{c.classList.toggle('selected',c.dataset.planId===pId);});
-  const plan=PLANS.find(p=>p.id===pId);
-  const consent=t('wa_consent');
-  const full=waCopy+(plan?` Plan Interest: ${plan.name} Tier.`:'')+consent;
-  state.activeWaUrl='https://wa.me/919259684363?text='+encodeURIComponent(full);
-  document.getElementById('whatsapp-text').textContent=plan?`${plan.name} Plan pe Shuru Karein →`:'WhatsApp pe Connect karein →';
-}
-
-function openWhatsAppRedirect(){
-  if(state.activeWaUrl&&state.activeWaUrl!=='#') window.open(state.activeWaUrl,'_blank');
-}
-
-function openTriageWhatsApp(){
-  const text='Hello JeevanKey, Maine Clinical Navigator complete kiya. Mujhe personal review chahiye — mere symptoms kai areas cover karte hain. Please sahi care path dhundhne mein madad karein.';
-  window.open('https://wa.me/919259684363?text='+encodeURIComponent(text),'_blank');
-}
-
-function restart(){
-  state.q0=null;state.q1=null;state.q2=null;state.q3=[];
-  state.q4=null;state.q5=null;state.selectedPlan=null;
-  state.activeWaUrl='#';state.result=null;state.history=[];
-  document.querySelectorAll('.answer-btn').forEach(b=>b.classList.remove('selected'));
-  document.getElementById('q3-continue').classList.remove('visible');
-  document.getElementById('q3-conceive').style.display='none';
-  showScreen('welcome');
-}
-
-/* Init */
-showScreen('welcome');
-if(window.ResizeObserver){new ResizeObserver(_broadcastHeight).observe(document.body);}
-window.addEventListener('load',_broadcastHeight);
-</script>
+<script src="engine.js"></script>
 </body>
 </html>
