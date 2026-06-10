@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════
-   JEEVANKEY NAVIGATOR v5 — PRODUCTION ENGINE (DECOUPLED)
+   JEEVANKEY NAVIGATOR v6 — PRODUCTION ENGINE (DECOUPLED)
    ══════════════════════════════════════════════════════ */
 'use strict';
 
@@ -14,17 +14,19 @@ const PLANS = [
 /* ── CLIENT STATE ── */
 const state = {
   q0: null, q1: null, q2: null, q3: [], q4: null, q5: null,
-  selectedPlan: null, activeWaUrl: '#', result: null,
-  lang: 'hi',          // Initial system default fallback
-  history: [],         // Navigation tracking stack
-  translations: null,  // Populated asynchronously
-  profiles: null       // Populated asynchronously
+  selectedPlan: null,
+  engineTier: null,      // REQ 3: stores engine's objective recommendation, never mutated by user selection
+  activeWaUrl: '#',
+  result: null,
+  lang: 'hi',
+  history: [],
+  translations: null,
+  profiles: null
 };
 
 /* ── RUNTIME ASYNC DATA FETCH INITIALIZER ── */
 async function initializeNavigatorData() {
   try {
-    // Fetches the dynamic JSON asset data modules relative to deployment paths
     const [translationsRes, profilesRes] = await Promise.all([
       fetch('i18n.json'),
       fetch('profiles.json')
@@ -37,11 +39,9 @@ async function initializeNavigatorData() {
     state.translations = await translationsRes.json();
     state.profiles = await profilesRes.json();
 
-    // Remove the loading blanket once assets hit background storage memory safely
     const overlay = document.getElementById('loading-overlay');
     if (overlay) overlay.style.display = 'none';
 
-    // Synchronize initial rendering paths
     setLang(state.lang);
     showScreen('welcome');
   } catch (error) {
@@ -61,7 +61,6 @@ function t(key) {
 
 function setLang(lang) {
   state.lang = lang;
-  // Sync language selection pickers across every state screen navigation element
   document.querySelectorAll('.lang-select').forEach(select => {
     select.value = lang;
   });
@@ -69,15 +68,14 @@ function setLang(lang) {
 }
 
 function applyTranslations() {
-  // Parse elements matching data hooks and execute clean language layout injection
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
     const value = t(key);
     if (value) el.innerHTML = value;
   });
   updateStepDisplay();
-  
-  // Re-run results grid renderer if active state data is cached
+
+  // Re-render results UI on language change so all dynamic strings (badges, plan labels, CTA) update live
   if (state.result) {
     renderResultUI();
   }
@@ -90,9 +88,7 @@ function updateStepDisplay() {
   const id = active.id.replace('screen-', '');
   const counterEl = document.getElementById(id + '-counter');
   if (!counterEl) return;
-
   const pos = state.history.length;
-  // Dynamic step tracker pulls labels safely out of regional string collections
   counterEl.textContent = t('step_prefix') + ' ' + pos;
 }
 
@@ -154,7 +150,6 @@ function selectQ5(val) {
 function selectQ1(val) {
   state.q1 = val;
   highlightSelected('q1-answers', val);
-  // Contextually render preconception indicators exclusively for women's endocrine states
   const conceiveBtn = document.getElementById('q3-conceive');
   if (conceiveBtn) conceiveBtn.style.display = (val === 'hormonal') ? 'flex' : 'none';
   pushHistory('q2');
@@ -171,7 +166,7 @@ function selectQ2(val) {
 function toggleQ3(val) {
   const btn = document.querySelector('#q3-answers [data-val="' + val + '"]');
   const noneBtn = document.getElementById('q3-none');
-  
+
   if (val === 'none') {
     state.q3 = ['none'];
     document.querySelectorAll('#q3-answers .answer-btn').forEach(b => b.classList.remove('selected'));
@@ -187,7 +182,7 @@ function toggleQ3(val) {
       if (btn) btn.classList.add('selected');
     }
   }
-  
+
   const continueBtn = document.getElementById('q3-continue');
   if (continueBtn) continueBtn.classList.toggle('visible', state.q3.length > 0);
 }
@@ -378,8 +373,11 @@ function _fallbackResult(q4, sen) {
 
 /* ── HIGH-FIDELITY OUTPUT GENERATION RENDERERS ── */
 function computeResult() {
-  const result = computeProfile(state.q0, state.q1, state.q2, state.q3, state.q4, state.state === undefined ? state.q5 : state.q5);
+  const result = computeProfile(state.q0, state.q1, state.q2, state.q3, state.q4, state.q5);
   state.result = result;
+
+  // REQ 3: Lock the engine's recommendation into state before any user interaction can mutate selectedPlan
+  state.engineTier = result.tier;
 
   if (result.isGuided) {
     showScreen('triage');
@@ -400,80 +398,123 @@ function renderResultUI() {
   const subEl = document.getElementById('result-sub');
   if (subEl) subEl.textContent = profile.sub;
 
-  // Sync structural alert layouts
   document.getElementById('alt-track-banner').classList.toggle('visible', paradigm === 'ALT');
   document.getElementById('seniority-notice').classList.toggle('visible', seniority_escalation);
   document.getElementById('triage-notice').classList.toggle('visible', isTriage);
 
-  // Execute clean HTML rendering on expert grid targets
+  // ── Team grid render — clean loop, no comment leaks, all role badges via i18n ──
   const grid = document.getElementById('team-grid');
   grid.innerHTML = '';
   profile.team.forEach((m, idx) => {
     const card = document.createElement('div');
     card.className = 'team-card';
-    
-    // Dynamic role mapping updates strings flawlessly based on selected language states
-    const translatedRoleKey = m.role.toLowerCase().replace(/ /g, '_');
-    
-    card.innerHTML = `
-      <div class="team-card-header" onclick="this.parentElement.classList.toggle('open')">
-        <span class="team-role-badge ${m.badge}">${t(translatedRoleKey)}</span>
-        <div class="team-expert-info">
-          <div class="team-expert-name">${m.name}</div>
-        </div>
-        <span class="team-card-chevron">▼</span>
-      </div>
-      <div class="team-card-body">
-        <div class="team-card-body-inner">${m.detail}</div>
-      </div>`;
+
+    // REQ 1: Role badge label resolved entirely through i18n lookup
+    // Map badge class → translation key; all 5 role types covered
+    const badgeKeyMap = {
+      'badge-anchor':      'diagnostic_anchor',
+      'badge-therapeutic': 'therapeutic_anchor',
+      'badge-driver':      'active_treatment_lead',
+      'badge-accel':       'core_accelerator',
+      'badge-compliance':  'compliance_anchor'
+    };
+    const badgeLabel = t(badgeKeyMap[m.badge] || m.badge);
+
+    // REQ 1: Active Treatment Lead subtitle rendered via i18n — no hardcoded English
+    const activeLeadSubHTML = m.isActiveLead
+      ? `<div class="active-lead-subtitle">${t('active_lead_sub')}</div>`
+      : '';
+
+    card.innerHTML =
+      '<div class="team-card-header" onclick="this.parentElement.classList.toggle(\'open\')">' +
+        '<span class="team-role-badge ' + m.badge + '">' + badgeLabel + '</span>' +
+        '<div class="team-expert-info">' +
+          '<div class="team-expert-name">' + m.name + '</div>' +
+          activeLeadSubHTML +
+        '</div>' +
+        '<span class="team-card-chevron">▼</span>' +
+      '</div>' +
+      '<div class="team-card-body">' +
+        '<div class="team-card-body-inner">' + m.detail + '</div>' +
+      '</div>';
+
     grid.appendChild(card);
     if (idx === 0) card.classList.add('open');
   });
 
-  // Render pricing selection arrays
+  // ── Plan grid render — REQ 2: no .dimmed class applied anywhere; all cards always interactive ──
   const planGrid = document.getElementById('plan-grid');
   planGrid.innerHTML = '';
   PLANS.forEach(p => {
     const card = document.createElement('div');
     const isMatched = p.id === tier;
-    const dimTrial = p.id === 'trial' && (tier === 'premium' || tier === 'elite');
-    
-    card.className = 'plan-card' + (isMatched ? ' selected' : '') + (dimTrial ? ' dimmed' : '');
+
+    // REQ 2: dimTrial logic removed entirely — all plans stay fully clickable at every tier
+    card.className = 'plan-card' + (isMatched ? ' selected' : '');
     card.setAttribute('data-plan-id', p.id);
-    
-    const trialNote = p.id === 'trial' && tier !== 'essential' ? `<div class="plan-trial-note">${t('plan_trial_note')}</div>` : '';
-    
-    card.innerHTML = `
-      ${isMatched ? `<div class="plan-tag match">${t('plan_match')}</div>` : ''}
-      ${p.featured && !isMatched ? `<div class="plan-tag pop">${t('plan_pop')}</div>` : ''}
-      <div class="plan-name">${p.name}</div>
-      <div class="plan-price">${p.price}<span style="font-size:10px;color:var(--ink-4)"> ${p.period}</span></div>
-      <div class="plan-experts">${p.experts}</div>
-      ${trialNote}`;
-      
+
+    const trialNote = p.id === 'trial' && tier !== 'essential'
+      ? '<div class="plan-trial-note">' + t('plan_trial_note') + '</div>'
+      : '';
+
+    card.innerHTML =
+      (isMatched ? '<div class="plan-tag match">' + t('plan_match') + '</div>' : '') +
+      (p.featured && !isMatched ? '<div class="plan-tag pop">' + t('plan_pop') + '</div>' : '') +
+      '<div class="plan-name">' + p.name + '</div>' +
+      '<div class="plan-price">' + p.price + '<span style="font-size:10px;color:var(--ink-4)"> ' + p.period + '</span></div>' +
+      '<div class="plan-experts">' + p.experts + '</div>' +
+      trialNote;
+
     card.onclick = () => selectPlan(p.id, profile.waCopy);
     planGrid.appendChild(card);
   });
 
+  // Default selection to engine's recommended tier
   selectPlan(tier, profile.waCopy);
   showScreen('result');
 }
 
+/* ── PLAN SELECTION — REQ 3 + REQ 4 + REQ 5 ── */
 function selectPlan(pId, waCopy) {
   state.selectedPlan = pId;
+
   document.querySelectorAll('.plan-card').forEach(c => {
     c.classList.toggle('selected', c.getAttribute('data-plan-id') === pId);
   });
-  
-  const plan = PLANS.find(p => p.id === pId);
-  const consent = t('wa_consent');
-  const full = waCopy + (plan ? ` Plan Interest: ${plan.name} Tier.` : '') + consent;
-  
-  state.activeWaUrl = 'https://wa.me/919259684363?text=' + encodeURIComponent(full);
-  
+
+  const selectedPlan = PLANS.find(p => p.id === pId);
+  const enginePlan   = PLANS.find(p => p.id === state.engineTier);
+
+  // REQ 5: Build bilingual WA payload — English data block first, localized confirmation second
+  // REQ 3: Both engine recommendation and user selection are explicitly declared in the payload
+  const langName = {
+    en:'English', hi:'Hindi', gu:'Gujarati', mr:'Marathi',
+    bn:'Bengali', ta:'Tamil', te:'Telugu', kn:'Kannada', ml:'Malayalam'
+  }[state.lang] || state.lang.toUpperCase();
+
+  const engineTierLabel   = enginePlan   ? enginePlan.name   : (state.engineTier   || 'Unknown');
+  const selectedTierLabel = selectedPlan ? selectedPlan.name : (pId                || 'Unknown');
+
+  // English block — internal routing data for team sorting
+  const enBlock =
+    t('wa_intro_en') + '\n' +
+    '---\n' +
+    t('wa_profile_label')  + ': ' + (state.result && state.result.profile ? state.result.profile.eyebrow : waCopy) + '\n' +
+    t('wa_engine_tier')    + ': ' + engineTierLabel   + '\n' +
+    t('wa_user_tier')      + ': ' + selectedTierLabel + '\n' +
+    t('wa_lang_label')     + ': ' + langName + '\n' +
+    '---';
+
+  // Localized block — patient-facing confirmation in their chosen language
+  const localBlock = t('wa_confirm_local') + '\n' + t('wa_consent');
+
+  const fullPayload = enBlock + '\n\n' + localBlock;
+  state.activeWaUrl = 'https://wa.me/919259684363?text=' + encodeURIComponent(fullPayload);
+
+  // REQ 4: CTA button label sourced from i18n key 'cta_btn' — no hardcoded plan name in the label
   const waBtnText = document.getElementById('whatsapp-text');
   if (waBtnText) {
-    waBtnText.textContent = plan ? `${plan.name} Plan pe Shuru Karein →` : 'WhatsApp pe Connect karein →';
+    waBtnText.textContent = t('cta_btn');
   }
 }
 
@@ -481,23 +522,39 @@ function openWhatsAppRedirect() {
   if (state.activeWaUrl && state.activeWaUrl !== '#') window.open(state.activeWaUrl, '_blank');
 }
 
+/* ── TRIAGE WHATSAPP — REQ 5: bilingual payload here too ── */
 function openTriageWhatsApp() {
-  const text = 'Hello JeevanKey, Maine Clinical Navigator complete kiya. Mujhe personal review chahiye — mere symptoms kai areas cover karte hain. Please sahi care path dhundhne mein madad karein.';
-  window.open('https://wa.me/919259684363?text=' + encodeURIComponent(text), '_blank');
+  const langName = {
+    en:'English', hi:'Hindi', gu:'Gujarati', mr:'Marathi',
+    bn:'Bengali', ta:'Tamil', te:'Telugu', kn:'Kannada', ml:'Malayalam'
+  }[state.lang] || state.lang.toUpperCase();
+
+  const enBlock =
+    'Hello JeevanKey Team,\n' +
+    'I have completed the Clinical Navigator questionnaire.\n' +
+    '---\n' +
+    'Care Profile: Personal Coordinator Review Required\n' +
+    'Engine Recommended Tier: Triage\n' +
+    'Language: ' + langName + '\n' +
+    '---';
+
+  const localBlock = t('wa_confirm_local') + '\n' + t('wa_consent');
+  const fullPayload = enBlock + '\n\n' + localBlock;
+
+  window.open('https://wa.me/919259684363?text=' + encodeURIComponent(fullPayload), '_blank');
 }
 
 function restart() {
   state.q0 = null; state.q1 = null; state.q2 = null; state.q3 = [];
   state.q4 = null; state.q5 = null; state.selectedPlan = null;
-  state.activeWaUrl = '#'; state.result = null; state.history = [];
-  
+  state.engineTier = null; state.activeWaUrl = '#'; state.result = null; state.history = [];
+
   document.querySelectorAll('.answer-btn').forEach(b => b.classList.remove('selected'));
   const contBtn = document.getElementById('q3-continue');
   if (contBtn) contBtn.classList.remove('visible');
-  
   const conceiveBtn = document.getElementById('q3-conceive');
   if (conceiveBtn) conceiveBtn.style.display = 'none';
-  
+
   showScreen('welcome');
 }
 
