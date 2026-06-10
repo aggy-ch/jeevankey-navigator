@@ -1,5 +1,6 @@
 /* ══════════════════════════════════════════════════════
-   JEEVANKEY NAVIGATOR v6 — PRODUCTION ENGINE (DECOUPLED)
+   JEEVANKEY NAVIGATOR v5 — PRODUCTION ENGINE (DECOUPLED)
+   GA4 FUNNEL TRACKING LAYER — G-JQG3B09294
    ══════════════════════════════════════════════════════ */
 'use strict';
 
@@ -14,15 +15,56 @@ const PLANS = [
 /* ── CLIENT STATE ── */
 const state = {
   q0: null, q1: null, q2: null, q3: [], q4: null, q5: null,
-  selectedPlan: null,
-  engineTier: null,      // REQ 3: stores engine's objective recommendation, never mutated by user selection
-  activeWaUrl: '#',
-  result: null,
+  selectedPlan: null, activeWaUrl: '#', result: null,
   lang: 'hi',
   history: [],
   translations: null,
-  profiles: null
+  profiles: null,
+  _navigatorStartTime: null   // GA4: session-level timer for time-to-completion metric
 };
+
+/* ══════════════════════════════════════════════════════
+   GA4 TRACKING LAYER
+   ─────────────────────────────────────────────────────
+   All events fire via gtag() which is loaded on the
+   parent Carrd page (jeevankey.com) using measurement
+   ID G-JQG3B09294. The iframe sends events upward via
+   postMessage so the parent page's gtag instance fires
+   them — this is the only reliable cross-origin method.
+
+   Event naming convention:
+   - Snake_case, all lowercase
+   - Prefixed jk_ for easy filtering in GA4 Explorer
+   - Every event carries lang, paradigm, cluster dims
+   ══════════════════════════════════════════════════════ */
+
+/* Safe gtag dispatcher — works from iframe context */
+function _gtag(eventName, params) {
+  try {
+    // Primary: if gtag is available on THIS window (GitHub Pages direct visit)
+    if (typeof gtag === 'function') {
+      gtag('event', eventName, params);
+      return;
+    }
+    // Secondary: postMessage to Carrd parent — gtag lives there
+    window.parent.postMessage({
+      type: 'jk-ga4-event',
+      eventName: eventName,
+      params: params
+    }, 'https://jeevankey.com');
+  } catch (e) {
+    // Silent fail — never break the UX for analytics
+  }
+}
+
+/* Build a consistent base parameter set to attach to every event */
+function _baseParams() {
+  return {
+    lang: state.lang,
+    paradigm: state.q0 || 'not_set',
+    primary_cluster: state.q1 || 'not_set'
+  };
+}
 
 /* ── RUNTIME ASYNC DATA FETCH INITIALIZER ── */
 async function initializeNavigatorData() {
@@ -74,8 +116,6 @@ function applyTranslations() {
     if (value) el.innerHTML = value;
   });
   updateStepDisplay();
-
-  // Re-render results UI on language change so all dynamic strings (badges, plan labels, CTA) update live
   if (state.result) {
     renderResultUI();
   }
@@ -110,16 +150,43 @@ function pushHistory(screenId) {
   }
 }
 
+/* ══════════════════════════
+   EVENT: jk_navigator_start
+   Fires when user clicks "Begin" on welcome screen.
+   This is the top of your funnel.
+   Dimension: lang (tells you which language audience is largest)
+══════════════════════════ */
 function startNavigator() {
   state.history = [];
+  state._navigatorStartTime = Date.now();
   pushHistory('q0');
   showScreen('q0');
+
+  _gtag('jk_navigator_start', {
+    lang: state.lang,
+    event_category: 'navigator_funnel',
+    event_label: 'welcome_screen'
+  });
 }
 
-/* ── INTERACTIVE DIALOGUE SELECTION HANDLERS ── */
+/* ══════════════════════════
+   EVENT: jk_paradigm_selected (Q0)
+   Most important early signal.
+   Dimensions: paradigm_choice (allopathic/alternative/open/guided)
+   Use: if 60%+ pick "open", your Q0 framing is working.
+   Drop-off here = welcome screen not motivating enough.
+══════════════════════════ */
 function selectQ0(val) {
   state.q0 = val;
   highlightSelected('q0-answers', val);
+
+  _gtag('jk_paradigm_selected', {
+    ..._baseParams(),
+    paradigm_choice: val,
+    event_category: 'navigator_funnel',
+    event_label: 'q0_paradigm_gate'
+  });
+
   setTimeout(() => {
     if (val === 'guided') {
       showScreen('triage');
@@ -134,6 +201,8 @@ function selectQ0(val) {
   }, 250);
 }
 
+/* Q5 — Confidence check (open paradigm only, no dedicated event needed —
+   the dissatisfied/confused signal is captured on result render) */
 function selectQ5(val) {
   state.q5 = val;
   highlightSelected('q5-answers', val);
@@ -147,22 +216,54 @@ function selectQ5(val) {
   }, 250);
 }
 
+/* ══════════════════════════
+   EVENT: jk_primary_concern_selected (Q1)
+   Your most valuable segmentation dimension.
+   Tells you which health cluster dominates your audience.
+   Use this to decide which expert type to onboard first.
+   Dimension: concern_cluster (mind/gut/pain/hormonal/energy/chronic)
+══════════════════════════ */
 function selectQ1(val) {
   state.q1 = val;
   highlightSelected('q1-answers', val);
   const conceiveBtn = document.getElementById('q3-conceive');
   if (conceiveBtn) conceiveBtn.style.display = (val === 'hormonal') ? 'flex' : 'none';
   pushHistory('q2');
+
+  _gtag('jk_primary_concern_selected', {
+    ..._baseParams(),
+    concern_cluster: val,
+    event_category: 'navigator_funnel',
+    event_label: 'q1_primary_concern'
+  });
+
   setTimeout(() => showScreen('q2'), 250);
 }
 
+/* ══════════════════════════
+   EVENT: jk_duration_selected (Q2)
+   Signals chronic vs acute patient split.
+   Dimension: symptom_duration
+   Use: if 70%+ pick "recurring", you have a chronic patient base
+   — price your plans and messaging accordingly.
+══════════════════════════ */
 function selectQ2(val) {
   state.q2 = val;
   highlightSelected('q2-answers', val);
   pushHistory('q3');
+
+  _gtag('jk_duration_selected', {
+    ..._baseParams(),
+    symptom_duration: val,
+    event_category: 'navigator_funnel',
+    event_label: 'q2_duration'
+  });
+
   setTimeout(() => showScreen('q3'), 250);
 }
 
+/* Q3 toggle — no individual event per chip, the final set
+   is captured in jk_complexity_signals_submitted below */
 function toggleQ3(val) {
   const btn = document.querySelector('#q3-answers [data-val="' + val + '"]');
   const noneBtn = document.getElementById('q3-none');
@@ -187,18 +288,59 @@ function toggleQ3(val) {
   if (continueBtn) continueBtn.classList.toggle('visible', state.q3.length > 0);
 }
 
+/* ══════════════════════════
+   EVENT: jk_complexity_signals_submitted (Q3 Continue)
+   Captures the full secondary signals array and count.
+   Dimensions: signal_count, signals_list
+   Use: high signal_count = complex patients = Elite candidates.
+   Drop-off here = too many chips, users feel overwhelmed.
+══════════════════════════ */
 function goToQ4() {
   if (state.q3.length > 0) {
     pushHistory('q4');
+
+    const signals = state.q3.filter(v => v !== 'none');
+    _gtag('jk_complexity_signals_submitted', {
+      ..._baseParams(),
+      signal_count: signals.length,
+      signals_list: signals.join(','),
+      event_category: 'navigator_funnel',
+      event_label: 'q3_secondary_signals'
+    });
+
     showScreen('q4');
   }
 }
 
+/* ══════════════════════════
+   EVENT: jk_lifestyle_selected (Q4)
+   Final question — triggers matching.
+   Dimension: lifestyle_type
+   Also fires jk_matching_initiated immediately after.
+══════════════════════════ */
 function selectQ4(val) {
   state.q4 = val;
   highlightSelected('q4-answers', val);
+
+  _gtag('jk_lifestyle_selected', {
+    ..._baseParams(),
+    lifestyle_type: val,
+    event_category: 'navigator_funnel',
+    event_label: 'q4_lifestyle'
+  });
+
   setTimeout(() => {
     showScreen('matching');
+
+    _gtag('jk_matching_initiated', {
+      ..._baseParams(),
+      symptom_duration: state.q2 || 'not_set',
+      signal_count: state.q3.filter(v => v !== 'none').length,
+      lifestyle_type: val,
+      event_category: 'navigator_funnel',
+      event_label: 'matching_screen'
+    });
+
     setTimeout(() => computeResult(), 2000);
   }, 250);
 }
@@ -216,18 +358,15 @@ function computeProfile(q0, q1, q2, q3, q4, q5) {
   const envFlag = has('env_exposure');
   const hormOvlp = ['periods', 'acne', 'skin_hair'].some(s => has(s));
 
-  // STAGE 1: Explicit Gate Assessment
   let paradigm = q0;
   if (q0 === 'guided') return _buildResult('I1_fallback_triage', 'A', false, true, true);
 
-  // STAGE 2: History Friction Evaluation
   let seniority_escalation = false;
   if (q0 === 'open') {
     if (q5 === 'confused') return _buildResult('I1_fallback_triage', 'A', false, true, true);
     if (q5 === 'dissatisfied') seniority_escalation = true;
   }
 
-  // STAGE 3: Multi-Morbidity Cluster Alignment
   let cluster;
   if (q4 === 'managing' && q1 !== 'hormonal') { cluster = 'F'; }
   else if (q1 === 'hormonal' && conceiveFlag) { cluster = 'H'; }
@@ -242,7 +381,6 @@ function computeProfile(q0, q1, q2, q3, q4, q5) {
 
   if (cluster === 'H' && paradigm === 'open') { paradigm = 'allopathic'; }
 
-  // STAGE 4: Pathological Complexity Scoring
   const dur = { acute: 0, months: 1, long: 2, recurring: 3 }[q2] || 0;
   const q3c = Array.isArray(q3) ? q3.filter(v => !['none', 'conceive', 'env_exposure'].includes(v)) : [];
   let sig = Math.min(q3c.length, 3);
@@ -250,10 +388,8 @@ function computeProfile(q0, q1, q2, q3, q4, q5) {
   const complexity = dur + sig;
   let tier = complexity <= 1 ? 'essential' : complexity <= 4 ? 'premium' : 'elite';
 
-  // STAGE 5: Secondary Systemic Constraints Check
   if (q4 === 'managing' && cluster !== 'F') cluster = 'F';
 
-  // STAGE 6: Resolution of Open Paradigm States
   if (paradigm === 'open') {
     const clinAnchor = ['periods', 'acne', 'skin_hair'].some(s => has(s)) || conceiveFlag || q4 === 'managing' || complexity >= 4;
     const lifeSigs = ['meal_fatigue', 'sleep', 'motivation', 'weight'].filter(s => has(s)).length;
@@ -263,7 +399,6 @@ function computeProfile(q0, q1, q2, q3, q4, q5) {
 
   const pdm = (paradigm === 'alternative') ? 'ALT' : 'A';
 
-  // STAGE 7: Final Source Mapping Matrix Check
   const profileKey = _selectMapping(cluster, pdm, tier, q4, q1, q3);
   if (!profileKey || !state.profiles || !state.profiles[profileKey]) {
     return _fallbackResult(q4, seniority_escalation);
@@ -373,11 +508,8 @@ function _fallbackResult(q4, sen) {
 
 /* ── HIGH-FIDELITY OUTPUT GENERATION RENDERERS ── */
 function computeResult() {
-  const result = computeProfile(state.q0, state.q1, state.q2, state.q3, state.q4, state.q5);
+  const result = computeProfile(state.q0, state.q1, state.q2, state.q3, state.q4, state.state === undefined ? state.q5 : state.q5);
   state.result = result;
-
-  // REQ 3: Lock the engine's recommendation into state before any user interaction can mutate selectedPlan
-  state.engineTier = result.tier;
 
   if (result.isGuided) {
     showScreen('triage');
@@ -386,8 +518,38 @@ function computeResult() {
   renderResultUI();
 }
 
+/* ══════════════════════════
+   EVENT: jk_care_profile_matched
+   The most important mid-funnel event.
+   Dimensions: profile_key, care_tier, paradigm_resolved, time_to_match_ms
+   Use: which profiles match most? Which tiers are most common?
+   Do Elite-matched users convert less? (suggests price friction)
+   Does triage_routed = true correlate with drop-off?
+══════════════════════════ */
 function renderResultUI() {
   const { profile, tier, paradigm, seniority_escalation, isTriage } = state.result;
+  const profileKey = state.result.profileKey;
+
+  // Calculate time user spent answering questions
+  const timeToMatch = state._navigatorStartTime
+    ? Math.round((Date.now() - state._navigatorStartTime) / 1000)
+    : null;
+
+  _gtag('jk_care_profile_matched', {
+    ..._baseParams(),
+    profile_key:        profileKey,
+    care_tier:          tier,
+    paradigm_resolved:  paradigm,
+    is_alt_track:       paradigm === 'ALT',
+    seniority_flag:     seniority_escalation,
+    triage_routed:      isTriage,
+    symptom_duration:   state.q2 || 'not_set',
+    signal_count:       state.q3.filter(v => v !== 'none').length,
+    lifestyle_type:     state.q4 || 'not_set',
+    time_to_match_sec:  timeToMatch,
+    event_category:     'navigator_funnel',
+    event_label:        'result_screen'
+  });
 
   const eyebrowEl = document.getElementById('result-eyebrow');
   if (eyebrowEl) {
@@ -402,152 +564,176 @@ function renderResultUI() {
   document.getElementById('seniority-notice').classList.toggle('visible', seniority_escalation);
   document.getElementById('triage-notice').classList.toggle('visible', isTriage);
 
-  // ── Team grid render — clean loop, no comment leaks, all role badges via i18n ──
   const grid = document.getElementById('team-grid');
   grid.innerHTML = '';
   profile.team.forEach((m, idx) => {
     const card = document.createElement('div');
     card.className = 'team-card';
-
-    // REQ 1: Role badge label resolved entirely through i18n lookup
-    // Map badge class → translation key; all 5 role types covered
-    const badgeKeyMap = {
-      'badge-anchor':      'diagnostic_anchor',
-      'badge-therapeutic': 'therapeutic_anchor',
-      'badge-driver':      'active_treatment_lead',
-      'badge-accel':       'core_accelerator',
-      'badge-compliance':  'compliance_anchor'
-    };
-    const badgeLabel = t(badgeKeyMap[m.badge] || m.badge);
-
-    // REQ 1: Active Treatment Lead subtitle rendered via i18n — no hardcoded English
-    const activeLeadSubHTML = m.isActiveLead
-      ? `<div class="active-lead-subtitle">${t('active_lead_sub')}</div>`
-      : '';
-
-    card.innerHTML =
-      '<div class="team-card-header" onclick="this.parentElement.classList.toggle(\'open\')">' +
-        '<span class="team-role-badge ' + m.badge + '">' + badgeLabel + '</span>' +
-        '<div class="team-expert-info">' +
-          '<div class="team-expert-name">' + m.name + '</div>' +
-          activeLeadSubHTML +
-        '</div>' +
-        '<span class="team-card-chevron">▼</span>' +
-      '</div>' +
-      '<div class="team-card-body">' +
-        '<div class="team-card-body-inner">' + m.detail + '</div>' +
-      '</div>';
-
+    const translatedRoleKey = m.role.toLowerCase().replace(/ /g, '_');
+    card.innerHTML = `
+      <div class="team-card-header" onclick="this.parentElement.classList.toggle('open')">
+        <span class="team-role-badge ${m.badge}">${t(translatedRoleKey)}</span>
+        <div class="team-expert-info">
+          <div class="team-expert-name">${m.name}</div>
+        </div>
+        <span class="team-card-chevron">▼</span>
+      </div>
+      <div class="team-card-body">
+        <div class="team-card-body-inner">${m.detail}</div>
+      </div>`;
     grid.appendChild(card);
     if (idx === 0) card.classList.add('open');
   });
 
-  // ── Plan grid render — REQ 2: no .dimmed class applied anywhere; all cards always interactive ──
   const planGrid = document.getElementById('plan-grid');
   planGrid.innerHTML = '';
   PLANS.forEach(p => {
     const card = document.createElement('div');
     const isMatched = p.id === tier;
-
-    // REQ 2: dimTrial logic removed entirely — all plans stay fully clickable at every tier
-    card.className = 'plan-card' + (isMatched ? ' selected' : '');
+    const dimTrial = p.id === 'trial' && (tier === 'premium' || tier === 'elite');
+    card.className = 'plan-card' + (isMatched ? ' selected' : '') + (dimTrial ? ' dimmed' : '');
     card.setAttribute('data-plan-id', p.id);
-
-    const trialNote = p.id === 'trial' && tier !== 'essential'
-      ? '<div class="plan-trial-note">' + t('plan_trial_note') + '</div>'
-      : '';
-
-    card.innerHTML =
-      (isMatched ? '<div class="plan-tag match">' + t('plan_match') + '</div>' : '') +
-      (p.featured && !isMatched ? '<div class="plan-tag pop">' + t('plan_pop') + '</div>' : '') +
-      '<div class="plan-name">' + p.name + '</div>' +
-      '<div class="plan-price">' + p.price + '<span style="font-size:10px;color:var(--ink-4)"> ' + p.period + '</span></div>' +
-      '<div class="plan-experts">' + p.experts + '</div>' +
-      trialNote;
-
+    const trialNote = p.id === 'trial' && tier !== 'essential' ? `<div class="plan-trial-note">${t('plan_trial_note')}</div>` : '';
+    card.innerHTML = `
+      ${isMatched ? `<div class="plan-tag match">${t('plan_match')}</div>` : ''}
+      ${p.featured && !isMatched ? `<div class="plan-tag pop">${t('plan_pop')}</div>` : ''}
+      <div class="plan-name">${p.name}</div>
+      <div class="plan-price">${p.price}<span style="font-size:10px;color:var(--ink-4)"> ${p.period}</span></div>
+      <div class="plan-experts">${p.experts}</div>
+      ${trialNote}`;
     card.onclick = () => selectPlan(p.id, profile.waCopy);
     planGrid.appendChild(card);
   });
 
-  // Default selection to engine's recommended tier
   selectPlan(tier, profile.waCopy);
   showScreen('result');
 }
 
-/* ── PLAN SELECTION — REQ 3 + REQ 4 + REQ 5 ── */
+/* ══════════════════════════
+   EVENT: jk_plan_selected
+   Fires every time a user clicks a plan card.
+   Includes whether they drifted from the engine recommendation.
+   Dimensions: plan_chosen, engine_recommended, is_downgrade, is_upgrade
+   Use: if 60%+ downgrade from Elite to Trial = price objection is real.
+   Critical for pricing strategy decisions.
+══════════════════════════ */
 function selectPlan(pId, waCopy) {
+  const prevPlan = state.selectedPlan;
   state.selectedPlan = pId;
 
   document.querySelectorAll('.plan-card').forEach(c => {
     c.classList.toggle('selected', c.getAttribute('data-plan-id') === pId);
   });
 
-  const selectedPlan = PLANS.find(p => p.id === pId);
-  const enginePlan   = PLANS.find(p => p.id === state.engineTier);
+  const plan = PLANS.find(p => p.id === pId);
+  const consent = t('wa_consent');
+  const full = waCopy + (plan ? ` Plan Interest: ${plan.name} Tier.` : '') + consent;
+  state.activeWaUrl = 'https://wa.me/919259684363?text=' + encodeURIComponent(full);
 
-  // REQ 5: Build bilingual WA payload — English data block first, localized confirmation second
-  // REQ 3: Both engine recommendation and user selection are explicitly declared in the payload
-  const langName = {
-    en:'English', hi:'Hindi', gu:'Gujarati', mr:'Marathi',
-    bn:'Bengali', ta:'Tamil', te:'Telugu', kn:'Kannada', ml:'Malayalam'
-  }[state.lang] || state.lang.toUpperCase();
-
-  const engineTierLabel   = enginePlan   ? enginePlan.name   : (state.engineTier   || 'Unknown');
-  const selectedTierLabel = selectedPlan ? selectedPlan.name : (pId                || 'Unknown');
-
-  // English block — internal routing data for team sorting
-  const enBlock =
-    t('wa_intro_en') + '\n' +
-    '---\n' +
-    t('wa_profile_label')  + ': ' + (state.result && state.result.profile ? state.result.profile.eyebrow : waCopy) + '\n' +
-    t('wa_engine_tier')    + ': ' + engineTierLabel   + '\n' +
-    t('wa_user_tier')      + ': ' + selectedTierLabel + '\n' +
-    t('wa_lang_label')     + ': ' + langName + '\n' +
-    '---';
-
-  // Localized block — patient-facing confirmation in their chosen language
-  const localBlock = t('wa_confirm_local') + '\n' + t('wa_consent');
-
-  const fullPayload = enBlock + '\n\n' + localBlock;
-  state.activeWaUrl = 'https://wa.me/919259684363?text=' + encodeURIComponent(fullPayload);
-
-  // REQ 4: CTA button label sourced from i18n key 'cta_btn' — no hardcoded plan name in the label
   const waBtnText = document.getElementById('whatsapp-text');
   if (waBtnText) {
-    waBtnText.textContent = t('cta_btn');
+    waBtnText.textContent = plan ? `${plan.name} Plan pe Shuru Karein →` : 'WhatsApp pe Connect karein →';
+  }
+
+  // Only fire the event on explicit user selection (not the auto-call from renderResultUI)
+  const engineTier = state.result ? state.result.tier : null;
+  const tierOrder = { trial: 0, essential: 1, premium: 2, elite: 3 };
+  const isDowngrade = engineTier && tierOrder[pId] < tierOrder[engineTier];
+  const isUpgrade   = engineTier && tierOrder[pId] > tierOrder[engineTier];
+  const isDrift     = pId !== engineTier;
+
+  if (prevPlan !== null) {
+    // Only fire on explicit user click, not programmatic default selection
+    _gtag('jk_plan_selected', {
+      ..._baseParams(),
+      plan_chosen:        pId,
+      engine_recommended: engineTier || 'unknown',
+      is_drift:           isDrift,
+      is_downgrade:       isDowngrade,
+      is_upgrade:         isUpgrade,
+      profile_key:        state.result ? state.result.profileKey : 'unknown',
+      event_category:     'navigator_funnel',
+      event_label:        'plan_selection'
+    });
   }
 }
 
+/* ══════════════════════════
+   EVENT: jk_whatsapp_initiated  ← YOUR CONVERSION EVENT
+   This is the bottom of the funnel. Mark this as a
+   Conversion in GA4 (see setup instructions below).
+   Dimensions: plan_selected, engine_recommended, care_tier,
+               profile_key, paradigm_resolved, is_triage
+   Use: segment conversions by cluster to find your
+   highest-converting health concern category.
+   Cross-reference with plan_selected to find price-to-convert.
+══════════════════════════ */
 function openWhatsAppRedirect() {
-  if (state.activeWaUrl && state.activeWaUrl !== '#') window.open(state.activeWaUrl, '_blank');
+  if (!state.activeWaUrl || state.activeWaUrl === '#') return;
+
+  const result = state.result || {};
+  _gtag('jk_whatsapp_initiated', {
+    ..._baseParams(),
+    plan_selected:      state.selectedPlan  || 'unknown',
+    engine_recommended: result.tier         || 'unknown',
+    care_tier:          result.tier         || 'unknown',
+    profile_key:        result.profileKey   || 'unknown',
+    paradigm_resolved:  result.paradigm     || 'unknown',
+    is_triage:          result.isTriage     || false,
+    concern_cluster:    state.q1            || 'not_set',
+    symptom_duration:   state.q2            || 'not_set',
+    lifestyle_type:     state.q4            || 'not_set',
+    event_category:     'conversion',
+    event_label:        'whatsapp_cta'
+  });
+
+  window.open(state.activeWaUrl, '_blank');
 }
 
-/* ── TRIAGE WHATSAPP — REQ 5: bilingual payload here too ── */
+/* ══════════════════════════
+   EVENT: jk_triage_whatsapp_initiated
+   Separate conversion event for triage/coordinator route.
+   Lets you distinguish self-navigated vs coordinator-assisted conversions.
+══════════════════════════ */
 function openTriageWhatsApp() {
-  const langName = {
-    en:'English', hi:'Hindi', gu:'Gujarati', mr:'Marathi',
-    bn:'Bengali', ta:'Tamil', te:'Telugu', kn:'Kannada', ml:'Malayalam'
-  }[state.lang] || state.lang.toUpperCase();
+  _gtag('jk_triage_whatsapp_initiated', {
+    ..._baseParams(),
+    concern_cluster:  state.q1 || 'not_set',
+    triage_reason:    state.q0 === 'guided' ? 'guided_paradigm' : (state.q5 === 'confused' ? 'confused_history' : 'multi_area_profile'),
+    event_category:   'conversion',
+    event_label:      'triage_whatsapp_cta'
+  });
 
-  const enBlock =
-    'Hello JeevanKey Team,\n' +
-    'I have completed the Clinical Navigator questionnaire.\n' +
-    '---\n' +
-    'Care Profile: Personal Coordinator Review Required\n' +
-    'Engine Recommended Tier: Triage\n' +
-    'Language: ' + langName + '\n' +
-    '---';
-
-  const localBlock = t('wa_confirm_local') + '\n' + t('wa_consent');
-  const fullPayload = enBlock + '\n\n' + localBlock;
-
-  window.open('https://wa.me/919259684363?text=' + encodeURIComponent(fullPayload), '_blank');
+  const text = 'Hello JeevanKey, Maine Clinical Navigator complete kiya. Mujhe personal review chahiye — mere symptoms kai areas cover karte hain. Please sahi care path dhundhne mein madad karein.';
+  window.open('https://wa.me/919259684363?text=' + encodeURIComponent(text), '_blank');
 }
 
+/* ══════════════════════════
+   EVENT: jk_navigator_abandoned
+   Fires when a user restarts mid-funnel.
+   Dimension: abandoned_at_screen (tells you WHERE people give up)
+   Use: if abandoned_at_screen = q3 peaks, that screen has friction.
+══════════════════════════ */
 function restart() {
+  // Fire abandonment event only if they actually started (not on programmatic restart)
+  const activeScreen = document.querySelector('.screen.active');
+  const activeId = activeScreen ? activeScreen.id.replace('screen-', '') : 'unknown';
+  const nonEntryScreens = ['q0','q5','q1','q2','q3','q4','matching','result','triage'];
+
+  if (nonEntryScreens.includes(activeId)) {
+    _gtag('jk_navigator_abandoned', {
+      ..._baseParams(),
+      abandoned_at_screen: activeId,
+      steps_completed:     state.history.length,
+      event_category:      'navigator_funnel',
+      event_label:         'restart_clicked'
+    });
+  }
+
   state.q0 = null; state.q1 = null; state.q2 = null; state.q3 = [];
   state.q4 = null; state.q5 = null; state.selectedPlan = null;
-  state.engineTier = null; state.activeWaUrl = '#'; state.result = null; state.history = [];
+  state.activeWaUrl = '#'; state.result = null; state.history = [];
+  state._navigatorStartTime = null;
 
   document.querySelectorAll('.answer-btn').forEach(b => b.classList.remove('selected'));
   const contBtn = document.getElementById('q3-continue');
