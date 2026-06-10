@@ -18,11 +18,23 @@
 
     <!-- ══ WELCOME ══ -->
     <div class="screen" id="screen-welcome">
-      <div class="welcome-tag" data-i18n="welcome_tag">Health Navigator</div>
-      <h1 class="welcome-headline" data-i18n="welcome_headline"></h1>
-      <p class="welcome-body" data-i18n="welcome_body"></p>
-      <button class="start-btn" onclick="startNavigator()" data-i18n="welcome_btn">Begin →</button>
-      <p class="welcome-reassure" data-i18n="welcome_reassure"></p>
+      <nav class="nav nav--welcome">
+        <a class="logo" href="#">Jeevan<span>Key</span></a>
+        <select class="lang-select" id="lang-select-welcome" onchange="setLang(this.value)">
+          <option value="en">English</option><option value="hi">हिंदी</option>
+          <option value="gu">ગુજરાતી</option><option value="mr">मराठी</option>
+          <option value="bn">বাংলা</option><option value="ta">தமிழ்</option>
+          <option value="te">తెలుగు</option><option value="kn">ಕನ್ನಡ</option>
+          <option value="ml">മലയാളം</option>
+        </select>
+      </nav>
+      <div class="welcome-content">
+        <div class="welcome-tag" data-i18n="welcome_tag">Health Navigator</div>
+        <h1 class="welcome-headline" data-i18n="welcome_headline"></h1>
+        <p class="welcome-body" data-i18n="welcome_body"></p>
+        <button class="start-btn" onclick="startNavigator()" data-i18n="welcome_btn">Begin →</button>
+        <p class="welcome-reassure" data-i18n="welcome_reassure"></p>
+      </div>
     </div>
 
     <!-- ══ Q0 — PARADIGM GATE ══ -->
