@@ -47,11 +47,7 @@ function _gtag(eventName, params) {
       return;
     }
     // Secondary: postMessage to Carrd parent — gtag lives there
-    window.parent.postMessage({
-      type: 'jk-ga4-event',
-      eventName: eventName,
-      params: params
-    }, 'https://jeevankey.com');
+    window.parent.postMessage({ type: 'jk-ga4-event', eventName: eventName, params: params }, '*');
   } catch (e) {
     // Silent fail — never break the UX for analytics
   }
