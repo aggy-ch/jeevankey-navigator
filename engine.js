@@ -38,16 +38,36 @@ const state = {
    - Every event carries lang, paradigm, cluster dims
    ══════════════════════════════════════════════════════ */
 
-/* Safe gtag dispatcher — works from iframe context */
+/* Safe gtag dispatcher — queue-buffered to survive async GA4 library load race */
+var _gtagQueue = [];
+var _gtagReady = false;
+
+function _flushGtagQueue() {
+  _gtagReady = true;
+  _gtagQueue.forEach(function(item) {
+    gtag('event', item.eventName, item.params);
+  });
+  _gtagQueue = [];
+}
+
+// Poll until gtag is available (handles async script load race condition)
+(function _waitForGtag() {
+  if (typeof gtag === 'function') {
+    _flushGtagQueue();
+  } else {
+    setTimeout(_waitForGtag, 50);
+  }
+})();
+
 function _gtag(eventName, params) {
   try {
-    // Primary: if gtag is available on THIS window (GitHub Pages direct visit)
-    if (typeof gtag === 'function') {
+    if (_gtagReady && typeof gtag === 'function') {
+      // gtag loaded and queue flushed — fire immediately
       gtag('event', eventName, params);
-      return;
+    } else {
+      // gtag not ready yet — buffer the event
+      _gtagQueue.push({ eventName: eventName, params: params });
     }
-    // Secondary: postMessage to Carrd parent — gtag lives there
-    window.parent.postMessage({ type: 'jk-ga4-event', eventName: eventName, params: params }, '*');
   } catch (e) {
     // Silent fail — never break the UX for analytics
   }
