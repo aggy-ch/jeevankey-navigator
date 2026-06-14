@@ -703,6 +703,7 @@ function openWhatsAppRedirect() {
     event_label:        'whatsapp_cta'
   });
 
+  document.dispatchEvent(new Event('jk_converted'));
   window.open(state.activeWaUrl, '_blank');
 }
 
@@ -721,25 +722,26 @@ function openTriageWhatsApp() {
   });
 
   const text = 'Hello JeevanKey, Maine Clinical Navigator complete kiya. Mujhe personal review chahiye — mere symptoms kai areas cover karte hain. Please sahi care path dhundhne mein madad karein.';
+  document.dispatchEvent(new Event('jk_converted'));
   window.open('https://wa.me/919259684363?text=' + encodeURIComponent(text), '_blank');
 }
 
 /* ══════════════════════════
-   EVENT: jk_navigator_abandoned
-   Fires when a user restarts mid-funnel.
-   Dimension: abandoned_at_screen (tells you WHERE people give up)
-   Use: if abandoned_at_screen = q3 peaks, that screen has friction.
+   EVENT: jk_navigator_restarted
+   Fires when a user explicitly clicks the restart button mid-funnel.
+   This is intentional re-entry, NOT abandonment.
+   Dimension: restarted_at_screen — which screen made them want to start over.
+   Use: if restarted_at_screen = q3 peaks, that screen has selection friction.
 ══════════════════════════ */
 function restart() {
-  // Fire abandonment event only if they actually started (not on programmatic restart)
   const activeScreen = document.querySelector('.screen.active');
   const activeId = activeScreen ? activeScreen.id.replace('screen-', '') : 'unknown';
   const nonEntryScreens = ['q0','q5','q1','q2','q3','q4','matching','result','triage'];
 
   if (nonEntryScreens.includes(activeId)) {
-    _gtag('jk_navigator_abandoned', {
+    _gtag('jk_navigator_restarted', {
       ..._baseParams(),
-      abandoned_at_screen: activeId,
+      restarted_at_screen: activeId,
       steps_completed:     state.history.length,
       event_category:      'navigator_funnel',
       event_label:         'restart_clicked'
@@ -765,6 +767,69 @@ function _broadcastHeight() {
   const height = document.documentElement.scrollHeight;
   window.parent.postMessage({ type: 'jk-height', height: height }, '*');
 }
+
+/* ── TRUE ABANDONMENT TRACKING ── */
+/* ══════════════════════════
+   EVENT: jk_navigator_abandoned
+   Fires when user leaves mid-funnel WITHOUT clicking restart —
+   tab close, browser close, navigation away, app switch.
+   Uses Page Visibility API (visibilitychange) as primary signal —
+   fires when tab goes to background on mobile (app switch, lock screen).
+   Uses pagehide as secondary signal for tab/browser close on desktop.
+   Only fires if user has actually started (history.length > 0)
+   and has not yet converted (no whatsapp_initiated in this session).
+   Dimension: abandoned_at_screen, steps_completed, time_spent_sec
+   Use: this is your real drop-off data. Compare with jk_navigator_restarted
+   to distinguish friction (restarted) from disengagement (abandoned).
+══════════════════════════ */
+(function _initAbandonmentTracking() {
+  var _converted = false;
+  var _abandonFired = false;
+
+  // Mark session as converted so abandonment doesn't fire after WhatsApp click
+  document.addEventListener('jk_converted', function() {
+    _converted = true;
+  });
+
+  function _fireAbandonment(trigger) {
+    if (_abandonFired) return;           // fire once per session only
+    if (_converted) return;              // converted users are not abandonments
+    if (!state.history || state.history.length === 0) return;  // never started
+
+    var activeScreen = document.querySelector('.screen.active');
+    var activeId = activeScreen ? activeScreen.id.replace('screen-', '') : 'unknown';
+    if (activeId === 'welcome') return;  // left from welcome = never truly started
+
+    var timeSpent = state._navigatorStartTime
+      ? Math.round((Date.now() - state._navigatorStartTime) / 1000)
+      : null;
+
+    _abandonFired = true;
+    _gtag('jk_navigator_abandoned', {
+      lang:                state.lang          || 'not_set',
+      paradigm:            state.q0            || 'not_set',
+      primary_cluster:     state.q1            || 'not_set',
+      abandoned_at_screen: activeId,
+      steps_completed:     state.history.length,
+      time_spent_sec:      timeSpent,
+      abandon_trigger:     trigger,
+      event_category:      'navigator_funnel',
+      event_label:         'true_abandonment'
+    });
+  }
+
+  // Primary: visibility change — catches mobile app switch, lock screen, tab switch
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'hidden') {
+      _fireAbandonment('visibility_hidden');
+    }
+  });
+
+  // Secondary: pagehide — catches tab close and browser close on desktop
+  window.addEventListener('pagehide', function() {
+    _fireAbandonment('page_hide');
+  });
+})();
 
 /* ── BOOTSTRAP INITIALIZATION STAGE ── */
 document.addEventListener('DOMContentLoaded', initializeNavigatorData);
