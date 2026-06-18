@@ -33,19 +33,25 @@
 }
 
 html, body {
-  height: 100%;
+  height: auto;
+  min-height: 100%;
   font-family: var(--sans);
   background: var(--off);
   color: var(--ink);
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   -webkit-font-smoothing: antialiased;
 }
 
 #app {
-  position: fixed; inset: 0; z-index: 1;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
   padding: 20px;
+  min-height: 100%;
 }
 
 .wrap {
@@ -56,11 +62,11 @@ html, body {
   box-shadow: 0 10px 40px rgba(12, 68, 124, 0.06);
   padding: 40px 32px;
   position: relative;
-  height: 680px;
-  max-height: 92vh;
+  height: auto;
+  min-height: 580px;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible;
 }
 
 /* ── Async Loading Overlay Layer ── */
@@ -277,8 +283,15 @@ html, body {
 
 /* ── High-Fidelity Mobile Viewport Adaptation ── */
 @media (max-width: 480px) {
-  #app { padding: 0; }
-  .wrap { padding: 22px 16px; height: auto; border-radius: 0; width: 100%; min-height: 100%; }
+  #app { padding: 0; min-height: auto; }
+  .wrap {
+    padding: 20px 16px 32px;
+    height: auto;
+    min-height: auto;
+    border-radius: 0;
+    width: 100%;
+    overflow: visible;
+  }
   .q-text { font-size: 18px; }
   .welcome-headline { font-size: 24px; }
   .answers.multi-col { grid-template-columns: 1fr 1fr; }
