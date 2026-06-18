@@ -38,14 +38,35 @@ const state = {
    - Every event carries lang, paradigm, cluster dims
    ══════════════════════════════════════════════════════ */
 
-/* Safe gtag dispatcher — queue-buffered to survive async GA4 library load race */
+/* Safe gtag dispatcher — dual-path: fires locally AND notifies parent
+   Local path: gtag on GitHub Pages iframe (direct URL visits)
+   Parent path: postMessage to Carrd parent (jeevankey.com embedded visits)
+   Both paths always fire so events are captured regardless of access method */
 var _gtagQueue = [];
 var _gtagReady = false;
+
+/* Detect if running inside an iframe (Carrd embed) */
+var _inIframe = (function() {
+  try { return window.self !== window.top; } catch(e) { return true; }
+})();
+
+function _sendToParent(eventName, params) {
+  try {
+    /* Always attempt postMessage — parent bridge will handle it
+       '*' target origin is safe because bridge validates source */
+    window.parent.postMessage({
+      type: 'jk-ga4-event',
+      eventName: eventName,
+      params: params
+    }, '*');
+  } catch(e) {}
+}
 
 function _flushGtagQueue() {
   _gtagReady = true;
   _gtagQueue.forEach(function(item) {
     gtag('event', item.eventName, item.params);
+    _sendToParent(item.eventName, item.params);
   });
   _gtagQueue = [];
 }
@@ -61,13 +82,17 @@ function _flushGtagQueue() {
 
 function _gtag(eventName, params) {
   try {
+    /* Path 1: fire via local gtag (works on GitHub direct URL and iframe) */
     if (_gtagReady && typeof gtag === 'function') {
-      // gtag loaded and queue flushed — fire immediately
       gtag('event', eventName, params);
     } else {
-      // gtag not ready yet — buffer the event
       _gtagQueue.push({ eventName: eventName, params: params });
     }
+    /* Path 2: always notify parent via postMessage
+       When embedded in Carrd, parent bridge picks this up and
+       fires gtag again in the jeevankey.com session context
+       ensuring correct session source attribution */
+    _sendToParent(eventName, params);
   } catch (e) {
     // Silent fail — never break the UX for analytics
   }
