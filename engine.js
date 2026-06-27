@@ -669,7 +669,7 @@ function selectPlan(pId, waCopy) {
   const plan = PLANS.find(p => p.id === pId);
   const consent = t('wa_consent');
   const full = waCopy + (plan ? ` Plan Interest: ${plan.name} Tier.` : '') + consent;
-  state.activeWaUrl = 'https://wa.me/919259684363?text=' + encodeURIComponent(full);
+  state.activeWaUrl = 'https://wa.me/919760015878?text=' + encodeURIComponent(full);
 
   const waBtnText = document.getElementById('whatsapp-text');
   if (waBtnText) {
@@ -748,7 +748,7 @@ function openTriageWhatsApp() {
 
   const text = 'Hello JeevanKey, Maine Clinical Navigator complete kiya. Mujhe personal review chahiye — mere symptoms kai areas cover karte hain. Please sahi care path dhundhne mein madad karein.';
   document.dispatchEvent(new Event('jk_converted'));
-  window.open('https://wa.me/919259684363?text=' + encodeURIComponent(text), '_blank');
+  window.open('https://wa.me/919760015878?text=' + encodeURIComponent(text), '_blank');
 }
 
 /* ══════════════════════════
