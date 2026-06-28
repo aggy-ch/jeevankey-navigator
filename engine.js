@@ -220,40 +220,19 @@ function startNavigator() {
 function selectQ0(val) {
   state.q0 = val;
   highlightSelected('q0-answers', val);
-
+ 
   _gtag('jk_paradigm_selected', {
     ..._baseParams(),
     paradigm_choice: val,
     event_category: 'navigator_funnel',
     event_label: 'q0_paradigm_gate'
   });
-
+ 
   setTimeout(() => {
-    if (val === 'guided') {
-      showScreen('triage');
-    } else if (val === 'open') {
-      pushHistory('q5');
-      showScreen('q5');
-    } else {
-      state.q5 = null;
-      pushHistory('q1');
-      showScreen('q1');
-    }
-  }, 250);
-}
-
-/* Q5 — Confidence check (open paradigm only, no dedicated event needed —
-   the dissatisfied/confused signal is captured on result render) */
-function selectQ5(val) {
-  state.q5 = val;
-  highlightSelected('q5-answers', val);
-  setTimeout(() => {
-    if (val === 'confused') {
-      showScreen('triage');
-    } else {
-      pushHistory('q1');
-      showScreen('q1');
-    }
+    // All paradigms go straight to Q1 — no Q5 branch, no triage branch
+    state.q5 = null;
+    pushHistory('q1');
+    showScreen('q1');
   }, 250);
 }
 
@@ -393,63 +372,46 @@ function highlightSelected(containerId, val) {
 }
 
 /* ── 7-STAGE CLINICAL TRIAGE ARCHITECTURE ── */
-function computeProfile(q0, q1, q2, q3, q4, q5) {
+function computeProfile(q0, q1, q2, q3, q4) {
+  // q5 parameter dropped — no longer used
   const has = (v) => Array.isArray(q3) && q3.includes(v);
   const conceiveFlag = has('conceive');
   const envFlag = has('env_exposure');
   const hormOvlp = ['periods', 'acne', 'skin_hair'].some(s => has(s));
-
-  let paradigm = q0;
-  if (q0 === 'guided') return _buildResult('I1_fallback_triage', 'A', false, true, true);
-
-  let seniority_escalation = false;
-  if (q0 === 'open') {
-    if (q5 === 'confused') return _buildResult('I1_fallback_triage', 'A', false, true, true);
-    if (q5 === 'dissatisfied') seniority_escalation = true;
-  }
-
+ 
+  // Seniority escalation: true for all 'open' paradigm users (was: only if q5 === 'dissatisfied')
+  let seniority_escalation = (q0 === 'open');
+ 
   let cluster;
   if (q4 === 'managing' && q1 !== 'hormonal') { cluster = 'F'; }
-  else if (q1 === 'hormonal' && conceiveFlag) { cluster = 'H'; }
+  else if (q1 === 'hormonal' && conceiveFlag)  { cluster = 'H'; }
   else if (q1 === 'chronic' || q4 === 'managing') { cluster = 'F'; }
-  else if (q1 === 'mind') { cluster = 'A'; }
+  else if (q1 === 'mind')   { cluster = 'A'; }
   else if ((q1 === 'gut' || q1 === 'energy') && envFlag) { cluster = 'G'; }
-  else if (q1 === 'gut') { cluster = 'B'; }
-  else if (q1 === 'pain') { cluster = 'C'; }
+  else if (q1 === 'gut')    { cluster = 'B'; }
+  else if (q1 === 'pain')   { cluster = 'C'; }
   else if (q1 === 'hormonal') { cluster = 'D'; }
   else if (q1 === 'energy') { cluster = 'E'; }
   else { return _fallbackResult(q4, seniority_escalation); }
-
+ 
+  // Paradigm resolution: 'open' + hormonal cluster → allopathic (unchanged)
+  let paradigm = q0;
   if (cluster === 'H' && paradigm === 'open') { paradigm = 'allopathic'; }
-
+ 
   const dur = { acute: 0, months: 1, long: 2, recurring: 3 }[q2] || 0;
   const q3c = Array.isArray(q3) ? q3.filter(v => !['none', 'conceive', 'env_exposure'].includes(v)) : [];
   let sig = Math.min(q3c.length, 3);
   if (cluster !== 'D' && cluster !== 'H' && hormOvlp) sig += 1;
   const complexity = dur + sig;
   let tier = complexity <= 1 ? 'essential' : complexity <= 4 ? 'premium' : 'elite';
-
-  if (q4 === 'managing' && cluster !== 'F') cluster = 'F';
-
-  if (paradigm === 'open') {
-    const clinAnchor = ['periods', 'acne', 'skin_hair'].some(s => has(s)) || conceiveFlag || q4 === 'managing' || complexity >= 4;
-    const lifeSigs = ['meal_fatigue', 'sleep', 'motivation', 'weight'].filter(s => has(s)).length;
-    const lifeDom = lifeSigs >= 2 && complexity <= 3 && !clinAnchor;
-    paradigm = clinAnchor ? 'allopathic' : (lifeDom ? 'alternative' : 'allopathic');
-  }
-
-  const pdm = (paradigm === 'alternative') ? 'ALT' : 'A';
-
-  const profileKey = _selectMapping(cluster, pdm, tier, q4, q1, q3);
-  if (!profileKey || !state.profiles || !state.profiles[profileKey]) {
-    return _fallbackResult(q4, seniority_escalation);
-  }
-
-  let profile = JSON.parse(JSON.stringify(state.profiles[profileKey]));
-  const resolvedTier = profile.tier;
-  if (seniority_escalation) profile = _applySeniority(profile, cluster, pdm);
-
-  return { profileKey, profile, tier: resolvedTier, paradigm: pdm, seniority_escalation, isTriage: !!profile.isTriage, isGuided: false };
+ 
+  return _buildResult(
+    _profileKey(cluster, paradigm, tier),
+    paradigm,
+    seniority_escalation,
+    false,   // isTriage always false now
+    false    // isGuided always false now
+  );
 }
 
 function _buildResult(key, pdm, sen, isTriage, isGuided) {
@@ -549,16 +511,12 @@ function _fallbackResult(q4, sen) {
 
 /* ── HIGH-FIDELITY OUTPUT GENERATION RENDERERS ── */
 function computeResult() {
-  const result = computeProfile(state.q0, state.q1, state.q2, state.q3, state.q4, state.state === undefined ? state.q5 : state.q5);
+  // Pass only 5 args — q5 removed
+  const result = computeProfile(state.q0, state.q1, state.q2, state.q3, state.q4);
   state.result = result;
-
-  if (result.isGuided) {
-    showScreen('triage');
-    return;
-  }
+  // No triage branch — always render result
   renderResultUI();
 }
-
 /* ══════════════════════════
    EVENT: jk_care_profile_matched
    The most important mid-funnel event.
@@ -730,25 +688,6 @@ function openWhatsAppRedirect() {
 
   document.dispatchEvent(new Event('jk_converted'));
   window.open(state.activeWaUrl, '_blank');
-}
-
-/* ══════════════════════════
-   EVENT: jk_triage_whatsapp_initiated
-   Separate conversion event for triage/coordinator route.
-   Lets you distinguish self-navigated vs coordinator-assisted conversions.
-══════════════════════════ */
-function openTriageWhatsApp() {
-  _gtag('jk_triage_whatsapp_initiated', {
-    ..._baseParams(),
-    concern_cluster:  state.q1 || 'not_set',
-    triage_reason:    state.q0 === 'guided' ? 'guided_paradigm' : (state.q5 === 'confused' ? 'confused_history' : 'multi_area_profile'),
-    event_category:   'conversion',
-    event_label:      'triage_whatsapp_cta'
-  });
-
-  const text = 'Hello JeevanKey, Maine Clinical Navigator complete kiya. Mujhe personal review chahiye — mere symptoms kai areas cover karte hain. Please sahi care path dhundhne mein madad karein.';
-  document.dispatchEvent(new Event('jk_converted'));
-  window.open('https://wa.me/919760015878?text=' + encodeURIComponent(text), '_blank');
 }
 
 /* ══════════════════════════
