@@ -435,6 +435,12 @@ function _selectMapping(cluster, pdm, tier, q4, q1, q3) {
       if (q4 === 'stressed' || has('mood') || has('motivation')) return 'B4_gut_premium_stress';
       return 'B2_gut_premium_chronic';
     case 'C':
+      if (pdm === 'ALT') {
+        if (tier === 'essential') return 'C5_pain_alt_essential';
+        if (tier === 'elite') return 'C8_pain_alt_elite';
+        if (has('weight') || q4 === 'sedentary') return 'C7_pain_alt_premium_weight';
+        return 'C6_pain_alt_premium_stress';
+      }
       if (tier === 'essential') return 'C1_pain_essential';
       if (tier === 'elite') return 'C4_pain_elite';
       if (has('weight') || q4 === 'sedentary') return 'C3_pain_premium_weight';
@@ -481,11 +487,15 @@ function _selectMapping(cluster, pdm, tier, q4, q1, q3) {
 function _applySeniority(profile, cluster, pdm) {
   const a = profile.team[0];
   if (pdm === 'ALT') {
-    if (cluster === 'H') {
-      a.detail = 'Senior specialist (8+ years reproductive medicine). ' + a.detail;
-    } else {
-      a.name = 'Senior Ayurvedic Doctor (8+ years experience)';
-      a.detail = 'Senior practitioner. ' + a.detail;
+      if (cluster === 'H') {
+        a.detail = 'Senior specialist (8+ years reproductive medicine). ' + a.detail;
+      } else if (a.name && a.name.includes('BHMS')) {
+        a.name = 'Senior BHMS Doctor (8+ years experience)';
+        a.detail = 'Senior homeopathic practitioner. ' + a.detail;
+      } else {
+        a.name = 'Senior Ayurvedic Doctor (8+ years experience)';
+        a.detail = 'Senior practitioner. ' + a.detail;
+      }
     }
   } else {
     if (cluster === 'D' || cluster === 'H') {
