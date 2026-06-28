@@ -15,6 +15,130 @@
   "C2_pain_premium_stress":{"cluster":"C","paradigm":"A","tier":"premium","eyebrow":"Body Pain — Stress Making It Worse","sub":"Your mental stress is increasing your body pain. Both need to be treated together for real relief.","team":[{"role":"Diagnostic Anchor","badge":"badge-anchor","name":"MBBS Doctor","detail":"Rules out inflammatory conditions and checks if stress is amplifying the pain signals in your nervous system.","isActiveLead":false},{"role":"Active Treatment Lead","badge":"badge-driver","name":"Physiotherapist","detail":"Your main daily contact — leads your recovery. Physical rehabilitation coordinated with mental stress management.","isActiveLead":true},{"role":"Core Accelerator","badge":"badge-accel","name":"Counsellor / Psychotherapist","detail":"Addresses the mental side of chronic pain — fear of movement, anxiety, and stress that keeps pain going.","isActiveLead":false}],"waCopy":"Hello JeevanKey, I completed the Navigator. Result: Body Pain — Stress Making It Worse."},
   "C3_pain_premium_weight":{"cluster":"C","paradigm":"A","tier":"premium","eyebrow":"Body Pain — Weight & Lifestyle","sub":"Extra weight is adding load on your joints and spine. Reducing that load while rebuilding movement is the key.","team":[{"role":"Diagnostic Anchor","badge":"badge-anchor","name":"MBBS Doctor","detail":"Assesses joint load, inflammation markers, and structural damage from excess weight.","isActiveLead":false},{"role":"Active Treatment Lead","badge":"badge-driver","name":"Physiotherapist","detail":"Your main daily contact — leads your recovery. Low-impact rehabilitation that reduces pain while protecting joints.","isActiveLead":true},{"role":"Core Accelerator","badge":"badge-accel","name":"Dietician / Nutritionist","detail":"Anti-inflammatory diet plan to reduce joint load and support tissue repair.","isActiveLead":false}],"waCopy":"Hello JeevanKey, I completed the Navigator. Result: Body Pain — Weight & Lifestyle."},
   "C4_pain_elite":{"cluster":"C","paradigm":"A","tier":"elite","eyebrow":"Body Pain — Full Recovery Programme","sub":"Your long-standing pain with mood, sleep and motivation problems needs a complete four-expert team working on every side of your recovery.","team":[{"role":"Diagnostic Anchor","badge":"badge-anchor","name":"MBBS Doctor","detail":"Medical oversight, monitors inflammation markers, and escalates if pain becomes structural.","isActiveLead":false},{"role":"Active Treatment Lead","badge":"badge-driver","name":"Physiotherapist","detail":"Your main daily contact — leads your recovery. Full physical rehabilitation across pain, mobility, and strength phases.","isActiveLead":true},{"role":"Core Accelerator","badge":"badge-accel","name":"Counsellor / Psychotherapist","detail":"Addresses chronic pain psychology — the fear, avoidance, and sleep-pain loop that keeps it going.","isActiveLead":false},{"role":"Compliance Anchor","badge":"badge-compliance","name":"Yoga & Breathwork Coach","detail":"Daily pain-regulation practices and breathing to calm the nervous system.","isActiveLead":false}],"waCopy":"Hello JeevanKey, I completed the Navigator. Result: Body Pain — Full Recovery Programme."},
+  "C5_pain_alt_essential": {
+    "cluster": "C",
+    "paradigm": "ALT",
+    "tier": "essential",
+    "eyebrow": "Body Pain — Homeopathic Recovery",
+    "sub": "Your body pain will be treated constitutionally and supported with guided movement therapy.",
+    "team": [
+      {
+        "role": "Therapeutic Anchor",
+        "badge": "badge-anchor",
+        "name": "BHMS Doctor",
+        "detail": "Leads your treatment. Constitutional homeopathic assessment to identify the root cause of your pain and prescribe the correct remedy for lasting relief.",
+        "isActiveLead": false
+      },
+      {
+        "role": "Active Treatment Lead",
+        "badge": "badge-driver",
+        "name": "Physiotherapist",
+        "detail": "Your main daily contact — leads your physical recovery. Designs a step-by-step movement and rehabilitation plan to reduce pain and restore mobility alongside homeopathic treatment.",
+        "isActiveLead": true
+      }
+    ],
+    "waCopy": "Hello JeevanKey, I completed the Navigator. Result: Body Pain — Homeopathic Recovery."
+  },
+  "C6_pain_alt_premium_stress": {
+    "cluster": "C",
+    "paradigm": "ALT",
+    "tier": "premium",
+    "eyebrow": "Body Pain — Stress and Pain Together",
+    "sub": "Mental stress is amplifying your body pain. Homeopathic treatment addresses both at the root level.",
+    "team": [
+      {
+        "role": "Therapeutic Anchor",
+        "badge": "badge-anchor",
+        "name": "BHMS Doctor",
+        "detail": "Leads your treatment. Constitutional homeopathic case-taking addresses both the physical pain and the mental-emotional stress patterns driving it.",
+        "isActiveLead": false
+      },
+      {
+        "role": "Active Treatment Lead",
+        "badge": "badge-driver",
+        "name": "Physiotherapist",
+        "detail": "Your main daily contact — leads physical recovery. Rehabilitation coordinated with the homeopathic treatment to reduce pain and rebuild movement.",
+        "isActiveLead": true
+      },
+      {
+        "role": "Core Accelerator",
+        "badge": "badge-accel",
+        "name": "Counsellor / Psychotherapist",
+        "detail": "Addresses the mental side of chronic pain — fear of movement, anxiety loops, and stress that keeps the pain signal active.",
+        "isActiveLead": false
+      }
+    ],
+    "waCopy": "Hello JeevanKey, I completed the Navigator. Result: Body Pain — Stress and Pain Together."
+  },
+  "C7_pain_alt_premium_weight": {
+    "cluster": "C",
+    "paradigm": "ALT",
+    "tier": "premium",
+    "eyebrow": "Body Pain — Weight and Joint Load",
+    "sub": "Extra weight is stressing your joints and spine. Ayurvedic treatment combined with movement and diet addresses the load at the source.",
+    "team": [
+      {
+        "role": "Therapeutic Anchor",
+        "badge": "badge-anchor",
+        "name": "BAMS Doctor",
+        "detail": "Leads your treatment. Ayurvedic assessment of joint inflammation, body type, and root imbalance — prescribes treatment to reduce pain and support healthy weight.",
+        "isActiveLead": false
+      },
+      {
+        "role": "Active Treatment Lead",
+        "badge": "badge-driver",
+        "name": "Physiotherapist",
+        "detail": "Your main daily contact — leads physical recovery. Low-impact rehabilitation that reduces pain while protecting joints during weight correction.",
+        "isActiveLead": true
+      },
+      {
+        "role": "Core Accelerator",
+        "badge": "badge-accel",
+        "name": "Dietician / Nutritionist",
+        "detail": "Anti-inflammatory nutrition plan to reduce joint load, support tissue repair, and assist healthy weight management.",
+        "isActiveLead": false
+      }
+    ],
+    "waCopy": "Hello JeevanKey, I completed the Navigator. Result: Body Pain — Weight and Joint Load."
+  },
+  "C8_pain_alt_elite": {
+    "cluster": "C",
+    "paradigm": "ALT",
+    "tier": "elite",
+    "eyebrow": "Body Pain — Full Ayurvedic Recovery Programme",
+    "sub": "Long-standing pain with mood, sleep, and motivation problems needs a complete team working on every dimension of your recovery — without English medicine.",
+    "team": [
+      {
+        "role": "Therapeutic Anchor",
+        "badge": "badge-anchor",
+        "name": "BAMS Doctor",
+        "detail": "Leads your treatment. Deep Ayurvedic case-taking covering physical pain, sleep, mood, and constitutional imbalance — coordinates the entire team around your recovery.",
+        "isActiveLead": false
+      },
+      {
+        "role": "Active Treatment Lead",
+        "badge": "badge-driver",
+        "name": "Physiotherapist",
+        "detail": "Your main daily contact — leads physical recovery. Full rehabilitation across pain, mobility, and strength phases, coordinated with Ayurvedic treatment.",
+        "isActiveLead": true
+      },
+      {
+        "role": "Core Accelerator",
+        "badge": "badge-accel",
+        "name": "Counsellor / Psychotherapist",
+        "detail": "Addresses the chronic pain psychology — the fear, avoidance, and sleep-pain loop that keeps pain going even when the body is healing.",
+        "isActiveLead": false
+      },
+      {
+        "role": "Compliance Anchor",
+        "badge": "badge-compliance",
+        "name": "Yoga & Breathwork Coach",
+        "detail": "Daily pain-regulation practices and nervous system breathing to reduce pain sensitivity and support recovery between sessions.",
+        "isActiveLead": false
+      }
+    ],
+    "waCopy": "Hello JeevanKey, I completed the Navigator. Result: Body Pain — Full Ayurvedic Recovery Programme."
+  }
   "D1_hormonal_essential":{"cluster":"D","paradigm":"A","tier":"essential","eyebrow":"Hormonal Issues — Basic Care","sub":"Your hormonal problem needs a clinical baseline check first, then the right diet to correct imbalances naturally.","team":[{"role":"Diagnostic Anchor","badge":"badge-anchor","name":"Gynaecologist / MBBS Doctor","detail":"Checks hormone levels (LH, FSH, thyroid, androgen), confirms diagnosis, and manages prescriptions as needed under Telemedicine Guidelines.","isActiveLead":false},{"role":"Active Treatment Lead","badge":"badge-driver","name":"Dietician / Nutritionist","detail":"Your main daily contact — leads your recovery. Fixes insulin resistance and hormonal imbalances through a proper low-GI diet plan.","isActiveLead":true}],"waCopy":"Hello JeevanKey, I completed the Navigator. Result: Hormonal Issues — Basic Care."},
   "D2_hormonal_premium_stress":{"cluster":"D","paradigm":"A","tier":"premium","eyebrow":"Hormonal Issues — Stress Causing It","sub":"Stress is directly disrupting your hormone cycle. The doctor, counsellor, and dietician work together to break this loop.","team":[{"role":"Diagnostic Anchor","badge":"badge-anchor","name":"Gynaecologist / Endocrinologist","detail":"Manages full hormonal panel, cycle regulation prescriptions, and ongoing hormone monitoring.","isActiveLead":false},{"role":"Active Treatment Lead","badge":"badge-driver","name":"Counsellor / Psychotherapist","detail":"Your main daily contact — leads your recovery. Targets the stress-hormone disruption loop that is causing cycle and mood problems.","isActiveLead":true},{"role":"Core Accelerator","badge":"badge-accel","name":"Dietician / Nutritionist","detail":"Manages insulin and cortisol through low-GI diet and nutritional hormone support.","isActiveLead":false}],"waCopy":"Hello JeevanKey, I completed the Navigator. Result: Hormonal Issues — Stress Causing It."},
   "D3_hormonal_premium_skin":{"cluster":"D","paradigm":"A","tier":"premium","eyebrow":"Hormonal Issues — Skin & Hair","sub":"Your hormonal imbalance is showing through your skin and hair. The team treats the root hormonal cause alongside nutrition and emotional support.","team":[{"role":"Diagnostic Anchor","badge":"badge-anchor","name":"MBBS Doctor / Gynaecologist","detail":"Checks androgen levels, DHEA, and hormonal markers causing skin and hair changes.","isActiveLead":false},{"role":"Active Treatment Lead","badge":"badge-driver","name":"Dietician / Nutritionist","detail":"Your main daily contact — leads your recovery. Anti-androgen nutrition plan with key micronutrients for skin and hair recovery.","isActiveLead":true},{"role":"Core Accelerator","badge":"badge-accel","name":"Counsellor / Psychotherapist","detail":"Addresses the emotional stress of visible hormonal symptoms, body image, and cortisol amplification.","isActiveLead":false}],"waCopy":"Hello JeevanKey, I completed the Navigator. Result: Hormonal Issues — Skin & Hair."},
