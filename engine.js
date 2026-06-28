@@ -405,13 +405,26 @@ function computeProfile(q0, q1, q2, q3, q4) {
   const complexity = dur + sig;
   let tier = complexity <= 1 ? 'essential' : complexity <= 4 ? 'premium' : 'elite';
  
-  return _buildResult(
-    _profileKey(cluster, paradigm, tier),
-    paradigm,
-    seniority_escalation,
-    false,   // isTriage always false now
-    false    // isGuided always false now
-  );
+  // Resolve 'open' paradigm to allopathic or alternative
+  if (paradigm === 'open') {
+    const clinAnchor = ['periods', 'acne', 'skin_hair'].some(s => has(s)) || conceiveFlag || q4 === 'managing' || complexity >= 4;
+    const lifeSigs = ['meal_fatigue', 'sleep', 'motivation', 'weight'].filter(s => has(s)).length;
+    const lifeDom = lifeSigs >= 2 && complexity <= 3 && !clinAnchor;
+    paradigm = clinAnchor ? 'allopathic' : (lifeDom ? 'alternative' : 'allopathic');
+  }
+
+  const pdm = (paradigm === 'alternative') ? 'ALT' : 'A';
+  const profileKey = _selectMapping(cluster, pdm, tier, q4, q1, q3);
+
+  if (!profileKey || !state.profiles || !state.profiles[profileKey]) {
+    return _fallbackResult(q4, seniority_escalation);
+  }
+
+  let profile = JSON.parse(JSON.stringify(state.profiles[profileKey]));
+  const resolvedTier = profile.tier;
+  if (seniority_escalation) profile = _applySeniority(profile, cluster, pdm);
+
+  return { profileKey, profile, tier: resolvedTier, paradigm: pdm, seniority_escalation, isTriage: false, isGuided: false };
 }
 
 function _buildResult(key, pdm, sen, isTriage, isGuided) {
