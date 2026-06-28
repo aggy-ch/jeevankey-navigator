@@ -76,41 +76,6 @@
           <span class="btn-icon">⚖️</span>
           <span class="btn-main"><span data-i18n="q0_a3_main"></span><span class="btn-sub" data-i18n="q0_a3_sub"></span></span>
         </button>
-        <button class="answer-btn" onclick="selectQ0('guided')" data-val="guided">
-          <span class="btn-icon">🤔</span>
-          <span class="btn-main"><span data-i18n="q0_a4_main"></span><span class="btn-sub" data-i18n="q0_a4_sub"></span></span>
-        </button>
-      </div>
-    </div>
-
-    <!-- ══ Q5 — CONFIDENCE CHECK ══ -->
-    <div class="screen" id="screen-q5">
-      <nav class="nav">
-        <a class="logo" href="#">Jeevan<span>Key</span></a>
-        <select class="lang-select" onchange="setLang(this.value)">
-          <option value="en">English</option><option value="hi">हिंदी</option>
-          <option value="gu">ગુજરાતી</option><option value="mr">मराठी</option>
-          <option value="bn">বাংলা</option><option value="ta">தமிழ்</option>
-          <option value="te">తెలుగు</option><option value="kn">ಕನ್ನಡ</option>
-          <option value="ml">മലയാളം</option>
-        </select>
-      </nav>
-      <div class="step-counter" id="q5-counter"></div>
-      <div class="progress-track"><div class="progress-fill" id="q5-fill" style="width:25%"></div></div>
-      <h2 class="q-text" data-i18n="q5_text"></h2>
-      <div class="answers" id="q5-answers">
-        <button class="answer-btn" onclick="selectQ5('clear')" data-val="clear">
-          <span class="btn-icon">🎯</span>
-          <span class="btn-main"><span data-i18n="q5_a1_main"></span><span class="btn-sub" data-i18n="q5_a1_sub"></span></span>
-        </button>
-        <button class="answer-btn" onclick="selectQ5('dissatisfied')" data-val="dissatisfied">
-          <span class="btn-icon">🔄</span>
-          <span class="btn-main"><span data-i18n="q5_a2_main"></span><span class="btn-sub" data-i18n="q5_a2_sub"></span></span>
-        </button>
-        <button class="answer-btn" onclick="selectQ5('confused')" data-val="confused">
-          <span class="btn-icon">🌫️</span>
-          <span class="btn-main"><span data-i18n="q5_a3_main"></span><span class="btn-sub" data-i18n="q5_a3_sub"></span></span>
-        </button>
       </div>
     </div>
 
@@ -264,18 +229,6 @@
       <div class="matching-pulse">🔬</div>
       <h2 class="matching-title" data-i18n="matching_title"></h2>
       <p class="matching-sub" data-i18n="matching_sub"></p>
-    </div>
-
-    <!-- ══ TRIAGE ══ -->
-    <div class="screen" id="screen-triage">
-      <div class="triage-icon">🤝</div>
-      <h2 class="triage-title" data-i18n="triage_title"></h2>
-      <p class="triage-body" data-i18n="triage_body"></p>
-      <button class="whatsapp-btn" onclick="openTriageWhatsApp()">
-        <span class="btn-icon">💬</span><span data-i18n="triage_btn">Talk to a Coordinator →</span>
-      </button>
-      <p class="cta-note" data-i18n="triage_note"></p>
-      <button class="restart-btn" onclick="restart()" data-i18n="restart">← Start over</button>
     </div>
 
     <!-- ══ RESULT ══ -->
