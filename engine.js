@@ -487,15 +487,14 @@ function _selectMapping(cluster, pdm, tier, q4, q1, q3) {
 function _applySeniority(profile, cluster, pdm) {
   const a = profile.team[0];
   if (pdm === 'ALT') {
-      if (cluster === 'H') {
-        a.detail = 'Senior specialist (8+ years reproductive medicine). ' + a.detail;
-      } else if (a.name && a.name.includes('BHMS')) {
-        a.name = 'Senior BHMS Doctor (8+ years experience)';
-        a.detail = 'Senior homeopathic practitioner. ' + a.detail;
-      } else {
-        a.name = 'Senior Ayurvedic Doctor (8+ years experience)';
-        a.detail = 'Senior practitioner. ' + a.detail;
-      }
+    if (cluster === 'H') {
+      a.detail = 'Senior specialist (8+ years reproductive medicine). ' + a.detail;
+    } else if (a.name && a.name.includes('BHMS')) {
+      a.name = 'Senior BHMS Doctor (8+ years experience)';
+      a.detail = 'Senior homeopathic practitioner. ' + a.detail;
+    } else {
+      a.name = 'Senior Ayurvedic Doctor (8+ years experience)';
+      a.detail = 'Senior practitioner. ' + a.detail;
     }
   } else {
     if (cluster === 'D' || cluster === 'H') {
