@@ -580,11 +580,9 @@ function renderResultUI() {
 
   const subEl = document.getElementById('result-sub');
   if (subEl) subEl.textContent = profile.sub;
-
   document.getElementById('alt-track-banner').classList.toggle('visible', paradigm === 'ALT');
   document.getElementById('seniority-notice').classList.toggle('visible', seniority_escalation);
-  document.getElementById('triage-notice').classList.toggle('visible', isTriage);
-
+   
   const grid = document.getElementById('team-grid');
   grid.innerHTML = '';
   profile.team.forEach((m, idx) => {
